@@ -6,10 +6,6 @@ import sqlite3
 from datetime import datetime
 import json
 
-# Define the output directory
-OUTPUT_DIR = "job_listings/active"
-os.makedirs(OUTPUT_DIR, exist_ok=True)
-
 category_job_id = 1
 category_name = "active"
 
