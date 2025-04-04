@@ -2,9 +2,12 @@
 
 ## the script is set up to retrieve only a small sample rather than scraping everything available
 
-#### subids_to_sample = ["1", "8"]  # Only 2 categories
-### max_jobs_per_category = 3  # Only 3 jobs per category
+____________________
 
+#### subids_to_sample = ["1", "8"]  # Only 2 categories
+#### max_jobs_per_category = 3  # Only 3 jobs per category
+
+____________________
 
 This application consists of two main components:
 1. A job scraper that collects job listings from JobIndex and stores them in a SQLite database
