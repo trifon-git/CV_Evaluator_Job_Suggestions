@@ -39551,3 +39551,108 @@ Call log:
 
 2025-04-06 12:32:24 - [Job ID: 8526] No content found on attempt 3
 2025-04-06 12:32:25 - No content retrieved for job ID: 8526
+2025-04-06 12:32:39 - [Job ID: 7736] Attempt 3 failed: Page.goto: Timeout 15000ms exceeded.
+Call log:
+  - navigating to "https://www.jobindex.dk/jobannonce/h1549689/senior-finance-controller-for-esg-and-financial-data", waiting until "networkidle"
+
+2025-04-06 12:32:39 - [Job ID: 7736] All attempts failed for https://www.jobindex.dk/jobannonce/h1549689/senior-finance-controller-for-esg-and-financial-data
+2025-04-06 12:32:40 - No content retrieved for job ID: 7736
+2025-04-06 12:32:41 - Processing jobs 51 to 60 of 8032...
+2025-04-06 12:32:43 - [Job ID: 11273] Attempt 1: Accessing https://candidate.hr-manager.net/ApplicationInit.aspx?cid=316&ProjectId=187892&DepartmentId=9824&MediaId=5
+2025-04-06 12:32:43 - [Job ID: 11451] Attempt 1: Accessing https://bestseller-as.contactrh.com/jobs/10895/43292383/en_GB
+2025-04-06 12:32:44 - [Job ID: 11718] Attempt 1: Accessing https://www.jobindex.dk/img/pdf/supplychain_logisticsmanager.pdf
+2025-04-06 12:32:44 - [Job ID: 11718] Attempt 1 failed: Page.goto: Download is starting
+Call log:
+  - navigating to "https://www.jobindex.dk/img/pdf/supplychain_logisticsmanager.pdf", waiting until "networkidle"
+
+2025-04-06 12:32:44 - [Job ID: 11367] Attempt 1: Accessing https://candidate.hr-manager.net/ApplicationInit.aspx?cid=316&ProjectId=187853&DepartmentId=9823&MediaId=5
+2025-04-06 12:32:45 - [Job ID: 9976] Attempt 1: Accessing https://www.jobindex.dk/img/pdf/skovhaven_paedagogiskssa-soeges.pdf
+2025-04-06 12:32:46 - [Job ID: 9976] Attempt 1 failed: Page.goto: Download is starting
+Call log:
+  - navigating to "https://www.jobindex.dk/img/pdf/skovhaven_paedagogiskssa-soeges.pdf", waiting until "networkidle"
+
+2025-04-06 12:32:46 - [Job ID: 11050] Attempt 1: Accessing https://www.jobindex.dk/img/pdf/majinvest_communicationsmanager_20250321_lost.pdf
+2025-04-06 12:32:47 - [Job ID: 11638] Attempt 1: Accessing https://www.jobindex.dk/img/pdf/purchaser_houno_0425.pdf
+2025-04-06 12:32:47 - [Job ID: 11050] Attempt 1 failed: Page.goto: Download is starting
+Call log:
+  - navigating to "https://www.jobindex.dk/img/pdf/majinvest_communicationsmanager_20250321_lost.pdf", waiting until "networkidle"
+
+2025-04-06 12:32:48 - [Job ID: 11638] Attempt 1 failed: Page.goto: Download is starting
+Call log:
+  - navigating to "https://www.jobindex.dk/img/pdf/purchaser_houno_0425.pdf", waiting until "networkidle"
+
+2025-04-06 12:32:48 - [Job ID: 11718] Attempt 2: Accessing https://www.jobindex.dk/img/pdf/supplychain_logisticsmanager.pdf
+2025-04-06 12:32:48 - [Job ID: 11718] Attempt 2 failed: Page.goto: Download is starting
+Call log:
+  - navigating to "https://www.jobindex.dk/img/pdf/supplychain_logisticsmanager.pdf", waiting until "networkidle"
+
+2025-04-06 12:32:48 - [Job ID: 11478] Attempt 1: Accessing https://www.jobindex.dk/img/pdf/indkoeber_stilling.pdf
+2025-04-06 12:32:49 - [Job ID: 11478] Attempt 1 failed: Page.goto: Download is starting
+Call log:
+  - navigating to "https://www.jobindex.dk/img/pdf/indkoeber_stilling.pdf", waiting until "networkidle"
+
+2025-04-06 12:32:49 - [Job ID: 11473] Attempt 1: Accessing https://careers-dn-merlinentertainments.icims.com/jobs/6644/senior-procurement-manager---europe/job?mobile=false&width=1280&height=500&bga=true&needsRedirect=false&jan1offset=60&jun1offset=120
+2025-04-06 12:32:49 - [Job ID: 11376] Attempt 1: Accessing https://candidate.hr-manager.net/ApplicationInit.aspx?cid=316&ProjectId=187823&DepartmentId=9823&MediaId=5
+2025-04-06 12:32:49 - [Job ID: 9976] Attempt 2: Accessing https://www.jobindex.dk/img/pdf/skovhaven_paedagogiskssa-soeges.pdf
+2025-04-06 12:32:49 - [Job ID: 9976] Attempt 2 failed: Page.goto: Download is starting
+Call log:
+  - navigating to "https://www.jobindex.dk/img/pdf/skovhaven_paedagogiskssa-soeges.pdf", waiting until "networkidle"
+
+2025-04-06 12:32:50 - [Job ID: 11050] Attempt 2: Accessing https://www.jobindex.dk/img/pdf/majinvest_communicationsmanager_20250321_lost.pdf
+2025-04-06 12:32:50 - [Job ID: 11050] Attempt 2 failed: Page.goto: Download is starting
+Call log:
+  - navigating to "https://www.jobindex.dk/img/pdf/majinvest_communicationsmanager_20250321_lost.pdf", waiting until "networkidle"
+
+2025-04-06 12:32:51 - [Job ID: 11638] Attempt 2: Accessing https://www.jobindex.dk/img/pdf/purchaser_houno_0425.pdf
+2025-04-06 12:32:51 - [Job ID: 11638] Attempt 2 failed: Page.goto: Download is starting
+Call log:
+  - navigating to "https://www.jobindex.dk/img/pdf/purchaser_houno_0425.pdf", waiting until "networkidle"
+
+2025-04-06 12:32:51 - [Job ID: 11718] Attempt 3: Accessing https://www.jobindex.dk/img/pdf/supplychain_logisticsmanager.pdf
+2025-04-06 12:32:51 - [Job ID: 11718] Attempt 3 failed: Page.goto: Download is starting
+Call log:
+  - navigating to "https://www.jobindex.dk/img/pdf/supplychain_logisticsmanager.pdf", waiting until "networkidle"
+
+2025-04-06 12:32:52 - [Job ID: 11718] All attempts failed for https://www.jobindex.dk/img/pdf/supplychain_logisticsmanager.pdf
+2025-04-06 12:32:52 - [Job ID: 11478] Attempt 2: Accessing https://www.jobindex.dk/img/pdf/indkoeber_stilling.pdf
+2025-04-06 12:32:52 - [Job ID: 11478] Attempt 2 failed: Page.goto: Download is starting
+Call log:
+  - navigating to "https://www.jobindex.dk/img/pdf/indkoeber_stilling.pdf", waiting until "networkidle"
+
+2025-04-06 12:32:52 - No content retrieved for job ID: 11718
+2025-04-06 12:32:53 - [Job ID: 9976] Attempt 3: Accessing https://www.jobindex.dk/img/pdf/skovhaven_paedagogiskssa-soeges.pdf
+2025-04-06 12:32:53 - [Job ID: 9976] Attempt 3 failed: Page.goto: Download is starting
+Call log:
+  - navigating to "https://www.jobindex.dk/img/pdf/skovhaven_paedagogiskssa-soeges.pdf", waiting until "networkidle"
+
+2025-04-06 12:32:53 - [Job ID: 9976] All attempts failed for https://www.jobindex.dk/img/pdf/skovhaven_paedagogiskssa-soeges.pdf
+2025-04-06 12:32:54 - No content retrieved for job ID: 9976
+2025-04-06 12:32:54 - [Job ID: 11050] Attempt 3: Accessing https://www.jobindex.dk/img/pdf/majinvest_communicationsmanager_20250321_lost.pdf
+2025-04-06 12:32:54 - [Job ID: 11050] Attempt 3 failed: Page.goto: Download is starting
+Call log:
+  - navigating to "https://www.jobindex.dk/img/pdf/majinvest_communicationsmanager_20250321_lost.pdf", waiting until "networkidle"
+
+2025-04-06 12:32:54 - [Job ID: 11638] Attempt 3: Accessing https://www.jobindex.dk/img/pdf/purchaser_houno_0425.pdf
+2025-04-06 12:32:54 - [Job ID: 11050] All attempts failed for https://www.jobindex.dk/img/pdf/majinvest_communicationsmanager_20250321_lost.pdf
+2025-04-06 12:32:54 - [Job ID: 11638] Attempt 3 failed: Page.goto: Download is starting
+Call log:
+  - navigating to "https://www.jobindex.dk/img/pdf/purchaser_houno_0425.pdf", waiting until "networkidle"
+
+2025-04-06 12:32:55 - [Job ID: 11638] All attempts failed for https://www.jobindex.dk/img/pdf/purchaser_houno_0425.pdf
+2025-04-06 12:32:55 - No content retrieved for job ID: 11050
+2025-04-06 12:32:55 - [Job ID: 11478] Attempt 3: Accessing https://www.jobindex.dk/img/pdf/indkoeber_stilling.pdf
+2025-04-06 12:32:55 - [Job ID: 11478] Attempt 3 failed: Page.goto: Download is starting
+Call log:
+  - navigating to "https://www.jobindex.dk/img/pdf/indkoeber_stilling.pdf", waiting until "networkidle"
+
+2025-04-06 12:32:55 - No content retrieved for job ID: 11638
+2025-04-06 12:32:56 - [Job ID: 11478] All attempts failed for https://www.jobindex.dk/img/pdf/indkoeber_stilling.pdf
+2025-04-06 12:32:56 - No content retrieved for job ID: 11478
+2025-04-06 12:32:58 - [Job ID: 11273] Attempt 1 failed: Page.goto: Timeout 15000ms exceeded.
+Call log:
+  - navigating to "https://candidate.hr-manager.net/ApplicationInit.aspx?cid=316&ProjectId=187892&DepartmentId=9824&MediaId=5", waiting until "networkidle"
+
+2025-04-06 12:32:58 - [Job ID: 11451] Attempt 1 failed: Page.goto: Timeout 15000ms exceeded.
+Call log:
+  - navigating to "https://bestseller-as.contactrh.com/jobs/10895/43292383/en_GB", waiting until "networkidle"
+
