@@ -145,51 +145,63 @@ async def scrape_job_content(conn, job_id, url):
     except Exception as e:
         log_message(f"Error processing job ID {job_id}: {e}")
 
+# Add after imports
+PROGRESS_FILE = "scraping_progress.txt"
+
+def save_progress(last_id):
+    """Save the last processed job ID."""
+    with open(PROGRESS_FILE, "w") as f:
+        f.write(str(last_id))
+
+def load_progress():
+    """Load the last processed job ID."""
+    try:
+        with open(PROGRESS_FILE, "r") as f:
+            return int(f.read().strip())
+    except:
+        return 0  # Start from beginning if no progress file
+
 async def process_jobs_in_batches(batch_size=10):
     """Process jobs from database in batches."""
     try:
         conn = sqlite3.connect(DB_PATH)
         cursor = conn.cursor()
         
-        # Get total count first
-        cursor.execute('''
-            SELECT COUNT(*) FROM jobs 
-            WHERE html_content IS NULL 
-            AND application_url IS NOT NULL
-        ''')
-        total_jobs = cursor.fetchone()[0]
+        # Load last processed ID
+        last_processed_id = load_progress()
+        log_message(f"Resuming from job ID: {last_processed_id}")
         
-        # Process in smaller chunks with offset
-        offset = 0
-        while offset < total_jobs:
+        while True:
             cursor.execute('''
                 SELECT id, application_url 
                 FROM jobs 
                 WHERE html_content IS NULL 
                 AND application_url IS NOT NULL
+                AND id > ?
                 ORDER BY id
-                LIMIT ? OFFSET ?
-            ''', (batch_size, offset))
+                LIMIT ?
+            ''', (last_processed_id, batch_size))
             
             jobs = cursor.fetchall()
             if not jobs:
+                log_message("No more jobs to process. Finished!")
                 break
                 
-            log_message(f"Processing jobs {offset+1} to {offset+len(jobs)} of {total_jobs}...")
+            log_message(f"Processing jobs {jobs[0][0]} to {jobs[-1][0]}")
             
-            # Process one batch at a time
             tasks = [scrape_job_content(None, job_id, url) for job_id, url in jobs if url]
             if tasks:
                 await asyncio.gather(*tasks)
+                last_processed_id = jobs[-1][0]
+                save_progress(last_processed_id)
             
-            offset += batch_size
-            await asyncio.sleep(1)  # Small delay between batches
+            await asyncio.sleep(1)
             
         conn.close()
-        log_message("All jobs processed successfully!")
         
     except Exception as e:
         log_message(f"Database error: {e}")
+        save_progress(last_processed_id)  # Save progress even on error
 
 async def main():
     try:

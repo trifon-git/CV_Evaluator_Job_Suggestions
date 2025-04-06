@@ -111,8 +111,71 @@ def insert_jobs(conn, jobs_data, category_id):
             continue
     conn.commit()
 
+# Add near the top with other constants
+JOB_AGE_PARAM = "jobage=1"  # Change this value as needed (1=New, 2=Recent, 3=Older)
+
+def log_message(message):
+    """Log a message with timestamp."""
+    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    print(f"{timestamp} - {message}")
+
+def check_and_remove_duplicates(conn):
+    """Check for and remove duplicate jobs based on title, keeping only one."""
+    cursor = conn.cursor()
+    
+    try:
+        # Query to find duplicates by title
+        cursor.execute('''
+            SELECT title, COUNT(*) as count
+            FROM jobs
+            GROUP BY title
+            HAVING COUNT(*) > 1
+        ''')
+        
+        duplicates = cursor.fetchall()
+        
+        if not duplicates:
+            log_message("No duplicate jobs found")
+            return
+            
+        log_message(f"Found {len(duplicates)} sets of duplicates")
+        
+        for dup in duplicates:
+            title, count = dup
+            log_message(f"\nProcessing duplicates for title: {title}")
+            
+            # Get all IDs for these duplicates, ordered by ID
+            cursor.execute('''
+                SELECT id FROM jobs
+                WHERE title = ?
+                ORDER BY id
+            ''', (title,))
+            
+            ids = [row[0] for row in cursor.fetchall()]
+            
+            # Keep the first ID and delete the rest
+            keep_id = ids[0]
+            delete_ids = ids[1:]
+            
+            if delete_ids:
+                cursor.execute('''
+                    DELETE FROM jobs
+                    WHERE id IN ({})
+                '''.format(','.join('?' for _ in delete_ids)), delete_ids)
+                
+                conn.commit()
+                log_message(f"Kept ID {keep_id}, deleted IDs: {delete_ids}")
+            else:
+                log_message(f"No duplicates to delete for title: {title}")
+                
+        log_message("\nDuplicate removal completed")
+        
+    except sqlite3.Error as e:
+        log_message(f"Database error: {e}")
+        conn.rollback()
+
 def fetch_job_listings(keyword, page_limit=1, subid="1"):
-    base_url = f"https://www.jobindex.dk/jobsoegning.json?subid={subid}"
+    base_url = f"https://www.jobindex.dk/jobsoegning.json?subid={subid}&{JOB_AGE_PARAM}"
     job_listings = []
 
     for page in range(1, page_limit + 1):
@@ -230,7 +293,11 @@ def main():
             print(f"\nScraping jobs for subid {subid} ({info['category']})...")
             scrape_jobs(conn, keyword, info['id'], page_limit, subid)
 
-        print("\nAll categories completed.")
+        # Check for and remove duplicates after all scraping is done
+        log_message("\nStarting duplicate check...")
+        check_and_remove_duplicates(conn)
+        
+        print("\nAll categories completed and duplicates removed.")
         conn.close()
     except Exception as e:
         print(f"Critical error in the scraping pipeline: {e}")
