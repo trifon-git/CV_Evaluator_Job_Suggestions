@@ -39360,3 +39360,194 @@ Call log:
   - navigating to "https://www.godtsmil.dk/ledige-stillinger/?hr=show-job%2F249620%26locale%3Dda_DK", waiting until "networkidle"
 
 2025-04-06 12:31:28 - [Job ID: 7584] Attempt 3: Accessing https://www.godtsmil.dk/ledige-stillinger/?hr=show-job%2F249620%26locale%3Dda_DK
+2025-04-06 12:31:43 - [Job ID: 7584] Attempt 3 failed: Page.goto: Timeout 15000ms exceeded.
+Call log:
+  - navigating to "https://www.godtsmil.dk/ledige-stillinger/?hr=show-job%2F249620%26locale%3Dda_DK", waiting until "networkidle"
+
+2025-04-06 12:31:43 - [Job ID: 7584] All attempts failed for https://www.godtsmil.dk/ledige-stillinger/?hr=show-job%2F249620%26locale%3Dda_DK
+2025-04-06 12:31:44 - No content retrieved for job ID: 7584
+2025-04-06 12:31:45 - Processing jobs 41 to 50 of 8032...
+2025-04-06 12:31:46 - [Job ID: 7860] Attempt 1: Accessing https://www.jobindex.dk/img/pdf/intersource_20250312sul.pdf
+2025-04-06 12:31:47 - [Job ID: 8971] Attempt 1: Accessing https://www.jobindex.dk/img/pdf/stillingsopslagtipsvaengetapril2025.pdf
+2025-04-06 12:31:47 - [Job ID: 7860] Attempt 1 failed: Page.goto: Download is starting
+Call log:
+  - navigating to "https://www.jobindex.dk/img/pdf/intersource_20250312sul.pdf", waiting until "networkidle"
+
+2025-04-06 12:31:47 - [Job ID: 7736] Attempt 1: Accessing https://www.jobindex.dk/jobannonce/h1549689/senior-finance-controller-for-esg-and-financial-data
+2025-04-06 12:31:47 - [Job ID: 8971] Attempt 1 failed: Page.goto: Download is starting
+Call log:
+  - navigating to "https://www.jobindex.dk/img/pdf/stillingsopslagtipsvaengetapril2025.pdf", waiting until "networkidle"
+
+2025-04-06 12:31:48 - [Job ID: 8540] Attempt 1: Accessing https://lagkagehuset.youngcrm.com/jobportal/11074?utm_source=youngcrm&utm_medium=notification&utm_campaign=media
+2025-04-06 12:31:49 - [Job ID: 8473] Attempt 1: Accessing https://lagkagehuset.youngcrm.com/jobportal/11124?utm_source=youngcrm&utm_medium=notification&utm_campaign=media
+2025-04-06 12:31:49 - [Job ID: 8526] Attempt 1: Accessing https://lagkagehuset.youngcrm.com/jobportal/11097?utm_source=youngcrm&utm_medium=notification&utm_campaign=media
+2025-04-06 12:31:50 - [Job ID: 8474] Attempt 1: Accessing https://lagkagehuset.youngcrm.com/jobportal/11123?utm_source=youngcrm&utm_medium=notification&utm_campaign=media
+2025-04-06 12:31:50 - [Job ID: 7860] Attempt 2: Accessing https://www.jobindex.dk/img/pdf/intersource_20250312sul.pdf
+2025-04-06 12:31:50 - [Job ID: 7860] Attempt 2 failed: Page.goto: Download is starting
+Call log:
+  - navigating to "https://www.jobindex.dk/img/pdf/intersource_20250312sul.pdf", waiting until "networkidle"
+
+2025-04-06 12:31:51 - [Job ID: 8971] Attempt 2: Accessing https://www.jobindex.dk/img/pdf/stillingsopslagtipsvaengetapril2025.pdf
+2025-04-06 12:31:51 - [Job ID: 8971] Attempt 2 failed: Page.goto: Download is starting
+Call log:
+  - navigating to "https://www.jobindex.dk/img/pdf/stillingsopslagtipsvaengetapril2025.pdf", waiting until "networkidle"
+
+2025-04-06 12:31:51 - [Job ID: 7746] Attempt 1: Accessing https://www.jobindex.dk/img/pdf/jcnboligmac2025.pdf
+2025-04-06 12:31:52 - [Job ID: 7746] Attempt 1 failed: Page.goto: Download is starting
+Call log:
+  - navigating to "https://www.jobindex.dk/img/pdf/jcnboligmac2025.pdf", waiting until "networkidle"
+
+2025-04-06 12:31:52 - [Job ID: 9519] Attempt 1: Accessing https://www.polyteknik.com/wp-content/uploads/2025/03/Finmekanisk-komponent_montage_03_2025.pdf
+2025-04-06 12:31:53 - [Job ID: 8817] Attempt 1: Accessing https://www.jobindex.dk/img/pdf/jobannonce_tmrere_04_25-2.pdf
+2025-04-06 12:31:54 - [Job ID: 9519] Attempt 1 failed: Page.goto: Download is starting
+Call log:
+  - navigating to "https://www.polyteknik.com/wp-content/uploads/2025/03/Finmekanisk-komponent_montage_03_2025.pdf", waiting until "networkidle"
+
+2025-04-06 12:31:54 - [Job ID: 7860] Attempt 3: Accessing https://www.jobindex.dk/img/pdf/intersource_20250312sul.pdf
+2025-04-06 12:31:54 - [Job ID: 7860] Attempt 3 failed: Page.goto: Download is starting
+Call log:
+  - navigating to "https://www.jobindex.dk/img/pdf/intersource_20250312sul.pdf", waiting until "networkidle"
+
+2025-04-06 12:31:54 - [Job ID: 8971] Attempt 3: Accessing https://www.jobindex.dk/img/pdf/stillingsopslagtipsvaengetapril2025.pdf
+2025-04-06 12:31:54 - [Job ID: 7860] All attempts failed for https://www.jobindex.dk/img/pdf/intersource_20250312sul.pdf
+2025-04-06 12:31:55 - [Job ID: 8971] Attempt 3 failed: Page.goto: Download is starting
+Call log:
+  - navigating to "https://www.jobindex.dk/img/pdf/stillingsopslagtipsvaengetapril2025.pdf", waiting until "networkidle"
+
+2025-04-06 12:31:55 - [Job ID: 8971] All attempts failed for https://www.jobindex.dk/img/pdf/stillingsopslagtipsvaengetapril2025.pdf
+2025-04-06 12:31:55 - [Job ID: 7746] Attempt 2: Accessing https://www.jobindex.dk/img/pdf/jcnboligmac2025.pdf
+2025-04-06 12:31:55 - [Job ID: 7746] Attempt 2 failed: Page.goto: Download is starting
+Call log:
+  - navigating to "https://www.jobindex.dk/img/pdf/jcnboligmac2025.pdf", waiting until "networkidle"
+
+2025-04-06 12:31:56 - No content retrieved for job ID: 8971
+2025-04-06 12:31:56 - No content retrieved for job ID: 7860
+2025-04-06 12:31:57 - [Job ID: 8817] Attempt 1 failed: Page.goto: Download is starting
+Call log:
+  - navigating to "https://www.jobindex.dk/img/pdf/jobannonce_tmrere_04_25-2.pdf", waiting until "networkidle"
+
+2025-04-06 12:31:57 - [Job ID: 9519] Attempt 2: Accessing https://www.polyteknik.com/wp-content/uploads/2025/03/Finmekanisk-komponent_montage_03_2025.pdf
+2025-04-06 12:31:57 - [Job ID: 9519] Attempt 2 failed: Page.goto: Download is starting
+Call log:
+  - navigating to "https://www.polyteknik.com/wp-content/uploads/2025/03/Finmekanisk-komponent_montage_03_2025.pdf", waiting until "networkidle"
+
+2025-04-06 12:31:59 - [Job ID: 7746] Attempt 3: Accessing https://www.jobindex.dk/img/pdf/jcnboligmac2025.pdf
+2025-04-06 12:31:59 - [Job ID: 7746] Attempt 3 failed: Page.goto: Download is starting
+Call log:
+  - navigating to "https://www.jobindex.dk/img/pdf/jcnboligmac2025.pdf", waiting until "networkidle"
+
+2025-04-06 12:31:59 - [Job ID: 7746] All attempts failed for https://www.jobindex.dk/img/pdf/jcnboligmac2025.pdf
+2025-04-06 12:32:00 - No content retrieved for job ID: 7746
+2025-04-06 12:32:00 - [Job ID: 8817] Attempt 2: Accessing https://www.jobindex.dk/img/pdf/jobannonce_tmrere_04_25-2.pdf
+2025-04-06 12:32:00 - [Job ID: 8817] Attempt 2 failed: Page.goto: Download is starting
+Call log:
+  - navigating to "https://www.jobindex.dk/img/pdf/jobannonce_tmrere_04_25-2.pdf", waiting until "networkidle"
+
+2025-04-06 12:32:01 - [Job ID: 9519] Attempt 3: Accessing https://www.polyteknik.com/wp-content/uploads/2025/03/Finmekanisk-komponent_montage_03_2025.pdf
+2025-04-06 12:32:01 - [Job ID: 9519] Attempt 3 failed: Page.goto: Download is starting
+Call log:
+  - navigating to "https://www.polyteknik.com/wp-content/uploads/2025/03/Finmekanisk-komponent_montage_03_2025.pdf", waiting until "networkidle"
+
+2025-04-06 12:32:01 - [Job ID: 9519] All attempts failed for https://www.polyteknik.com/wp-content/uploads/2025/03/Finmekanisk-komponent_montage_03_2025.pdf
+2025-04-06 12:32:02 - No content retrieved for job ID: 9519
+2025-04-06 12:32:02 - [Job ID: 7736] Attempt 1 failed: Page.goto: Timeout 15000ms exceeded.
+Call log:
+  - navigating to "https://www.jobindex.dk/jobannonce/h1549689/senior-finance-controller-for-esg-and-financial-data", waiting until "networkidle"
+
+2025-04-06 12:32:04 - [Job ID: 8817] Attempt 3: Accessing https://www.jobindex.dk/img/pdf/jobannonce_tmrere_04_25-2.pdf
+2025-04-06 12:32:04 - [Job ID: 8817] Attempt 3 failed: Page.goto: Download is starting
+Call log:
+  - navigating to "https://www.jobindex.dk/img/pdf/jobannonce_tmrere_04_25-2.pdf", waiting until "networkidle"
+
+2025-04-06 12:32:04 - [Job ID: 8817] All attempts failed for https://www.jobindex.dk/img/pdf/jobannonce_tmrere_04_25-2.pdf
+2025-04-06 12:32:05 - No content retrieved for job ID: 8817
+2025-04-06 12:32:05 - Error extracting HTML from frames: Page.wait_for_selector: Timeout 5000ms exceeded.
+Call log:
+  - waiting for locator("body") to be visible
+  -     14 × locator resolved to hidden <body id="signup" class="    hasHover">…</body>
+
+2025-04-06 12:32:05 - [Job ID: 8540] No content found on attempt 1
+2025-04-06 12:32:05 - [Job ID: 8540] Attempt 2: Accessing https://lagkagehuset.youngcrm.com/jobportal/11074?utm_source=youngcrm&utm_medium=notification&utm_campaign=media
+2025-04-06 12:32:06 - Error extracting HTML from frames: Page.wait_for_selector: Timeout 5000ms exceeded.
+Call log:
+  - waiting for locator("body") to be visible
+  -     14 × locator resolved to hidden <body id="signup" class="    hasHover">…</body>
+
+2025-04-06 12:32:06 - [Job ID: 8474] No content found on attempt 1
+2025-04-06 12:32:06 - [Job ID: 8474] Attempt 2: Accessing https://lagkagehuset.youngcrm.com/jobportal/11123?utm_source=youngcrm&utm_medium=notification&utm_campaign=media
+2025-04-06 12:32:06 - [Job ID: 7736] Attempt 2: Accessing https://www.jobindex.dk/jobannonce/h1549689/senior-finance-controller-for-esg-and-financial-data
+2025-04-06 12:32:06 - Error extracting HTML from frames: Page.wait_for_selector: Timeout 5000ms exceeded.
+Call log:
+  - waiting for locator("body") to be visible
+  -     14 × locator resolved to hidden <body id="signup" class="    hasHover">…</body>
+
+2025-04-06 12:32:06 - [Job ID: 8473] No content found on attempt 1
+2025-04-06 12:32:06 - [Job ID: 8473] Attempt 2: Accessing https://lagkagehuset.youngcrm.com/jobportal/11124?utm_source=youngcrm&utm_medium=notification&utm_campaign=media
+2025-04-06 12:32:08 - Error extracting HTML from frames: Page.wait_for_selector: Timeout 5000ms exceeded.
+Call log:
+  - waiting for locator("body") to be visible
+  -     14 × locator resolved to hidden <body id="signup" class="    hasHover">…</body>
+
+2025-04-06 12:32:08 - [Job ID: 8526] No content found on attempt 1
+2025-04-06 12:32:08 - [Job ID: 8526] Attempt 2: Accessing https://lagkagehuset.youngcrm.com/jobportal/11097?utm_source=youngcrm&utm_medium=notification&utm_campaign=media
+2025-04-06 12:32:14 - Error extracting HTML from frames: Page.wait_for_selector: Timeout 5000ms exceeded.
+Call log:
+  - waiting for locator("body") to be visible
+  -     14 × locator resolved to hidden <body id="signup" class="    hasHover">…</body>
+
+2025-04-06 12:32:14 - [Job ID: 8540] No content found on attempt 2
+2025-04-06 12:32:14 - [Job ID: 8540] Attempt 3: Accessing https://lagkagehuset.youngcrm.com/jobportal/11074?utm_source=youngcrm&utm_medium=notification&utm_campaign=media
+2025-04-06 12:32:14 - Error extracting HTML from frames: Page.wait_for_selector: Timeout 5000ms exceeded.
+Call log:
+  - waiting for locator("body") to be visible
+  -     14 × locator resolved to hidden <body id="signup" class="    hasHover">…</body>
+
+2025-04-06 12:32:14 - [Job ID: 8474] No content found on attempt 2
+2025-04-06 12:32:14 - [Job ID: 8474] Attempt 3: Accessing https://lagkagehuset.youngcrm.com/jobportal/11123?utm_source=youngcrm&utm_medium=notification&utm_campaign=media
+2025-04-06 12:32:14 - Error extracting HTML from frames: Page.wait_for_selector: Timeout 5000ms exceeded.
+Call log:
+  - waiting for locator("body") to be visible
+  -     14 × locator resolved to hidden <body id="signup" class="    hasHover">…</body>
+
+2025-04-06 12:32:14 - [Job ID: 8473] No content found on attempt 2
+2025-04-06 12:32:14 - [Job ID: 8473] Attempt 3: Accessing https://lagkagehuset.youngcrm.com/jobportal/11124?utm_source=youngcrm&utm_medium=notification&utm_campaign=media
+2025-04-06 12:32:16 - Error extracting HTML from frames: Page.wait_for_selector: Timeout 5000ms exceeded.
+Call log:
+  - waiting for locator("body") to be visible
+  -     14 × locator resolved to hidden <body id="signup" class="    hasHover">…</body>
+
+2025-04-06 12:32:16 - [Job ID: 8526] No content found on attempt 2
+2025-04-06 12:32:16 - [Job ID: 8526] Attempt 3: Accessing https://lagkagehuset.youngcrm.com/jobportal/11097?utm_source=youngcrm&utm_medium=notification&utm_campaign=media
+2025-04-06 12:32:21 - [Job ID: 7736] Attempt 2 failed: Page.goto: Timeout 15000ms exceeded.
+Call log:
+  - navigating to "https://www.jobindex.dk/jobannonce/h1549689/senior-finance-controller-for-esg-and-financial-data", waiting until "networkidle"
+
+2025-04-06 12:32:22 - Error extracting HTML from frames: Page.wait_for_selector: Timeout 5000ms exceeded.
+Call log:
+  - waiting for locator("body") to be visible
+  -     14 × locator resolved to hidden <body id="signup" class="    hasHover">…</body>
+
+2025-04-06 12:32:22 - [Job ID: 8474] No content found on attempt 3
+2025-04-06 12:32:22 - Error extracting HTML from frames: Page.wait_for_selector: Timeout 5000ms exceeded.
+Call log:
+  - waiting for locator("body") to be visible
+  -     14 × locator resolved to hidden <body id="signup" class="    hasHover">…</body>
+
+2025-04-06 12:32:22 - [Job ID: 8540] No content found on attempt 3
+2025-04-06 12:32:22 - Error extracting HTML from frames: Page.wait_for_selector: Timeout 5000ms exceeded.
+Call log:
+  - waiting for locator("body") to be visible
+  -     14 × locator resolved to hidden <body id="signup" class="    hasHover">…</body>
+
+2025-04-06 12:32:22 - [Job ID: 8473] No content found on attempt 3
+2025-04-06 12:32:23 - No content retrieved for job ID: 8474
+2025-04-06 12:32:23 - No content retrieved for job ID: 8540
+2025-04-06 12:32:23 - No content retrieved for job ID: 8473
+2025-04-06 12:32:24 - [Job ID: 7736] Attempt 3: Accessing https://www.jobindex.dk/jobannonce/h1549689/senior-finance-controller-for-esg-and-financial-data
+2025-04-06 12:32:24 - Error extracting HTML from frames: Page.wait_for_selector: Timeout 5000ms exceeded.
+Call log:
+  - waiting for locator("body") to be visible
+  -     14 × locator resolved to hidden <body id="signup" class="    hasHover">…</body>
+
+2025-04-06 12:32:24 - [Job ID: 8526] No content found on attempt 3
+2025-04-06 12:32:25 - No content retrieved for job ID: 8526
