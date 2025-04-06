@@ -39656,3 +39656,28 @@ Call log:
 Call log:
   - navigating to "https://bestseller-as.contactrh.com/jobs/10895/43292383/en_GB", waiting until "networkidle"
 
+2025-04-06 12:32:59 - [Job ID: 11367] Attempt 1 failed: Page.goto: Timeout 15000ms exceeded.
+Call log:
+  - navigating to "https://candidate.hr-manager.net/ApplicationInit.aspx?cid=316&ProjectId=187853&DepartmentId=9823&MediaId=5", waiting until "networkidle"
+
+2025-04-06 12:33:01 - [Job ID: 11273] Attempt 2: Accessing https://candidate.hr-manager.net/ApplicationInit.aspx?cid=316&ProjectId=187892&DepartmentId=9824&MediaId=5
+2025-04-06 12:33:01 - [Job ID: 11451] Attempt 2: Accessing https://bestseller-as.contactrh.com/jobs/10895/43292383/en_GB
+2025-04-06 12:33:04 - [Job ID: 11473] Attempt 1 failed: Page.goto: Timeout 15000ms exceeded.
+Call log:
+  - navigating to "https://careers-dn-merlinentertainments.icims.com/jobs/6644/senior-procurement-manager---europe/job?mobile=false&width=1280&height=500&bga=true&needsRedirect=false&jan1offset=60&jun1offset=120", waiting until "networkidle"
+
+2025-04-06 12:33:04 - [Job ID: 11376] Attempt 1 failed: Page.goto: Timeout 15000ms exceeded.
+Call log:
+  - navigating to "https://candidate.hr-manager.net/ApplicationInit.aspx?cid=316&ProjectId=187823&DepartmentId=9823&MediaId=5", waiting until "networkidle"
+
+2025-04-06 12:33:04 - [Job ID: 11367] Attempt 2: Accessing https://candidate.hr-manager.net/ApplicationInit.aspx?cid=316&ProjectId=187853&DepartmentId=9823&MediaId=5
+2025-04-06 12:33:07 - [Job ID: 11473] Attempt 2: Accessing https://careers-dn-merlinentertainments.icims.com/jobs/6644/senior-procurement-manager---europe/job?mobile=false&width=1280&height=500&bga=true&needsRedirect=false&jan1offset=60&jun1offset=120
+2025-04-06 12:33:07 - [Job ID: 11376] Attempt 2: Accessing https://candidate.hr-manager.net/ApplicationInit.aspx?cid=316&ProjectId=187823&DepartmentId=9823&MediaId=5
+2025-04-06 12:33:16 - [Job ID: 11273] Attempt 2 failed: Page.goto: Timeout 15000ms exceeded.
+Call log:
+  - navigating to "https://candidate.hr-manager.net/ApplicationInit.aspx?cid=316&ProjectId=187892&DepartmentId=9824&MediaId=5", waiting until "networkidle"
+
+2025-04-06 12:33:16 - [Job ID: 11451] Attempt 2 failed: Page.goto: Timeout 15000ms exceeded.
+Call log:
+  - navigating to "https://bestseller-as.contactrh.com/jobs/10895/43292383/en_GB", waiting until "networkidle"
+
