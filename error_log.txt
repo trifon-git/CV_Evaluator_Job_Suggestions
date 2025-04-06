@@ -38639,3 +38639,724 @@ Call log:
 2025-04-06 12:14:49 - Updated content for job ID: 14910
 2025-04-06 12:14:49 - Updated content for job ID: 14927
 2025-04-06 12:14:50 - Updated content for job ID: 14914
+2025-04-06 12:28:18 - Updated content for job ID: 14913
+2025-04-06 12:28:18 - Updated content for job ID: 14911
+2025-04-06 12:28:18 - Updated content for job ID: 14912
+2025-04-06 12:28:20 - Processing jobs 1 to 10 of 8032...
+2025-04-06 12:28:21 - [Job ID: 798] Attempt 1: Accessing https://candidate.hr-manager.net/ApplicationInit.aspx?cid=316&ProjectId=187819&DepartmentId=21678&MediaId=5
+2025-04-06 12:28:22 - [Job ID: 1134] Attempt 1: Accessing https://www.jobindex.dk/jobannonce/h1538739/it-specialist-cax
+2025-04-06 12:28:22 - [Job ID: 675] Attempt 1: Accessing https://www.jobindex.dk/img/pdf/scleroseforeningen_crm_manager.pdf
+2025-04-06 12:28:23 - [Job ID: 675] Attempt 1 failed: Page.goto: Download is starting
+Call log:
+  - navigating to "https://www.jobindex.dk/img/pdf/scleroseforeningen_crm_manager.pdf", waiting until "networkidle"
+
+2025-04-06 12:28:23 - [Job ID: 1098] Attempt 1: Accessing https://candidate.hr-manager.net/ApplicationInit.aspx?cid=316&ProjectId=187792&DepartmentId=21682&MediaId=5
+2025-04-06 12:28:24 - [Job ID: 1036] Attempt 1: Accessing https://www.jobindex.dk/img/pdf/job_annonce_2025_application-manager.pdf
+2025-04-06 12:28:25 - [Job ID: 1036] Attempt 1 failed: Page.goto: Download is starting
+Call log:
+  - navigating to "https://www.jobindex.dk/img/pdf/job_annonce_2025_application-manager.pdf", waiting until "networkidle"
+
+2025-04-06 12:28:25 - [Job ID: 914] Attempt 1: Accessing https://candidate.hr-manager.net/ApplicationInit.aspx?cid=316&ProjectId=187871&DepartmentId=9823&MediaId=5
+2025-04-06 12:28:26 - [Job ID: 326] Attempt 1: Accessing https://www.jobindex.dk/jobannonce/h1539409/senior-software-developer-front-end
+2025-04-06 12:28:26 - [Job ID: 675] Attempt 2: Accessing https://www.jobindex.dk/img/pdf/scleroseforeningen_crm_manager.pdf
+2025-04-06 12:28:26 - [Job ID: 675] Attempt 2 failed: Page.goto: Download is starting
+Call log:
+  - navigating to "https://www.jobindex.dk/img/pdf/scleroseforeningen_crm_manager.pdf", waiting until "networkidle"
+
+2025-04-06 12:28:27 - [Job ID: 1069] Attempt 1: Accessing https://www.jobindex.dk/img/pdf/teamlead.pdf
+2025-04-06 12:28:28 - [Job ID: 895] Attempt 1: Accessing https://www.jobindex.dk/img/pdf/it-medarbejder-til-skanol-april-2025.pdf
+2025-04-06 12:28:28 - [Job ID: 916] Attempt 1: Accessing https://candidate.hr-manager.net/ApplicationInit.aspx?cid=316&ProjectId=187855&DepartmentId=21682&MediaId=5
+2025-04-06 12:28:28 - [Job ID: 1036] Attempt 2: Accessing https://www.jobindex.dk/img/pdf/job_annonce_2025_application-manager.pdf
+2025-04-06 12:28:29 - [Job ID: 1036] Attempt 2 failed: Page.goto: Download is starting
+Call log:
+  - navigating to "https://www.jobindex.dk/img/pdf/job_annonce_2025_application-manager.pdf", waiting until "networkidle"
+
+2025-04-06 12:28:29 - [Job ID: 1069] Attempt 1 failed: Page.goto: Download is starting
+Call log:
+  - navigating to "https://www.jobindex.dk/img/pdf/teamlead.pdf", waiting until "networkidle"
+
+2025-04-06 12:28:29 - [Job ID: 895] Attempt 1 failed: Page.goto: Download is starting
+Call log:
+  - navigating to "https://www.jobindex.dk/img/pdf/it-medarbejder-til-skanol-april-2025.pdf", waiting until "networkidle"
+
+2025-04-06 12:28:30 - [Job ID: 675] Attempt 3: Accessing https://www.jobindex.dk/img/pdf/scleroseforeningen_crm_manager.pdf
+2025-04-06 12:28:30 - [Job ID: 675] Attempt 3 failed: Page.goto: Download is starting
+Call log:
+  - navigating to "https://www.jobindex.dk/img/pdf/scleroseforeningen_crm_manager.pdf", waiting until "networkidle"
+
+2025-04-06 12:28:30 - [Job ID: 675] All attempts failed for https://www.jobindex.dk/img/pdf/scleroseforeningen_crm_manager.pdf
+2025-04-06 12:28:31 - No content retrieved for job ID: 675
+2025-04-06 12:28:32 - [Job ID: 1036] Attempt 3: Accessing https://www.jobindex.dk/img/pdf/job_annonce_2025_application-manager.pdf
+2025-04-06 12:28:32 - [Job ID: 1036] Attempt 3 failed: Page.goto: Download is starting
+Call log:
+  - navigating to "https://www.jobindex.dk/img/pdf/job_annonce_2025_application-manager.pdf", waiting until "networkidle"
+
+2025-04-06 12:28:32 - [Job ID: 1069] Attempt 2: Accessing https://www.jobindex.dk/img/pdf/teamlead.pdf
+2025-04-06 12:28:32 - [Job ID: 1036] All attempts failed for https://www.jobindex.dk/img/pdf/job_annonce_2025_application-manager.pdf
+2025-04-06 12:28:32 - [Job ID: 1069] Attempt 2 failed: Page.goto: Download is starting
+Call log:
+  - navigating to "https://www.jobindex.dk/img/pdf/teamlead.pdf", waiting until "networkidle"
+
+2025-04-06 12:28:32 - [Job ID: 895] Attempt 2: Accessing https://www.jobindex.dk/img/pdf/it-medarbejder-til-skanol-april-2025.pdf
+2025-04-06 12:28:33 - [Job ID: 895] Attempt 2 failed: Page.goto: Download is starting
+Call log:
+  - navigating to "https://www.jobindex.dk/img/pdf/it-medarbejder-til-skanol-april-2025.pdf", waiting until "networkidle"
+
+2025-04-06 12:28:33 - No content retrieved for job ID: 1036
+2025-04-06 12:28:36 - [Job ID: 1069] Attempt 3: Accessing https://www.jobindex.dk/img/pdf/teamlead.pdf
+2025-04-06 12:28:36 - [Job ID: 1069] Attempt 3 failed: Page.goto: Download is starting
+Call log:
+  - navigating to "https://www.jobindex.dk/img/pdf/teamlead.pdf", waiting until "networkidle"
+
+2025-04-06 12:28:36 - [Job ID: 895] Attempt 3: Accessing https://www.jobindex.dk/img/pdf/it-medarbejder-til-skanol-april-2025.pdf
+2025-04-06 12:28:36 - [Job ID: 895] Attempt 3 failed: Page.goto: Download is starting
+Call log:
+  - navigating to "https://www.jobindex.dk/img/pdf/it-medarbejder-til-skanol-april-2025.pdf", waiting until "networkidle"
+
+2025-04-06 12:28:36 - [Job ID: 1069] All attempts failed for https://www.jobindex.dk/img/pdf/teamlead.pdf
+2025-04-06 12:28:36 - [Job ID: 895] All attempts failed for https://www.jobindex.dk/img/pdf/it-medarbejder-til-skanol-april-2025.pdf
+2025-04-06 12:28:36 - [Job ID: 798] Attempt 1 failed: Page.goto: Timeout 15000ms exceeded.
+Call log:
+  - navigating to "https://candidate.hr-manager.net/ApplicationInit.aspx?cid=316&ProjectId=187819&DepartmentId=21678&MediaId=5", waiting until "networkidle"
+
+2025-04-06 12:28:37 - No content retrieved for job ID: 1069
+2025-04-06 12:28:37 - [Job ID: 1134] Attempt 1 failed: Page.goto: Timeout 15000ms exceeded.
+Call log:
+  - navigating to "https://www.jobindex.dk/jobannonce/h1538739/it-specialist-cax", waiting until "networkidle"
+
+2025-04-06 12:28:37 - No content retrieved for job ID: 895
+2025-04-06 12:28:38 - [Job ID: 1098] Attempt 1 failed: Page.goto: Timeout 15000ms exceeded.
+Call log:
+  - navigating to "https://candidate.hr-manager.net/ApplicationInit.aspx?cid=316&ProjectId=187792&DepartmentId=21682&MediaId=5", waiting until "networkidle"
+
+2025-04-06 12:28:40 - [Job ID: 798] Attempt 2: Accessing https://candidate.hr-manager.net/ApplicationInit.aspx?cid=316&ProjectId=187819&DepartmentId=21678&MediaId=5
+2025-04-06 12:28:40 - [Job ID: 1134] Attempt 2: Accessing https://www.jobindex.dk/jobannonce/h1538739/it-specialist-cax
+2025-04-06 12:28:40 - [Job ID: 914] Attempt 1 failed: Page.goto: Timeout 15000ms exceeded.
+Call log:
+  - navigating to "https://candidate.hr-manager.net/ApplicationInit.aspx?cid=316&ProjectId=187871&DepartmentId=9823&MediaId=5", waiting until "networkidle"
+
+2025-04-06 12:28:41 - [Job ID: 326] Attempt 1 failed: Page.goto: Timeout 15000ms exceeded.
+Call log:
+  - navigating to "https://www.jobindex.dk/jobannonce/h1539409/senior-software-developer-front-end", waiting until "networkidle"
+
+2025-04-06 12:28:42 - [Job ID: 1098] Attempt 2: Accessing https://candidate.hr-manager.net/ApplicationInit.aspx?cid=316&ProjectId=187792&DepartmentId=21682&MediaId=5
+2025-04-06 12:28:43 - [Job ID: 916] Attempt 1 failed: Page.goto: Timeout 15000ms exceeded.
+Call log:
+  - navigating to "https://candidate.hr-manager.net/ApplicationInit.aspx?cid=316&ProjectId=187855&DepartmentId=21682&MediaId=5", waiting until "networkidle"
+
+2025-04-06 12:28:44 - [Job ID: 914] Attempt 2: Accessing https://candidate.hr-manager.net/ApplicationInit.aspx?cid=316&ProjectId=187871&DepartmentId=9823&MediaId=5
+2025-04-06 12:28:44 - [Job ID: 326] Attempt 2: Accessing https://www.jobindex.dk/jobannonce/h1539409/senior-software-developer-front-end
+2025-04-06 12:28:46 - [Job ID: 916] Attempt 2: Accessing https://candidate.hr-manager.net/ApplicationInit.aspx?cid=316&ProjectId=187855&DepartmentId=21682&MediaId=5
+2025-04-06 12:28:55 - [Job ID: 798] Attempt 2 failed: Page.goto: Timeout 15000ms exceeded.
+Call log:
+  - navigating to "https://candidate.hr-manager.net/ApplicationInit.aspx?cid=316&ProjectId=187819&DepartmentId=21678&MediaId=5", waiting until "networkidle"
+
+2025-04-06 12:28:55 - [Job ID: 1134] Attempt 2 failed: Page.goto: Timeout 15000ms exceeded.
+Call log:
+  - navigating to "https://www.jobindex.dk/jobannonce/h1538739/it-specialist-cax", waiting until "networkidle"
+
+2025-04-06 12:28:57 - [Job ID: 1098] Attempt 2 failed: Page.goto: Timeout 15000ms exceeded.
+Call log:
+  - navigating to "https://candidate.hr-manager.net/ApplicationInit.aspx?cid=316&ProjectId=187792&DepartmentId=21682&MediaId=5", waiting until "networkidle"
+
+2025-04-06 12:28:59 - [Job ID: 798] Attempt 3: Accessing https://candidate.hr-manager.net/ApplicationInit.aspx?cid=316&ProjectId=187819&DepartmentId=21678&MediaId=5
+2025-04-06 12:28:59 - [Job ID: 914] Attempt 2 failed: Page.goto: Timeout 15000ms exceeded.
+Call log:
+  - navigating to "https://candidate.hr-manager.net/ApplicationInit.aspx?cid=316&ProjectId=187871&DepartmentId=9823&MediaId=5", waiting until "networkidle"
+
+2025-04-06 12:28:59 - [Job ID: 1134] Attempt 3: Accessing https://www.jobindex.dk/jobannonce/h1538739/it-specialist-cax
+2025-04-06 12:28:59 - [Job ID: 326] Attempt 2 failed: Page.goto: Timeout 15000ms exceeded.
+Call log:
+  - navigating to "https://www.jobindex.dk/jobannonce/h1539409/senior-software-developer-front-end", waiting until "networkidle"
+
+2025-04-06 12:29:01 - [Job ID: 1098] Attempt 3: Accessing https://candidate.hr-manager.net/ApplicationInit.aspx?cid=316&ProjectId=187792&DepartmentId=21682&MediaId=5
+2025-04-06 12:29:01 - [Job ID: 916] Attempt 2 failed: Page.goto: Timeout 15000ms exceeded.
+Call log:
+  - navigating to "https://candidate.hr-manager.net/ApplicationInit.aspx?cid=316&ProjectId=187855&DepartmentId=21682&MediaId=5", waiting until "networkidle"
+
+2025-04-06 12:29:03 - [Job ID: 914] Attempt 3: Accessing https://candidate.hr-manager.net/ApplicationInit.aspx?cid=316&ProjectId=187871&DepartmentId=9823&MediaId=5
+2025-04-06 12:29:03 - [Job ID: 326] Attempt 3: Accessing https://www.jobindex.dk/jobannonce/h1539409/senior-software-developer-front-end
+2025-04-06 12:29:04 - [Job ID: 916] Attempt 3: Accessing https://candidate.hr-manager.net/ApplicationInit.aspx?cid=316&ProjectId=187855&DepartmentId=21682&MediaId=5
+2025-04-06 12:29:14 - [Job ID: 798] Attempt 3 failed: Page.goto: Timeout 15000ms exceeded.
+Call log:
+  - navigating to "https://candidate.hr-manager.net/ApplicationInit.aspx?cid=316&ProjectId=187819&DepartmentId=21678&MediaId=5", waiting until "networkidle"
+
+2025-04-06 12:29:14 - [Job ID: 798] All attempts failed for https://candidate.hr-manager.net/ApplicationInit.aspx?cid=316&ProjectId=187819&DepartmentId=21678&MediaId=5
+2025-04-06 12:29:14 - [Job ID: 1134] Attempt 3 failed: Page.goto: Timeout 15000ms exceeded.
+Call log:
+  - navigating to "https://www.jobindex.dk/jobannonce/h1538739/it-specialist-cax", waiting until "networkidle"
+
+2025-04-06 12:29:14 - [Job ID: 1134] All attempts failed for https://www.jobindex.dk/jobannonce/h1538739/it-specialist-cax
+2025-04-06 12:29:15 - No content retrieved for job ID: 798
+2025-04-06 12:29:15 - No content retrieved for job ID: 1134
+2025-04-06 12:29:16 - [Job ID: 1098] Attempt 3 failed: Page.goto: Timeout 15000ms exceeded.
+Call log:
+  - navigating to "https://candidate.hr-manager.net/ApplicationInit.aspx?cid=316&ProjectId=187792&DepartmentId=21682&MediaId=5", waiting until "networkidle"
+
+2025-04-06 12:29:16 - [Job ID: 1098] All attempts failed for https://candidate.hr-manager.net/ApplicationInit.aspx?cid=316&ProjectId=187792&DepartmentId=21682&MediaId=5
+2025-04-06 12:29:16 - No content retrieved for job ID: 1098
+2025-04-06 12:29:18 - [Job ID: 914] Attempt 3 failed: Page.goto: Timeout 15000ms exceeded.
+Call log:
+  - navigating to "https://candidate.hr-manager.net/ApplicationInit.aspx?cid=316&ProjectId=187871&DepartmentId=9823&MediaId=5", waiting until "networkidle"
+
+2025-04-06 12:29:18 - [Job ID: 914] All attempts failed for https://candidate.hr-manager.net/ApplicationInit.aspx?cid=316&ProjectId=187871&DepartmentId=9823&MediaId=5
+2025-04-06 12:29:18 - [Job ID: 326] Attempt 3 failed: Page.goto: Timeout 15000ms exceeded.
+Call log:
+  - navigating to "https://www.jobindex.dk/jobannonce/h1539409/senior-software-developer-front-end", waiting until "networkidle"
+
+2025-04-06 12:29:18 - [Job ID: 326] All attempts failed for https://www.jobindex.dk/jobannonce/h1539409/senior-software-developer-front-end
+2025-04-06 12:29:19 - [Job ID: 916] Attempt 3 failed: Page.goto: Timeout 15000ms exceeded.
+Call log:
+  - navigating to "https://candidate.hr-manager.net/ApplicationInit.aspx?cid=316&ProjectId=187855&DepartmentId=21682&MediaId=5", waiting until "networkidle"
+
+2025-04-06 12:29:20 - [Job ID: 916] All attempts failed for https://candidate.hr-manager.net/ApplicationInit.aspx?cid=316&ProjectId=187855&DepartmentId=21682&MediaId=5
+2025-04-06 12:29:22 - No content retrieved for job ID: 326
+2025-04-06 12:29:22 - No content retrieved for job ID: 914
+2025-04-06 12:29:22 - No content retrieved for job ID: 916
+2025-04-06 12:29:23 - Processing jobs 11 to 20 of 8032...
+2025-04-06 12:29:26 - [Job ID: 2413] Attempt 1: Accessing https://lagkagehuset.youngcrm.com/jobportal/11173?utm_source=youngcrm&utm_medium=notification&utm_campaign=media
+2025-04-06 12:29:26 - [Job ID: 4361] Attempt 1: Accessing https://esmark.dk/jobs/esmark-soger-en-passioneret-bureauchef-til-blavand/
+2025-04-06 12:29:26 - [Job ID: 4688] Attempt 1: Accessing http://kiso.dk/images/pdf/Stillingsannonce_Administrativ_Medarbejder_2025-2.pdf
+2025-04-06 12:29:27 - [Job ID: 4688] Attempt 1 failed: Page.goto: Download is starting
+Call log:
+  - navigating to "http://kiso.dk/images/pdf/Stillingsannonce_Administrativ_Medarbejder_2025-2.pdf", waiting until "networkidle"
+
+2025-04-06 12:29:27 - [Job ID: 1350] Attempt 1: Accessing https://candidate.hr-manager.net/ApplicationInit.aspx?cid=316&ProjectId=187761&DepartmentId=21682&MediaId=5
+2025-04-06 12:29:28 - [Job ID: 4991] Attempt 1: Accessing https://www.elevportalen.dk/31349/aros-revision-soger-revisortrainees-til-aarhus
+2025-04-06 12:29:28 - [Job ID: 4513] Attempt 1: Accessing https://ilva.youngcrm.com/jobportal/11046
+2025-04-06 12:29:29 - [Job ID: 2414] Attempt 1: Accessing https://lagkagehuset.youngcrm.com/jobportal/11174?utm_source=youngcrm&utm_medium=notification&utm_campaign=media
+2025-04-06 12:29:30 - [Job ID: 1670] Attempt 1: Accessing https://candidate.hr-manager.net/ApplicationInit.aspx?cid=316&ProjectId=187832&DepartmentId=9824&MediaId=5
+2025-04-06 12:29:30 - [Job ID: 4688] Attempt 2: Accessing http://kiso.dk/images/pdf/Stillingsannonce_Administrativ_Medarbejder_2025-2.pdf
+2025-04-06 12:29:30 - [Job ID: 4688] Attempt 2 failed: Page.goto: Download is starting
+Call log:
+  - navigating to "http://kiso.dk/images/pdf/Stillingsannonce_Administrativ_Medarbejder_2025-2.pdf", waiting until "networkidle"
+
+2025-04-06 12:29:30 - [Job ID: 2418] Attempt 1: Accessing https://www.jobindex.dk/jobannonce/h1554107/senior-people-partner
+2025-04-06 12:29:31 - [Job ID: 4853] Attempt 1: Accessing https://www.jobindex.dk/img/pdf/tv2_nordkontorelev.pdf
+2025-04-06 12:29:32 - [Job ID: 4853] Attempt 1 failed: Page.goto: Download is starting
+Call log:
+  - navigating to "https://www.jobindex.dk/img/pdf/tv2_nordkontorelev.pdf", waiting until "networkidle"
+
+2025-04-06 12:29:33 - [Job ID: 4688] Attempt 3: Accessing http://kiso.dk/images/pdf/Stillingsannonce_Administrativ_Medarbejder_2025-2.pdf
+2025-04-06 12:29:34 - [Job ID: 4688] Attempt 3 failed: Page.goto: Download is starting
+Call log:
+  - navigating to "http://kiso.dk/images/pdf/Stillingsannonce_Administrativ_Medarbejder_2025-2.pdf", waiting until "networkidle"
+
+2025-04-06 12:29:34 - [Job ID: 4688] All attempts failed for http://kiso.dk/images/pdf/Stillingsannonce_Administrativ_Medarbejder_2025-2.pdf
+2025-04-06 12:29:34 - No content retrieved for job ID: 4688
+2025-04-06 12:29:34 - Error extracting HTML from frames: Page.wait_for_selector: Timeout 5000ms exceeded.
+Call log:
+  - waiting for locator("body") to be visible
+  -     14 × locator resolved to hidden <body id="signup" class="    hasHover">…</body>
+
+2025-04-06 12:29:34 - [Job ID: 2413] No content found on attempt 1
+2025-04-06 12:29:34 - [Job ID: 2413] Attempt 2: Accessing https://lagkagehuset.youngcrm.com/jobportal/11173?utm_source=youngcrm&utm_medium=notification&utm_campaign=media
+2025-04-06 12:29:35 - [Job ID: 4853] Attempt 2: Accessing https://www.jobindex.dk/img/pdf/tv2_nordkontorelev.pdf
+2025-04-06 12:29:35 - [Job ID: 4853] Attempt 2 failed: Page.goto: Download is starting
+Call log:
+  - navigating to "https://www.jobindex.dk/img/pdf/tv2_nordkontorelev.pdf", waiting until "networkidle"
+
+2025-04-06 12:29:38 - [Job ID: 4853] Attempt 3: Accessing https://www.jobindex.dk/img/pdf/tv2_nordkontorelev.pdf
+2025-04-06 12:29:39 - [Job ID: 4853] Attempt 3 failed: Page.goto: Download is starting
+Call log:
+  - navigating to "https://www.jobindex.dk/img/pdf/tv2_nordkontorelev.pdf", waiting until "networkidle"
+
+2025-04-06 12:29:39 - [Job ID: 4853] All attempts failed for https://www.jobindex.dk/img/pdf/tv2_nordkontorelev.pdf
+2025-04-06 12:29:40 - No content retrieved for job ID: 4853
+2025-04-06 12:29:40 - Error extracting HTML from frames: Page.wait_for_selector: Timeout 5000ms exceeded.
+Call log:
+  - waiting for locator("body") to be visible
+  -     14 × locator resolved to hidden <body id="signup" class="    hasHover">…</body>
+
+2025-04-06 12:29:40 - [Job ID: 2414] No content found on attempt 1
+2025-04-06 12:29:40 - [Job ID: 2414] Attempt 2: Accessing https://lagkagehuset.youngcrm.com/jobportal/11174?utm_source=youngcrm&utm_medium=notification&utm_campaign=media
+2025-04-06 12:29:41 - [Job ID: 4361] Attempt 1 failed: Page.goto: Timeout 15000ms exceeded.
+Call log:
+  - navigating to "https://esmark.dk/jobs/esmark-soger-en-passioneret-bureauchef-til-blavand/", waiting until "networkidle"
+
+2025-04-06 12:29:41 - Error extracting HTML from frames: Page.wait_for_selector: Timeout 5000ms exceeded.
+Call log:
+  - waiting for locator("body") to be visible
+  -     14 × locator resolved to hidden <body id="signup" class="    hasHover">…</body>
+
+2025-04-06 12:29:41 - [Job ID: 2413] No content found on attempt 2
+2025-04-06 12:29:41 - [Job ID: 2413] Attempt 3: Accessing https://lagkagehuset.youngcrm.com/jobportal/11173?utm_source=youngcrm&utm_medium=notification&utm_campaign=media
+2025-04-06 12:29:42 - [Job ID: 1350] Attempt 1 failed: Page.goto: Timeout 15000ms exceeded.
+Call log:
+  - navigating to "https://candidate.hr-manager.net/ApplicationInit.aspx?cid=316&ProjectId=187761&DepartmentId=21682&MediaId=5", waiting until "networkidle"
+
+2025-04-06 12:29:43 - [Job ID: 4991] Attempt 1 failed: Page.goto: Timeout 15000ms exceeded.
+Call log:
+  - navigating to "https://www.elevportalen.dk/31349/aros-revision-soger-revisortrainees-til-aarhus", waiting until "networkidle"
+
+2025-04-06 12:29:44 - Error extracting HTML from frames: Page.wait_for_selector: Timeout 5000ms exceeded.
+Call log:
+  - waiting for locator("body") to be visible
+  -     14 × locator resolved to hidden <body id="signup" class="    hasHover">…</body>
+
+2025-04-06 12:29:44 - [Job ID: 4513] No content found on attempt 1
+2025-04-06 12:29:44 - [Job ID: 4513] Attempt 2: Accessing https://ilva.youngcrm.com/jobportal/11046
+2025-04-06 12:29:44 - [Job ID: 4361] Attempt 2: Accessing https://esmark.dk/jobs/esmark-soger-en-passioneret-bureauchef-til-blavand/
+2025-04-06 12:29:45 - [Job ID: 1670] Attempt 1 failed: Page.goto: Timeout 15000ms exceeded.
+Call log:
+  - navigating to "https://candidate.hr-manager.net/ApplicationInit.aspx?cid=316&ProjectId=187832&DepartmentId=9824&MediaId=5", waiting until "networkidle"
+
+2025-04-06 12:29:45 - [Job ID: 2418] Attempt 1 failed: Page.goto: Timeout 15000ms exceeded.
+Call log:
+  - navigating to "https://www.jobindex.dk/jobannonce/h1554107/senior-people-partner", waiting until "networkidle"
+
+2025-04-06 12:29:45 - [Job ID: 1350] Attempt 2: Accessing https://candidate.hr-manager.net/ApplicationInit.aspx?cid=316&ProjectId=187761&DepartmentId=21682&MediaId=5
+2025-04-06 12:29:46 - [Job ID: 4991] Attempt 2: Accessing https://www.elevportalen.dk/31349/aros-revision-soger-revisortrainees-til-aarhus
+2025-04-06 12:29:47 - Error extracting HTML from frames: Page.wait_for_selector: Timeout 5000ms exceeded.
+Call log:
+  - waiting for locator("body") to be visible
+  -     14 × locator resolved to hidden <body id="signup" class="    hasHover">…</body>
+
+2025-04-06 12:29:47 - [Job ID: 2414] No content found on attempt 2
+2025-04-06 12:29:47 - [Job ID: 2414] Attempt 3: Accessing https://lagkagehuset.youngcrm.com/jobportal/11174?utm_source=youngcrm&utm_medium=notification&utm_campaign=media
+2025-04-06 12:29:48 - [Job ID: 1670] Attempt 2: Accessing https://candidate.hr-manager.net/ApplicationInit.aspx?cid=316&ProjectId=187832&DepartmentId=9824&MediaId=5
+2025-04-06 12:29:48 - Error extracting HTML from frames: Page.wait_for_selector: Timeout 5000ms exceeded.
+Call log:
+  - waiting for locator("body") to be visible
+  -     14 × locator resolved to hidden <body id="signup" class="    hasHover">…</body>
+
+2025-04-06 12:29:48 - [Job ID: 2413] No content found on attempt 3
+2025-04-06 12:29:49 - [Job ID: 2418] Attempt 2: Accessing https://www.jobindex.dk/jobannonce/h1554107/senior-people-partner
+2025-04-06 12:29:49 - No content retrieved for job ID: 2413
+2025-04-06 12:29:50 - Error extracting HTML from frames: Page.wait_for_selector: Timeout 5000ms exceeded.
+Call log:
+  - waiting for locator("body") to be visible
+  -     14 × locator resolved to hidden <body id="signup" class="    hasHover">…</body>
+
+2025-04-06 12:29:50 - [Job ID: 4513] No content found on attempt 2
+2025-04-06 12:29:50 - [Job ID: 4513] Attempt 3: Accessing https://ilva.youngcrm.com/jobportal/11046
+2025-04-06 12:29:54 - Error extracting HTML from frames: Page.wait_for_selector: Timeout 5000ms exceeded.
+Call log:
+  - waiting for locator("body") to be visible
+  -     14 × locator resolved to hidden <body id="signup" class="    hasHover">…</body>
+
+2025-04-06 12:29:54 - [Job ID: 2414] No content found on attempt 3
+2025-04-06 12:29:57 - Error extracting HTML from frames: Page.wait_for_selector: Timeout 5000ms exceeded.
+Call log:
+  - waiting for locator("body") to be visible
+  -     14 × locator resolved to hidden <body id="signup" class="    hasHover">…</body>
+
+2025-04-06 12:29:57 - [Job ID: 4513] No content found on attempt 3
+2025-04-06 12:29:59 - [Job ID: 4361] Attempt 2 failed: Page.goto: Timeout 15000ms exceeded.
+Call log:
+  - navigating to "https://esmark.dk/jobs/esmark-soger-en-passioneret-bureauchef-til-blavand/", waiting until "networkidle"
+
+2025-04-06 12:30:00 - [Job ID: 1350] Attempt 2 failed: Page.goto: Timeout 15000ms exceeded.
+Call log:
+  - navigating to "https://candidate.hr-manager.net/ApplicationInit.aspx?cid=316&ProjectId=187761&DepartmentId=21682&MediaId=5", waiting until "networkidle"
+
+2025-04-06 12:30:01 - [Job ID: 4991] Attempt 2 failed: Page.goto: Timeout 15000ms exceeded.
+Call log:
+  - navigating to "https://www.elevportalen.dk/31349/aros-revision-soger-revisortrainees-til-aarhus", waiting until "networkidle"
+
+2025-04-06 12:30:03 - [Job ID: 4361] Attempt 3: Accessing https://esmark.dk/jobs/esmark-soger-en-passioneret-bureauchef-til-blavand/
+2025-04-06 12:30:03 - [Job ID: 1670] Attempt 2 failed: Page.goto: Timeout 15000ms exceeded.
+Call log:
+  - navigating to "https://candidate.hr-manager.net/ApplicationInit.aspx?cid=316&ProjectId=187832&DepartmentId=9824&MediaId=5", waiting until "networkidle"
+
+2025-04-06 12:30:04 - [Job ID: 2418] Attempt 2 failed: Page.goto: Timeout 15000ms exceeded.
+Call log:
+  - navigating to "https://www.jobindex.dk/jobannonce/h1554107/senior-people-partner", waiting until "networkidle"
+
+2025-04-06 12:30:04 - [Job ID: 1350] Attempt 3: Accessing https://candidate.hr-manager.net/ApplicationInit.aspx?cid=316&ProjectId=187761&DepartmentId=21682&MediaId=5
+2025-04-06 12:30:05 - [Job ID: 4991] Attempt 3: Accessing https://www.elevportalen.dk/31349/aros-revision-soger-revisortrainees-til-aarhus
+2025-04-06 12:30:06 - No content retrieved for job ID: 2414
+2025-04-06 12:30:06 - [Job ID: 1670] Attempt 3: Accessing https://candidate.hr-manager.net/ApplicationInit.aspx?cid=316&ProjectId=187832&DepartmentId=9824&MediaId=5
+2025-04-06 12:30:07 - [Job ID: 2418] Attempt 3: Accessing https://www.jobindex.dk/jobannonce/h1554107/senior-people-partner
+2025-04-06 12:30:11 - No content retrieved for job ID: 4513
+2025-04-06 12:30:18 - [Job ID: 4361] Attempt 3 failed: Page.goto: Timeout 15000ms exceeded.
+Call log:
+  - navigating to "https://esmark.dk/jobs/esmark-soger-en-passioneret-bureauchef-til-blavand/", waiting until "networkidle"
+
+2025-04-06 12:30:18 - [Job ID: 4361] All attempts failed for https://esmark.dk/jobs/esmark-soger-en-passioneret-bureauchef-til-blavand/
+2025-04-06 12:30:19 - No content retrieved for job ID: 4361
+2025-04-06 12:30:19 - [Job ID: 1350] Attempt 3 failed: Page.goto: Timeout 15000ms exceeded.
+Call log:
+  - navigating to "https://candidate.hr-manager.net/ApplicationInit.aspx?cid=316&ProjectId=187761&DepartmentId=21682&MediaId=5", waiting until "networkidle"
+
+2025-04-06 12:30:19 - [Job ID: 1350] All attempts failed for https://candidate.hr-manager.net/ApplicationInit.aspx?cid=316&ProjectId=187761&DepartmentId=21682&MediaId=5
+2025-04-06 12:30:20 - No content retrieved for job ID: 1350
+2025-04-06 12:30:20 - [Job ID: 4991] Attempt 3 failed: Page.goto: Timeout 15000ms exceeded.
+Call log:
+  - navigating to "https://www.elevportalen.dk/31349/aros-revision-soger-revisortrainees-til-aarhus", waiting until "networkidle"
+
+2025-04-06 12:30:20 - [Job ID: 4991] All attempts failed for https://www.elevportalen.dk/31349/aros-revision-soger-revisortrainees-til-aarhus
+2025-04-06 12:30:20 - No content retrieved for job ID: 4991
+2025-04-06 12:30:21 - [Job ID: 1670] Attempt 3 failed: Page.goto: Timeout 15000ms exceeded.
+Call log:
+  - navigating to "https://candidate.hr-manager.net/ApplicationInit.aspx?cid=316&ProjectId=187832&DepartmentId=9824&MediaId=5", waiting until "networkidle"
+
+2025-04-06 12:30:22 - [Job ID: 1670] All attempts failed for https://candidate.hr-manager.net/ApplicationInit.aspx?cid=316&ProjectId=187832&DepartmentId=9824&MediaId=5
+2025-04-06 12:30:22 - [Job ID: 2418] Attempt 3 failed: Page.goto: Timeout 15000ms exceeded.
+Call log:
+  - navigating to "https://www.jobindex.dk/jobannonce/h1554107/senior-people-partner", waiting until "networkidle"
+
+2025-04-06 12:30:22 - No content retrieved for job ID: 1670
+2025-04-06 12:30:22 - [Job ID: 2418] All attempts failed for https://www.jobindex.dk/jobannonce/h1554107/senior-people-partner
+2025-04-06 12:30:23 - No content retrieved for job ID: 2418
+2025-04-06 12:30:24 - Processing jobs 21 to 30 of 8032...
+2025-04-06 12:30:25 - [Job ID: 5748] Attempt 1: Accessing https://www.jobindex.dk/img/pdf/nypaedagogstilling_teaterboerneinstitutionen_marts2025.pdf
+2025-04-06 12:30:26 - [Job ID: 6913] Attempt 1: Accessing https://www.jobindex.dk/img/pdf/aabenraafriskole_laerere.pdf
+2025-04-06 12:30:26 - [Job ID: 5748] Attempt 1 failed: Page.goto: Download is starting
+Call log:
+  - navigating to "https://www.jobindex.dk/img/pdf/nypaedagogstilling_teaterboerneinstitutionen_marts2025.pdf", waiting until "networkidle"
+
+2025-04-06 12:30:26 - [Job ID: 6913] Attempt 1 failed: Page.goto: Download is starting
+Call log:
+  - navigating to "https://www.jobindex.dk/img/pdf/aabenraafriskole_laerere.pdf", waiting until "networkidle"
+
+2025-04-06 12:30:26 - [Job ID: 6276] Attempt 1: Accessing https://andreasskolen.dk/wp-content/uploads/2025/03/Paedagog-SFO.pdf
+2025-04-06 12:30:27 - [Job ID: 6276] Attempt 1 failed: Page.goto: Download is starting
+Call log:
+  - navigating to "https://andreasskolen.dk/wp-content/uploads/2025/03/Paedagog-SFO.pdf", waiting until "networkidle"
+
+2025-04-06 12:30:27 - [Job ID: 6939] Attempt 1: Accessing https://www.jobindex.dk/img/pdf/vid-gymnasier-hf_undervisere.pdf
+2025-04-06 12:30:27 - [Job ID: 6939] Attempt 1 failed: Page.goto: Download is starting
+Call log:
+  - navigating to "https://www.jobindex.dk/img/pdf/vid-gymnasier-hf_undervisere.pdf", waiting until "networkidle"
+
+2025-04-06 12:30:27 - [Job ID: 5479] Attempt 1: Accessing https://dalumls.dk/wp-content/uploads/2025/03/Stillingsopslag_AldebertsmindeLandbrug_elev-jesper-mols.png
+2025-04-06 12:30:28 - [Job ID: 6865] Attempt 1: Accessing https://www.jobindex.dk/img/pdf/gronsundmac2025.pdf
+2025-04-06 12:30:29 - [Job ID: 6865] Attempt 1 failed: Page.goto: Download is starting
+Call log:
+  - navigating to "https://www.jobindex.dk/img/pdf/gronsundmac2025.pdf", waiting until "networkidle"
+
+2025-04-06 12:30:29 - [Job ID: 5022] Attempt 1: Accessing https://www.kajmadsen.dk/Spedit%C3%B8r%20Trainee%202025.pdf
+2025-04-06 12:30:29 - [Job ID: 5748] Attempt 2: Accessing https://www.jobindex.dk/img/pdf/nypaedagogstilling_teaterboerneinstitutionen_marts2025.pdf
+2025-04-06 12:30:29 - [Job ID: 5022] Attempt 1 failed: Page.goto: Download is starting
+Call log:
+  - navigating to "https://www.kajmadsen.dk/Spedit%C3%B8r%20Trainee%202025.pdf", waiting until "networkidle"
+
+2025-04-06 12:30:29 - [Job ID: 5748] Attempt 2 failed: Page.goto: Download is starting
+Call log:
+  - navigating to "https://www.jobindex.dk/img/pdf/nypaedagogstilling_teaterboerneinstitutionen_marts2025.pdf", waiting until "networkidle"
+
+2025-04-06 12:30:29 - [Job ID: 5739] Attempt 1: Accessing https://www.jobindex.dk/img/pdf/nymedhjaelper_teaterboerneinstitutionen_marts2025.pdf
+2025-04-06 12:30:29 - [Job ID: 6913] Attempt 2: Accessing https://www.jobindex.dk/img/pdf/aabenraafriskole_laerere.pdf
+2025-04-06 12:30:29 - [Job ID: 6913] Attempt 2 failed: Page.goto: Download is starting
+Call log:
+  - navigating to "https://www.jobindex.dk/img/pdf/aabenraafriskole_laerere.pdf", waiting until "networkidle"
+
+2025-04-06 12:30:30 - [Job ID: 5739] Attempt 1 failed: Page.goto: Download is starting
+Call log:
+  - navigating to "https://www.jobindex.dk/img/pdf/nymedhjaelper_teaterboerneinstitutionen_marts2025.pdf", waiting until "networkidle"
+
+2025-04-06 12:30:30 - [Job ID: 6276] Attempt 2: Accessing https://andreasskolen.dk/wp-content/uploads/2025/03/Paedagog-SFO.pdf
+2025-04-06 12:30:30 - [Job ID: 6276] Attempt 2 failed: Page.goto: Download is starting
+Call log:
+  - navigating to "https://andreasskolen.dk/wp-content/uploads/2025/03/Paedagog-SFO.pdf", waiting until "networkidle"
+
+2025-04-06 12:30:30 - [Job ID: 5849] Attempt 1: Accessing https://www.jobindex.dk/img/pdf/jobopslag_paedagog_sfo-og-indskoling_2025.pdf
+2025-04-06 12:30:31 - [Job ID: 6939] Attempt 2: Accessing https://www.jobindex.dk/img/pdf/vid-gymnasier-hf_undervisere.pdf
+2025-04-06 12:30:31 - [Job ID: 6939] Attempt 2 failed: Page.goto: Download is starting
+Call log:
+  - navigating to "https://www.jobindex.dk/img/pdf/vid-gymnasier-hf_undervisere.pdf", waiting until "networkidle"
+
+2025-04-06 12:30:31 - [Job ID: 5668] Attempt 1: Accessing https://www.jobindex.dk/img/pdf/botilbudetholsted_paedagog.pdf
+2025-04-06 12:30:31 - [Job ID: 5849] Attempt 1 failed: Page.goto: Download is starting
+Call log:
+  - navigating to "https://www.jobindex.dk/img/pdf/jobopslag_paedagog_sfo-og-indskoling_2025.pdf", waiting until "networkidle"
+
+2025-04-06 12:30:31 - [Job ID: 5668] Attempt 1 failed: Page.goto: Download is starting
+Call log:
+  - navigating to "https://www.jobindex.dk/img/pdf/botilbudetholsted_paedagog.pdf", waiting until "networkidle"
+
+2025-04-06 12:30:32 - [Job ID: 6865] Attempt 2: Accessing https://www.jobindex.dk/img/pdf/gronsundmac2025.pdf
+2025-04-06 12:30:32 - [Job ID: 6865] Attempt 2 failed: Page.goto: Download is starting
+Call log:
+  - navigating to "https://www.jobindex.dk/img/pdf/gronsundmac2025.pdf", waiting until "networkidle"
+
+2025-04-06 12:30:32 - [Job ID: 5748] Attempt 3: Accessing https://www.jobindex.dk/img/pdf/nypaedagogstilling_teaterboerneinstitutionen_marts2025.pdf
+2025-04-06 12:30:32 - [Job ID: 5022] Attempt 2: Accessing https://www.kajmadsen.dk/Spedit%C3%B8r%20Trainee%202025.pdf
+2025-04-06 12:30:32 - [Job ID: 5022] Attempt 2 failed: Page.goto: Download is starting
+Call log:
+  - navigating to "https://www.kajmadsen.dk/Spedit%C3%B8r%20Trainee%202025.pdf", waiting until "networkidle"
+
+2025-04-06 12:30:32 - [Job ID: 5748] Attempt 3 failed: Page.goto: Download is starting
+Call log:
+  - navigating to "https://www.jobindex.dk/img/pdf/nypaedagogstilling_teaterboerneinstitutionen_marts2025.pdf", waiting until "networkidle"
+
+2025-04-06 12:30:33 - [Job ID: 5748] All attempts failed for https://www.jobindex.dk/img/pdf/nypaedagogstilling_teaterboerneinstitutionen_marts2025.pdf
+2025-04-06 12:30:33 - [Job ID: 6913] Attempt 3: Accessing https://www.jobindex.dk/img/pdf/aabenraafriskole_laerere.pdf
+2025-04-06 12:30:33 - [Job ID: 6913] Attempt 3 failed: Page.goto: Download is starting
+Call log:
+  - navigating to "https://www.jobindex.dk/img/pdf/aabenraafriskole_laerere.pdf", waiting until "networkidle"
+
+2025-04-06 12:30:33 - No content retrieved for job ID: 5748
+2025-04-06 12:30:33 - [Job ID: 6913] All attempts failed for https://www.jobindex.dk/img/pdf/aabenraafriskole_laerere.pdf
+2025-04-06 12:30:33 - [Job ID: 5739] Attempt 2: Accessing https://www.jobindex.dk/img/pdf/nymedhjaelper_teaterboerneinstitutionen_marts2025.pdf
+2025-04-06 12:30:33 - [Job ID: 6276] Attempt 3: Accessing https://andreasskolen.dk/wp-content/uploads/2025/03/Paedagog-SFO.pdf
+2025-04-06 12:30:33 - [Job ID: 5739] Attempt 2 failed: Page.goto: Download is starting
+Call log:
+  - navigating to "https://www.jobindex.dk/img/pdf/nymedhjaelper_teaterboerneinstitutionen_marts2025.pdf", waiting until "networkidle"
+
+2025-04-06 12:30:33 - [Job ID: 6276] Attempt 3 failed: Page.goto: Download is starting
+Call log:
+  - navigating to "https://andreasskolen.dk/wp-content/uploads/2025/03/Paedagog-SFO.pdf", waiting until "networkidle"
+
+2025-04-06 12:30:34 - No content retrieved for job ID: 6913
+2025-04-06 12:30:34 - [Job ID: 6276] All attempts failed for https://andreasskolen.dk/wp-content/uploads/2025/03/Paedagog-SFO.pdf
+2025-04-06 12:30:34 - Error extracting HTML from frames: Page.wait_for_selector: Timeout 5000ms exceeded.
+Call log:
+  - waiting for locator("body") to be visible
+  -     15 × locator resolved to hidden <body>…</body>
+
+2025-04-06 12:30:34 - [Job ID: 5479] No content found on attempt 1
+2025-04-06 12:30:34 - [Job ID: 5479] Attempt 2: Accessing https://dalumls.dk/wp-content/uploads/2025/03/Stillingsopslag_AldebertsmindeLandbrug_elev-jesper-mols.png
+2025-04-06 12:30:34 - [Job ID: 6939] Attempt 3: Accessing https://www.jobindex.dk/img/pdf/vid-gymnasier-hf_undervisere.pdf
+2025-04-06 12:30:34 - [Job ID: 5849] Attempt 2: Accessing https://www.jobindex.dk/img/pdf/jobopslag_paedagog_sfo-og-indskoling_2025.pdf
+2025-04-06 12:30:34 - No content retrieved for job ID: 6276
+2025-04-06 12:30:34 - [Job ID: 6939] Attempt 3 failed: Page.goto: Download is starting
+Call log:
+  - navigating to "https://www.jobindex.dk/img/pdf/vid-gymnasier-hf_undervisere.pdf", waiting until "networkidle"
+
+2025-04-06 12:30:34 - [Job ID: 5849] Attempt 2 failed: Page.goto: Download is starting
+Call log:
+  - navigating to "https://www.jobindex.dk/img/pdf/jobopslag_paedagog_sfo-og-indskoling_2025.pdf", waiting until "networkidle"
+
+2025-04-06 12:30:34 - [Job ID: 6939] All attempts failed for https://www.jobindex.dk/img/pdf/vid-gymnasier-hf_undervisere.pdf
+2025-04-06 12:30:34 - [Job ID: 5668] Attempt 2: Accessing https://www.jobindex.dk/img/pdf/botilbudetholsted_paedagog.pdf
+2025-04-06 12:30:35 - [Job ID: 5668] Attempt 2 failed: Page.goto: Download is starting
+Call log:
+  - navigating to "https://www.jobindex.dk/img/pdf/botilbudetholsted_paedagog.pdf", waiting until "networkidle"
+
+2025-04-06 12:30:35 - No content retrieved for job ID: 6939
+2025-04-06 12:30:35 - [Job ID: 6865] Attempt 3: Accessing https://www.jobindex.dk/img/pdf/gronsundmac2025.pdf
+2025-04-06 12:30:35 - [Job ID: 6865] Attempt 3 failed: Page.goto: Download is starting
+Call log:
+  - navigating to "https://www.jobindex.dk/img/pdf/gronsundmac2025.pdf", waiting until "networkidle"
+
+2025-04-06 12:30:35 - [Job ID: 6865] All attempts failed for https://www.jobindex.dk/img/pdf/gronsundmac2025.pdf
+2025-04-06 12:30:36 - [Job ID: 5022] Attempt 3: Accessing https://www.kajmadsen.dk/Spedit%C3%B8r%20Trainee%202025.pdf
+2025-04-06 12:30:36 - [Job ID: 5022] Attempt 3 failed: Page.goto: Download is starting
+Call log:
+  - navigating to "https://www.kajmadsen.dk/Spedit%C3%B8r%20Trainee%202025.pdf", waiting until "networkidle"
+
+2025-04-06 12:30:36 - No content retrieved for job ID: 6865
+2025-04-06 12:30:36 - [Job ID: 5022] All attempts failed for https://www.kajmadsen.dk/Spedit%C3%B8r%20Trainee%202025.pdf
+2025-04-06 12:30:36 - No content retrieved for job ID: 5022
+2025-04-06 12:30:37 - [Job ID: 5739] Attempt 3: Accessing https://www.jobindex.dk/img/pdf/nymedhjaelper_teaterboerneinstitutionen_marts2025.pdf
+2025-04-06 12:30:37 - [Job ID: 5739] Attempt 3 failed: Page.goto: Download is starting
+Call log:
+  - navigating to "https://www.jobindex.dk/img/pdf/nymedhjaelper_teaterboerneinstitutionen_marts2025.pdf", waiting until "networkidle"
+
+2025-04-06 12:30:37 - [Job ID: 5739] All attempts failed for https://www.jobindex.dk/img/pdf/nymedhjaelper_teaterboerneinstitutionen_marts2025.pdf
+2025-04-06 12:30:37 - No content retrieved for job ID: 5739
+2025-04-06 12:30:37 - [Job ID: 5849] Attempt 3: Accessing https://www.jobindex.dk/img/pdf/jobopslag_paedagog_sfo-og-indskoling_2025.pdf
+2025-04-06 12:30:37 - [Job ID: 5849] Attempt 3 failed: Page.goto: Download is starting
+Call log:
+  - navigating to "https://www.jobindex.dk/img/pdf/jobopslag_paedagog_sfo-og-indskoling_2025.pdf", waiting until "networkidle"
+
+2025-04-06 12:30:38 - [Job ID: 5849] All attempts failed for https://www.jobindex.dk/img/pdf/jobopslag_paedagog_sfo-og-indskoling_2025.pdf
+2025-04-06 12:30:38 - [Job ID: 5668] Attempt 3: Accessing https://www.jobindex.dk/img/pdf/botilbudetholsted_paedagog.pdf
+2025-04-06 12:30:38 - [Job ID: 5668] Attempt 3 failed: Page.goto: Download is starting
+Call log:
+  - navigating to "https://www.jobindex.dk/img/pdf/botilbudetholsted_paedagog.pdf", waiting until "networkidle"
+
+2025-04-06 12:30:38 - No content retrieved for job ID: 5849
+2025-04-06 12:30:38 - [Job ID: 5668] All attempts failed for https://www.jobindex.dk/img/pdf/botilbudetholsted_paedagog.pdf
+2025-04-06 12:30:39 - No content retrieved for job ID: 5668
+2025-04-06 12:30:39 - Error extracting HTML from frames: Page.wait_for_selector: Timeout 5000ms exceeded.
+Call log:
+  - waiting for locator("body") to be visible
+  -     15 × locator resolved to hidden <body>…</body>
+
+2025-04-06 12:30:39 - [Job ID: 5479] No content found on attempt 2
+2025-04-06 12:30:39 - [Job ID: 5479] Attempt 3: Accessing https://dalumls.dk/wp-content/uploads/2025/03/Stillingsopslag_AldebertsmindeLandbrug_elev-jesper-mols.png
+2025-04-06 12:30:45 - Error extracting HTML from frames: Page.wait_for_selector: Timeout 5000ms exceeded.
+Call log:
+  - waiting for locator("body") to be visible
+  -     15 × locator resolved to hidden <body>…</body>
+
+2025-04-06 12:30:45 - [Job ID: 5479] No content found on attempt 3
+2025-04-06 12:30:45 - No content retrieved for job ID: 5479
+2025-04-06 12:30:46 - Processing jobs 31 to 40 of 8032...
+2025-04-06 12:30:48 - [Job ID: 7319] Attempt 1: Accessing https://lagkagehuset.youngcrm.com/jobportal/11170?utm_source=youngcrm&utm_medium=notification&utm_campaign=media
+2025-04-06 12:30:48 - [Job ID: 6949] Attempt 1: Accessing https://www.jobindex.dk/img/pdf/part-time-french-mat-leave_200325_nis.pdf
+2025-04-06 12:30:49 - [Job ID: 6949] Attempt 1 failed: Page.goto: Download is starting
+Call log:
+  - navigating to "https://www.jobindex.dk/img/pdf/part-time-french-mat-leave_200325_nis.pdf", waiting until "networkidle"
+
+2025-04-06 12:30:49 - [Job ID: 7587] Attempt 1: Accessing https://www.jobindex.dk/img/pdf/markberg_oekonomiassistent_1.pdf
+2025-04-06 12:30:49 - [Job ID: 7587] Attempt 1 failed: Page.goto: Download is starting
+Call log:
+  - navigating to "https://www.jobindex.dk/img/pdf/markberg_oekonomiassistent_1.pdf", waiting until "networkidle"
+
+2025-04-06 12:30:49 - [Job ID: 7321] Attempt 1: Accessing https://lagkagehuset.youngcrm.com/jobportal/11172?utm_source=youngcrm&utm_medium=notification&utm_campaign=media
+2025-04-06 12:30:50 - [Job ID: 7583] Attempt 1: Accessing https://www.jobindex.dk/img/pdf/struktureret_oekonomiassistent.pdf
+2025-04-06 12:30:50 - [Job ID: 7718] Attempt 1: Accessing https://ilva.youngcrm.com/jobportal/11102
+2025-04-06 12:30:50 - [Job ID: 7583] Attempt 1 failed: Page.goto: Download is starting
+Call log:
+  - navigating to "https://www.jobindex.dk/img/pdf/struktureret_oekonomiassistent.pdf", waiting until "networkidle"
+
+2025-04-06 12:30:51 - [Job ID: 6958] Attempt 1: Accessing https://www.jobindex.dk/img/pdf/ringeefterskole_laerer20250319eca.pdf
+2025-04-06 12:30:52 - [Job ID: 6958] Attempt 1 failed: Page.goto: Download is starting
+Call log:
+  - navigating to "https://www.jobindex.dk/img/pdf/ringeefterskole_laerer20250319eca.pdf", waiting until "networkidle"
+
+2025-04-06 12:30:52 - [Job ID: 7584] Attempt 1: Accessing https://www.godtsmil.dk/ledige-stillinger/?hr=show-job%2F249620%26locale%3Dda_DK
+2025-04-06 12:30:52 - [Job ID: 6949] Attempt 2: Accessing https://www.jobindex.dk/img/pdf/part-time-french-mat-leave_200325_nis.pdf
+2025-04-06 12:30:52 - [Job ID: 6949] Attempt 2 failed: Page.goto: Download is starting
+Call log:
+  - navigating to "https://www.jobindex.dk/img/pdf/part-time-french-mat-leave_200325_nis.pdf", waiting until "networkidle"
+
+2025-04-06 12:30:52 - [Job ID: 7153] Attempt 1: Accessing https://andreasskolen.dk/wp-content/uploads/2025/03/Stillingsopslag-Andreasskolen-marts-2025-1.pdf
+2025-04-06 12:30:53 - [Job ID: 7587] Attempt 2: Accessing https://www.jobindex.dk/img/pdf/markberg_oekonomiassistent_1.pdf
+2025-04-06 12:30:53 - [Job ID: 7587] Attempt 2 failed: Page.goto: Download is starting
+Call log:
+  - navigating to "https://www.jobindex.dk/img/pdf/markberg_oekonomiassistent_1.pdf", waiting until "networkidle"
+
+2025-04-06 12:30:53 - [Job ID: 7153] Attempt 1 failed: Page.goto: Download is starting
+Call log:
+  - navigating to "https://andreasskolen.dk/wp-content/uploads/2025/03/Stillingsopslag-Andreasskolen-marts-2025-1.pdf", waiting until "networkidle"
+
+2025-04-06 12:30:53 - [Job ID: 7320] Attempt 1: Accessing https://lagkagehuset.youngcrm.com/jobportal/11171?utm_source=youngcrm&utm_medium=notification&utm_campaign=media
+2025-04-06 12:30:54 - [Job ID: 7583] Attempt 2: Accessing https://www.jobindex.dk/img/pdf/struktureret_oekonomiassistent.pdf
+2025-04-06 12:30:54 - [Job ID: 7583] Attempt 2 failed: Page.goto: Download is starting
+Call log:
+  - navigating to "https://www.jobindex.dk/img/pdf/struktureret_oekonomiassistent.pdf", waiting until "networkidle"
+
+2025-04-06 12:30:55 - [Job ID: 6958] Attempt 2: Accessing https://www.jobindex.dk/img/pdf/ringeefterskole_laerer20250319eca.pdf
+2025-04-06 12:30:55 - [Job ID: 6958] Attempt 2 failed: Page.goto: Download is starting
+Call log:
+  - navigating to "https://www.jobindex.dk/img/pdf/ringeefterskole_laerer20250319eca.pdf", waiting until "networkidle"
+
+2025-04-06 12:30:55 - [Job ID: 6949] Attempt 3: Accessing https://www.jobindex.dk/img/pdf/part-time-french-mat-leave_200325_nis.pdf
+2025-04-06 12:30:55 - [Job ID: 6949] Attempt 3 failed: Page.goto: Download is starting
+Call log:
+  - navigating to "https://www.jobindex.dk/img/pdf/part-time-french-mat-leave_200325_nis.pdf", waiting until "networkidle"
+
+2025-04-06 12:30:56 - [Job ID: 6949] All attempts failed for https://www.jobindex.dk/img/pdf/part-time-french-mat-leave_200325_nis.pdf
+2025-04-06 12:30:56 - [Job ID: 7587] Attempt 3: Accessing https://www.jobindex.dk/img/pdf/markberg_oekonomiassistent_1.pdf
+2025-04-06 12:30:56 - [Job ID: 7587] Attempt 3 failed: Page.goto: Download is starting
+Call log:
+  - navigating to "https://www.jobindex.dk/img/pdf/markberg_oekonomiassistent_1.pdf", waiting until "networkidle"
+
+2025-04-06 12:30:56 - Error extracting HTML from frames: Page.wait_for_selector: Timeout 5000ms exceeded.
+Call log:
+  - waiting for locator("body") to be visible
+  -     14 × locator resolved to hidden <body id="signup" class="    hasHover">…</body>
+
+2025-04-06 12:30:56 - [Job ID: 7319] No content found on attempt 1
+2025-04-06 12:30:56 - [Job ID: 7319] Attempt 2: Accessing https://lagkagehuset.youngcrm.com/jobportal/11170?utm_source=youngcrm&utm_medium=notification&utm_campaign=media
+2025-04-06 12:30:56 - [Job ID: 7153] Attempt 2: Accessing https://andreasskolen.dk/wp-content/uploads/2025/03/Stillingsopslag-Andreasskolen-marts-2025-1.pdf
+2025-04-06 12:30:56 - [Job ID: 7153] Attempt 2 failed: Page.goto: Download is starting
+Call log:
+  - navigating to "https://andreasskolen.dk/wp-content/uploads/2025/03/Stillingsopslag-Andreasskolen-marts-2025-1.pdf", waiting until "networkidle"
+
+2025-04-06 12:30:56 - [Job ID: 7587] All attempts failed for https://www.jobindex.dk/img/pdf/markberg_oekonomiassistent_1.pdf
+2025-04-06 12:30:57 - No content retrieved for job ID: 6949
+2025-04-06 12:30:57 - [Job ID: 7583] Attempt 3: Accessing https://www.jobindex.dk/img/pdf/struktureret_oekonomiassistent.pdf
+2025-04-06 12:30:57 - [Job ID: 7583] Attempt 3 failed: Page.goto: Download is starting
+Call log:
+  - navigating to "https://www.jobindex.dk/img/pdf/struktureret_oekonomiassistent.pdf", waiting until "networkidle"
+
+2025-04-06 12:30:57 - No content retrieved for job ID: 7587
+2025-04-06 12:30:57 - Error extracting HTML from frames: Page.wait_for_selector: Timeout 5000ms exceeded.
+Call log:
+  - waiting for locator("body") to be visible
+  -     14 × locator resolved to hidden <body id="signup" class="    hasHover">…</body>
+
+2025-04-06 12:30:57 - [Job ID: 7321] No content found on attempt 1
+2025-04-06 12:30:57 - [Job ID: 7321] Attempt 2: Accessing https://lagkagehuset.youngcrm.com/jobportal/11172?utm_source=youngcrm&utm_medium=notification&utm_campaign=media
+2025-04-06 12:30:58 - [Job ID: 7583] All attempts failed for https://www.jobindex.dk/img/pdf/struktureret_oekonomiassistent.pdf
+2025-04-06 12:30:58 - No content retrieved for job ID: 7583
+2025-04-06 12:30:59 - [Job ID: 6958] Attempt 3: Accessing https://www.jobindex.dk/img/pdf/ringeefterskole_laerer20250319eca.pdf
+2025-04-06 12:30:59 - [Job ID: 6958] Attempt 3 failed: Page.goto: Download is starting
+Call log:
+  - navigating to "https://www.jobindex.dk/img/pdf/ringeefterskole_laerer20250319eca.pdf", waiting until "networkidle"
+
+2025-04-06 12:30:59 - [Job ID: 6958] All attempts failed for https://www.jobindex.dk/img/pdf/ringeefterskole_laerer20250319eca.pdf
+2025-04-06 12:30:59 - [Job ID: 7153] Attempt 3: Accessing https://andreasskolen.dk/wp-content/uploads/2025/03/Stillingsopslag-Andreasskolen-marts-2025-1.pdf
+2025-04-06 12:31:00 - [Job ID: 7153] Attempt 3 failed: Page.goto: Download is starting
+Call log:
+  - navigating to "https://andreasskolen.dk/wp-content/uploads/2025/03/Stillingsopslag-Andreasskolen-marts-2025-1.pdf", waiting until "networkidle"
+
+2025-04-06 12:31:00 - No content retrieved for job ID: 6958
+2025-04-06 12:31:00 - [Job ID: 7153] All attempts failed for https://andreasskolen.dk/wp-content/uploads/2025/03/Stillingsopslag-Andreasskolen-marts-2025-1.pdf
+2025-04-06 12:31:00 - Error extracting HTML from frames: Page.wait_for_selector: Timeout 5000ms exceeded.
+Call log:
+  - waiting for locator("body") to be visible
+  -     14 × locator resolved to hidden <body id="signup" class="    hasHover">…</body>
+
+2025-04-06 12:31:00 - [Job ID: 7718] No content found on attempt 1
+2025-04-06 12:31:00 - [Job ID: 7718] Attempt 2: Accessing https://ilva.youngcrm.com/jobportal/11102
+2025-04-06 12:31:00 - No content retrieved for job ID: 7153
+2025-04-06 12:31:03 - Error extracting HTML from frames: Page.wait_for_selector: Timeout 5000ms exceeded.
+Call log:
+  - waiting for locator("body") to be visible
+  -     14 × locator resolved to hidden <body id="signup" class="    hasHover">…</body>
+
+2025-04-06 12:31:03 - [Job ID: 7319] No content found on attempt 2
+2025-04-06 12:31:03 - [Job ID: 7319] Attempt 3: Accessing https://lagkagehuset.youngcrm.com/jobportal/11170?utm_source=youngcrm&utm_medium=notification&utm_campaign=media
+2025-04-06 12:31:04 - Error extracting HTML from frames: Page.wait_for_selector: Timeout 5000ms exceeded.
+Call log:
+  - waiting for locator("body") to be visible
+  -     15 × locator resolved to hidden <body id="signup" class="    hasHover">…</body>
+
+2025-04-06 12:31:04 - [Job ID: 7321] No content found on attempt 2
+2025-04-06 12:31:04 - [Job ID: 7321] Attempt 3: Accessing https://lagkagehuset.youngcrm.com/jobportal/11172?utm_source=youngcrm&utm_medium=notification&utm_campaign=media
+2025-04-06 12:31:06 - Error extracting HTML from frames: Page.wait_for_selector: Timeout 5000ms exceeded.
+Call log:
+  - waiting for locator("body") to be visible
+  -     14 × locator resolved to hidden <body id="signup" class="    hasHover">…</body>
+
+2025-04-06 12:31:06 - [Job ID: 7320] No content found on attempt 1
+2025-04-06 12:31:06 - [Job ID: 7320] Attempt 2: Accessing https://lagkagehuset.youngcrm.com/jobportal/11171?utm_source=youngcrm&utm_medium=notification&utm_campaign=media
+2025-04-06 12:31:07 - Error extracting HTML from frames: Page.wait_for_selector: Timeout 5000ms exceeded.
+Call log:
+  - waiting for locator("body") to be visible
+  -     14 × locator resolved to hidden <body id="signup" class="    hasHover">…</body>
+
+2025-04-06 12:31:07 - [Job ID: 7718] No content found on attempt 2
+2025-04-06 12:31:07 - [Job ID: 7718] Attempt 3: Accessing https://ilva.youngcrm.com/jobportal/11102
+2025-04-06 12:31:07 - [Job ID: 7584] Attempt 1 failed: Page.goto: Timeout 15000ms exceeded.
+Call log:
+  - navigating to "https://www.godtsmil.dk/ledige-stillinger/?hr=show-job%2F249620%26locale%3Dda_DK", waiting until "networkidle"
+
+2025-04-06 12:31:09 - Error extracting HTML from frames: Page.wait_for_selector: Timeout 5000ms exceeded.
+Call log:
+  - waiting for locator("body") to be visible
+  -     14 × locator resolved to hidden <body id="signup" class="    hasHover">…</body>
+
+2025-04-06 12:31:09 - [Job ID: 7319] No content found on attempt 3
+2025-04-06 12:31:10 - [Job ID: 7584] Attempt 2: Accessing https://www.godtsmil.dk/ledige-stillinger/?hr=show-job%2F249620%26locale%3Dda_DK
+2025-04-06 12:31:11 - Error extracting HTML from frames: Page.wait_for_selector: Timeout 5000ms exceeded.
+Call log:
+  - waiting for locator("body") to be visible
+  -     14 × locator resolved to hidden <body id="signup" class="    hasHover">…</body>
+
+2025-04-06 12:31:11 - [Job ID: 7321] No content found on attempt 3
+2025-04-06 12:31:12 - Error extracting HTML from frames: Page.wait_for_selector: Timeout 5000ms exceeded.
+Call log:
+  - waiting for locator("body") to be visible
+  -     14 × locator resolved to hidden <body id="signup" class="    hasHover">…</body>
+
+2025-04-06 12:31:12 - [Job ID: 7320] No content found on attempt 2
+2025-04-06 12:31:12 - [Job ID: 7320] Attempt 3: Accessing https://lagkagehuset.youngcrm.com/jobportal/11171?utm_source=youngcrm&utm_medium=notification&utm_campaign=media
+2025-04-06 12:31:13 - Error extracting HTML from frames: Page.wait_for_selector: Timeout 5000ms exceeded.
+Call log:
+  - waiting for locator("body") to be visible
+  -     14 × locator resolved to hidden <body id="signup" class="    hasHover">…</body>
+
+2025-04-06 12:31:13 - [Job ID: 7718] No content found on attempt 3
+2025-04-06 12:31:14 - No content retrieved for job ID: 7321
+2025-04-06 12:31:14 - No content retrieved for job ID: 7319
+2025-04-06 12:31:14 - No content retrieved for job ID: 7718
+2025-04-06 12:31:19 - Error extracting HTML from frames: Page.wait_for_selector: Timeout 5000ms exceeded.
+Call log:
+  - waiting for locator("body") to be visible
+  -     15 × locator resolved to hidden <body id="signup" class="    hasHover">…</body>
+
+2025-04-06 12:31:19 - [Job ID: 7320] No content found on attempt 3
+2025-04-06 12:31:20 - No content retrieved for job ID: 7320
+2025-04-06 12:31:25 - [Job ID: 7584] Attempt 2 failed: Page.goto: Timeout 15000ms exceeded.
+Call log:
+  - navigating to "https://www.godtsmil.dk/ledige-stillinger/?hr=show-job%2F249620%26locale%3Dda_DK", waiting until "networkidle"
+
+2025-04-06 12:31:28 - [Job ID: 7584] Attempt 3: Accessing https://www.godtsmil.dk/ledige-stillinger/?hr=show-job%2F249620%26locale%3Dda_DK
