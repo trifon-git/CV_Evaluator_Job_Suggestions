@@ -39681,3 +39681,457 @@ Call log:
 Call log:
   - navigating to "https://bestseller-as.contactrh.com/jobs/10895/43292383/en_GB", waiting until "networkidle"
 
+2025-04-06 12:33:19 - [Job ID: 11273] Attempt 3: Accessing https://candidate.hr-manager.net/ApplicationInit.aspx?cid=316&ProjectId=187892&DepartmentId=9824&MediaId=5
+2025-04-06 12:33:19 - [Job ID: 11367] Attempt 2 failed: Page.goto: Timeout 15000ms exceeded.
+Call log:
+  - navigating to "https://candidate.hr-manager.net/ApplicationInit.aspx?cid=316&ProjectId=187853&DepartmentId=9823&MediaId=5", waiting until "networkidle"
+
+2025-04-06 12:33:19 - [Job ID: 11451] Attempt 3: Accessing https://bestseller-as.contactrh.com/jobs/10895/43292383/en_GB
+2025-04-06 12:33:22 - [Job ID: 11473] Attempt 2 failed: Page.goto: Timeout 15000ms exceeded.
+Call log:
+  - navigating to "https://careers-dn-merlinentertainments.icims.com/jobs/6644/senior-procurement-manager---europe/job?mobile=false&width=1280&height=500&bga=true&needsRedirect=false&jan1offset=60&jun1offset=120", waiting until "networkidle"
+
+2025-04-06 12:33:22 - [Job ID: 11376] Attempt 2 failed: Page.goto: Timeout 15000ms exceeded.
+Call log:
+  - navigating to "https://candidate.hr-manager.net/ApplicationInit.aspx?cid=316&ProjectId=187823&DepartmentId=9823&MediaId=5", waiting until "networkidle"
+
+2025-04-06 12:33:22 - [Job ID: 11367] Attempt 3: Accessing https://candidate.hr-manager.net/ApplicationInit.aspx?cid=316&ProjectId=187853&DepartmentId=9823&MediaId=5
+2025-04-06 12:33:25 - [Job ID: 11473] Attempt 3: Accessing https://careers-dn-merlinentertainments.icims.com/jobs/6644/senior-procurement-manager---europe/job?mobile=false&width=1280&height=500&bga=true&needsRedirect=false&jan1offset=60&jun1offset=120
+2025-04-06 12:33:26 - [Job ID: 11376] Attempt 3: Accessing https://candidate.hr-manager.net/ApplicationInit.aspx?cid=316&ProjectId=187823&DepartmentId=9823&MediaId=5
+2025-04-06 12:33:34 - [Job ID: 11273] Attempt 3 failed: Page.goto: Timeout 15000ms exceeded.
+Call log:
+  - navigating to "https://candidate.hr-manager.net/ApplicationInit.aspx?cid=316&ProjectId=187892&DepartmentId=9824&MediaId=5", waiting until "networkidle"
+
+2025-04-06 12:33:34 - [Job ID: 11451] Attempt 3 failed: Page.goto: Timeout 15000ms exceeded.
+Call log:
+  - navigating to "https://bestseller-as.contactrh.com/jobs/10895/43292383/en_GB", waiting until "networkidle"
+
+2025-04-06 12:33:35 - [Job ID: 11273] All attempts failed for https://candidate.hr-manager.net/ApplicationInit.aspx?cid=316&ProjectId=187892&DepartmentId=9824&MediaId=5
+2025-04-06 12:33:35 - [Job ID: 11451] All attempts failed for https://bestseller-as.contactrh.com/jobs/10895/43292383/en_GB
+2025-04-06 12:33:35 - No content retrieved for job ID: 11273
+2025-04-06 12:33:35 - No content retrieved for job ID: 11451
+2025-04-06 12:33:37 - [Job ID: 11367] Attempt 3 failed: Page.goto: Timeout 15000ms exceeded.
+Call log:
+  - navigating to "https://candidate.hr-manager.net/ApplicationInit.aspx?cid=316&ProjectId=187853&DepartmentId=9823&MediaId=5", waiting until "networkidle"
+
+2025-04-06 12:33:38 - [Job ID: 11367] All attempts failed for https://candidate.hr-manager.net/ApplicationInit.aspx?cid=316&ProjectId=187853&DepartmentId=9823&MediaId=5
+2025-04-06 12:33:38 - No content retrieved for job ID: 11367
+2025-04-06 12:33:40 - [Job ID: 11473] Attempt 3 failed: Page.goto: Timeout 15000ms exceeded.
+Call log:
+  - navigating to "https://careers-dn-merlinentertainments.icims.com/jobs/6644/senior-procurement-manager---europe/job?mobile=false&width=1280&height=500&bga=true&needsRedirect=false&jan1offset=60&jun1offset=120", waiting until "networkidle"
+
+2025-04-06 12:33:41 - [Job ID: 11376] Attempt 3 failed: Page.goto: Timeout 15000ms exceeded.
+Call log:
+  - navigating to "https://candidate.hr-manager.net/ApplicationInit.aspx?cid=316&ProjectId=187823&DepartmentId=9823&MediaId=5", waiting until "networkidle"
+
+2025-04-06 12:33:41 - [Job ID: 11473] All attempts failed for https://careers-dn-merlinentertainments.icims.com/jobs/6644/senior-procurement-manager---europe/job?mobile=false&width=1280&height=500&bga=true&needsRedirect=false&jan1offset=60&jun1offset=120
+2025-04-06 12:33:41 - [Job ID: 11376] All attempts failed for https://candidate.hr-manager.net/ApplicationInit.aspx?cid=316&ProjectId=187823&DepartmentId=9823&MediaId=5
+2025-04-06 12:33:41 - No content retrieved for job ID: 11473
+2025-04-06 12:33:41 - No content retrieved for job ID: 11376
+2025-04-06 12:33:42 - Processing jobs 61 to 70 of 8032...
+2025-04-06 12:33:44 - [Job ID: 11832] Attempt 1: Accessing https://www.jobindex.dk/img/pdf/disponent_skandinavien.pdf
+2025-04-06 12:33:44 - [Job ID: 12480] Attempt 1: Accessing https://www.jobindex.dk/img/pdf/frellsen-salgssupporter-25032025.pdf
+2025-04-06 12:33:45 - [Job ID: 11832] Attempt 1 failed: Page.goto: Download is starting
+Call log:
+  - navigating to "https://www.jobindex.dk/img/pdf/disponent_skandinavien.pdf", waiting until "networkidle"
+
+2025-04-06 12:33:45 - [Job ID: 11995] Attempt 1: Accessing https://www.jobindex.dk/img/pdf/majinvest_digitalmarketingandperformancemanager_20250321_lost.pdf
+2025-04-06 12:33:45 - [Job ID: 12480] Attempt 1 failed: Page.goto: Download is starting
+Call log:
+  - navigating to "https://www.jobindex.dk/img/pdf/frellsen-salgssupporter-25032025.pdf", waiting until "networkidle"
+
+2025-04-06 12:33:45 - [Job ID: 11995] Attempt 1 failed: Page.goto: Download is starting
+Call log:
+  - navigating to "https://www.jobindex.dk/img/pdf/majinvest_digitalmarketingandperformancemanager_20250321_lost.pdf", waiting until "networkidle"
+
+2025-04-06 12:33:45 - [Job ID: 12651] Attempt 1: Accessing https://www.jobindex.dk/img/pdf/wuavmac2025.pdf
+2025-04-06 12:33:46 - [Job ID: 12651] Attempt 1 failed: Page.goto: Download is starting
+Call log:
+  - navigating to "https://www.jobindex.dk/img/pdf/wuavmac2025.pdf", waiting until "networkidle"
+
+2025-04-06 12:33:46 - [Job ID: 11848] Attempt 1: Accessing https://www.guldmann.com/media/8460/supply-chain-planner-traineeforl%C3%B8b_guldmann.pdf
+2025-04-06 12:33:46 - [Job ID: 11866] Attempt 1: Accessing https://www.kajmadsen.dk/Disponent%20-%20Spanien.pdf
+2025-04-06 12:33:47 - [Job ID: 11848] Attempt 1 failed: Page.goto: Download is starting
+Call log:
+  - navigating to "https://www.guldmann.com/media/8460/supply-chain-planner-traineeforl%C3%B8b_guldmann.pdf", waiting until "networkidle"
+
+2025-04-06 12:33:47 - [Job ID: 11866] Attempt 1 failed: Page.goto: Download is starting
+Call log:
+  - navigating to "https://www.kajmadsen.dk/Disponent%20-%20Spanien.pdf", waiting until "networkidle"
+
+2025-04-06 12:33:47 - [Job ID: 12383] Attempt 1: Accessing https://www.jobindex.dk/img/pdf/intern_saelger_20250328sul.pdf
+2025-04-06 12:33:48 - [Job ID: 12383] Attempt 1 failed: Page.goto: Download is starting
+Call log:
+  - navigating to "https://www.jobindex.dk/img/pdf/intern_saelger_20250328sul.pdf", waiting until "networkidle"
+
+2025-04-06 12:33:48 - [Job ID: 12543] Attempt 1: Accessing https://www.jobindex.dk/img/pdf/embacollage-salgskonsulent.pdf
+2025-04-06 12:33:48 - [Job ID: 11832] Attempt 2: Accessing https://www.jobindex.dk/img/pdf/disponent_skandinavien.pdf
+2025-04-06 12:33:48 - [Job ID: 11832] Attempt 2 failed: Page.goto: Download is starting
+Call log:
+  - navigating to "https://www.jobindex.dk/img/pdf/disponent_skandinavien.pdf", waiting until "networkidle"
+
+2025-04-06 12:33:48 - [Job ID: 12291] Attempt 1: Accessing https://www.jobindex.dk/img/pdf/strandgaarden_field_sales_20250402_lost.pdf
+2025-04-06 12:33:48 - [Job ID: 12543] Attempt 1 failed: Page.goto: Download is starting
+Call log:
+  - navigating to "https://www.jobindex.dk/img/pdf/embacollage-salgskonsulent.pdf", waiting until "networkidle"
+
+2025-04-06 12:33:48 - [Job ID: 12480] Attempt 2: Accessing https://www.jobindex.dk/img/pdf/frellsen-salgssupporter-25032025.pdf
+2025-04-06 12:33:48 - [Job ID: 12480] Attempt 2 failed: Page.goto: Download is starting
+Call log:
+  - navigating to "https://www.jobindex.dk/img/pdf/frellsen-salgssupporter-25032025.pdf", waiting until "networkidle"
+
+2025-04-06 12:33:49 - [Job ID: 11995] Attempt 2: Accessing https://www.jobindex.dk/img/pdf/majinvest_digitalmarketingandperformancemanager_20250321_lost.pdf
+2025-04-06 12:33:49 - [Job ID: 12291] Attempt 1 failed: Page.goto: Download is starting
+Call log:
+  - navigating to "https://www.jobindex.dk/img/pdf/strandgaarden_field_sales_20250402_lost.pdf", waiting until "networkidle"
+
+2025-04-06 12:33:49 - [Job ID: 12410] Attempt 1: Accessing https://www.jobindex.dk/img/pdf/softline_areasalesmanager_danmark.pdf
+2025-04-06 12:33:49 - [Job ID: 11995] Attempt 2 failed: Page.goto: Download is starting
+Call log:
+  - navigating to "https://www.jobindex.dk/img/pdf/majinvest_digitalmarketingandperformancemanager_20250321_lost.pdf", waiting until "networkidle"
+
+2025-04-06 12:33:49 - [Job ID: 12651] Attempt 2: Accessing https://www.jobindex.dk/img/pdf/wuavmac2025.pdf
+2025-04-06 12:33:49 - [Job ID: 12410] Attempt 1 failed: Page.goto: Download is starting
+Call log:
+  - navigating to "https://www.jobindex.dk/img/pdf/softline_areasalesmanager_danmark.pdf", waiting until "networkidle"
+
+2025-04-06 12:33:49 - [Job ID: 12651] Attempt 2 failed: Page.goto: Download is starting
+Call log:
+  - navigating to "https://www.jobindex.dk/img/pdf/wuavmac2025.pdf", waiting until "networkidle"
+
+2025-04-06 12:33:50 - [Job ID: 11848] Attempt 2: Accessing https://www.guldmann.com/media/8460/supply-chain-planner-traineeforl%C3%B8b_guldmann.pdf
+2025-04-06 12:33:50 - [Job ID: 11848] Attempt 2 failed: Page.goto: Download is starting
+Call log:
+  - navigating to "https://www.guldmann.com/media/8460/supply-chain-planner-traineeforl%C3%B8b_guldmann.pdf", waiting until "networkidle"
+
+2025-04-06 12:33:50 - [Job ID: 11866] Attempt 2: Accessing https://www.kajmadsen.dk/Disponent%20-%20Spanien.pdf
+2025-04-06 12:33:50 - [Job ID: 11866] Attempt 2 failed: Page.goto: Download is starting
+Call log:
+  - navigating to "https://www.kajmadsen.dk/Disponent%20-%20Spanien.pdf", waiting until "networkidle"
+
+2025-04-06 12:33:51 - [Job ID: 12383] Attempt 2: Accessing https://www.jobindex.dk/img/pdf/intern_saelger_20250328sul.pdf
+2025-04-06 12:33:51 - [Job ID: 12383] Attempt 2 failed: Page.goto: Download is starting
+Call log:
+  - navigating to "https://www.jobindex.dk/img/pdf/intern_saelger_20250328sul.pdf", waiting until "networkidle"
+
+2025-04-06 12:33:51 - [Job ID: 11832] Attempt 3: Accessing https://www.jobindex.dk/img/pdf/disponent_skandinavien.pdf
+2025-04-06 12:33:51 - [Job ID: 11832] Attempt 3 failed: Page.goto: Download is starting
+Call log:
+  - navigating to "https://www.jobindex.dk/img/pdf/disponent_skandinavien.pdf", waiting until "networkidle"
+
+2025-04-06 12:33:51 - [Job ID: 11832] All attempts failed for https://www.jobindex.dk/img/pdf/disponent_skandinavien.pdf
+2025-04-06 12:33:51 - [Job ID: 12543] Attempt 2: Accessing https://www.jobindex.dk/img/pdf/embacollage-salgskonsulent.pdf
+2025-04-06 12:33:52 - [Job ID: 12480] Attempt 3: Accessing https://www.jobindex.dk/img/pdf/frellsen-salgssupporter-25032025.pdf
+2025-04-06 12:33:52 - [Job ID: 12543] Attempt 2 failed: Page.goto: Download is starting
+Call log:
+  - navigating to "https://www.jobindex.dk/img/pdf/embacollage-salgskonsulent.pdf", waiting until "networkidle"
+
+2025-04-06 12:33:52 - [Job ID: 12480] Attempt 3 failed: Page.goto: Download is starting
+Call log:
+  - navigating to "https://www.jobindex.dk/img/pdf/frellsen-salgssupporter-25032025.pdf", waiting until "networkidle"
+
+2025-04-06 12:33:52 - No content retrieved for job ID: 11832
+2025-04-06 12:33:52 - [Job ID: 12291] Attempt 2: Accessing https://www.jobindex.dk/img/pdf/strandgaarden_field_sales_20250402_lost.pdf
+2025-04-06 12:33:52 - [Job ID: 12480] All attempts failed for https://www.jobindex.dk/img/pdf/frellsen-salgssupporter-25032025.pdf
+2025-04-06 12:33:52 - [Job ID: 11995] Attempt 3: Accessing https://www.jobindex.dk/img/pdf/majinvest_digitalmarketingandperformancemanager_20250321_lost.pdf
+2025-04-06 12:33:52 - [Job ID: 12291] Attempt 2 failed: Page.goto: Download is starting
+Call log:
+  - navigating to "https://www.jobindex.dk/img/pdf/strandgaarden_field_sales_20250402_lost.pdf", waiting until "networkidle"
+
+2025-04-06 12:33:52 - [Job ID: 11995] Attempt 3 failed: Page.goto: Download is starting
+Call log:
+  - navigating to "https://www.jobindex.dk/img/pdf/majinvest_digitalmarketingandperformancemanager_20250321_lost.pdf", waiting until "networkidle"
+
+2025-04-06 12:33:52 - No content retrieved for job ID: 12480
+2025-04-06 12:33:52 - [Job ID: 12410] Attempt 2: Accessing https://www.jobindex.dk/img/pdf/softline_areasalesmanager_danmark.pdf
+2025-04-06 12:33:52 - [Job ID: 11995] All attempts failed for https://www.jobindex.dk/img/pdf/majinvest_digitalmarketingandperformancemanager_20250321_lost.pdf
+2025-04-06 12:33:52 - [Job ID: 12651] Attempt 3: Accessing https://www.jobindex.dk/img/pdf/wuavmac2025.pdf
+2025-04-06 12:33:52 - [Job ID: 12410] Attempt 2 failed: Page.goto: Download is starting
+Call log:
+  - navigating to "https://www.jobindex.dk/img/pdf/softline_areasalesmanager_danmark.pdf", waiting until "networkidle"
+
+2025-04-06 12:33:53 - [Job ID: 12651] Attempt 3 failed: Page.goto: Download is starting
+Call log:
+  - navigating to "https://www.jobindex.dk/img/pdf/wuavmac2025.pdf", waiting until "networkidle"
+
+2025-04-06 12:33:53 - [Job ID: 12651] All attempts failed for https://www.jobindex.dk/img/pdf/wuavmac2025.pdf
+2025-04-06 12:33:53 - No content retrieved for job ID: 11995
+2025-04-06 12:33:53 - [Job ID: 11848] Attempt 3: Accessing https://www.guldmann.com/media/8460/supply-chain-planner-traineeforl%C3%B8b_guldmann.pdf
+2025-04-06 12:33:53 - [Job ID: 11848] Attempt 3 failed: Page.goto: Download is starting
+Call log:
+  - navigating to "https://www.guldmann.com/media/8460/supply-chain-planner-traineeforl%C3%B8b_guldmann.pdf", waiting until "networkidle"
+
+2025-04-06 12:33:53 - [Job ID: 11848] All attempts failed for https://www.guldmann.com/media/8460/supply-chain-planner-traineeforl%C3%B8b_guldmann.pdf
+2025-04-06 12:33:53 - No content retrieved for job ID: 12651
+2025-04-06 12:33:53 - [Job ID: 11866] Attempt 3: Accessing https://www.kajmadsen.dk/Disponent%20-%20Spanien.pdf
+2025-04-06 12:33:53 - [Job ID: 11866] Attempt 3 failed: Page.goto: Download is starting
+Call log:
+  - navigating to "https://www.kajmadsen.dk/Disponent%20-%20Spanien.pdf", waiting until "networkidle"
+
+2025-04-06 12:33:54 - [Job ID: 11866] All attempts failed for https://www.kajmadsen.dk/Disponent%20-%20Spanien.pdf
+2025-04-06 12:33:54 - No content retrieved for job ID: 11848
+2025-04-06 12:33:54 - [Job ID: 12383] Attempt 3: Accessing https://www.jobindex.dk/img/pdf/intern_saelger_20250328sul.pdf
+2025-04-06 12:33:54 - [Job ID: 12383] Attempt 3 failed: Page.goto: Download is starting
+Call log:
+  - navigating to "https://www.jobindex.dk/img/pdf/intern_saelger_20250328sul.pdf", waiting until "networkidle"
+
+2025-04-06 12:33:54 - No content retrieved for job ID: 11866
+2025-04-06 12:33:54 - [Job ID: 12383] All attempts failed for https://www.jobindex.dk/img/pdf/intern_saelger_20250328sul.pdf
+2025-04-06 12:33:55 - [Job ID: 12543] Attempt 3: Accessing https://www.jobindex.dk/img/pdf/embacollage-salgskonsulent.pdf
+2025-04-06 12:33:55 - [Job ID: 12543] Attempt 3 failed: Page.goto: Download is starting
+Call log:
+  - navigating to "https://www.jobindex.dk/img/pdf/embacollage-salgskonsulent.pdf", waiting until "networkidle"
+
+2025-04-06 12:33:55 - No content retrieved for job ID: 12383
+2025-04-06 12:33:55 - [Job ID: 12543] All attempts failed for https://www.jobindex.dk/img/pdf/embacollage-salgskonsulent.pdf
+2025-04-06 12:33:55 - [Job ID: 12291] Attempt 3: Accessing https://www.jobindex.dk/img/pdf/strandgaarden_field_sales_20250402_lost.pdf
+2025-04-06 12:33:55 - [Job ID: 12291] Attempt 3 failed: Page.goto: Download is starting
+Call log:
+  - navigating to "https://www.jobindex.dk/img/pdf/strandgaarden_field_sales_20250402_lost.pdf", waiting until "networkidle"
+
+2025-04-06 12:33:55 - [Job ID: 12291] All attempts failed for https://www.jobindex.dk/img/pdf/strandgaarden_field_sales_20250402_lost.pdf
+2025-04-06 12:33:56 - [Job ID: 12410] Attempt 3: Accessing https://www.jobindex.dk/img/pdf/softline_areasalesmanager_danmark.pdf
+2025-04-06 12:33:56 - No content retrieved for job ID: 12543
+2025-04-06 12:33:56 - [Job ID: 12410] Attempt 3 failed: Page.goto: Download is starting
+Call log:
+  - navigating to "https://www.jobindex.dk/img/pdf/softline_areasalesmanager_danmark.pdf", waiting until "networkidle"
+
+2025-04-06 12:33:56 - No content retrieved for job ID: 12291
+2025-04-06 12:33:56 - [Job ID: 12410] All attempts failed for https://www.jobindex.dk/img/pdf/softline_areasalesmanager_danmark.pdf
+2025-04-06 12:33:56 - No content retrieved for job ID: 12410
+2025-04-06 12:33:57 - Processing jobs 71 to 80 of 8032...
+2025-04-06 12:33:59 - [Job ID: 12961] Attempt 1: Accessing https://home.hr-skyen.dk/show-job/250364
+2025-04-06 12:33:59 - [Job ID: 13112] Attempt 1: Accessing https://www.jobindex.dk/img/pdf/projektleder_kbh_foraar2025.pdf
+2025-04-06 12:34:00 - [Job ID: 13112] Attempt 1 failed: Page.goto: Download is starting
+Call log:
+  - navigating to "https://www.jobindex.dk/img/pdf/projektleder_kbh_foraar2025.pdf", waiting until "networkidle"
+
+2025-04-06 12:34:00 - [Job ID: 12962] Attempt 1: Accessing https://home.hr-skyen.dk/show-job/227612
+2025-04-06 12:34:01 - [Job ID: 12934] Attempt 1: Accessing https://www.jobindex.dk/img/pdf/nordicalsvestjylland_sagskoordinator.pdf
+2025-04-06 12:34:01 - [Job ID: 12934] Attempt 1 failed: Page.goto: Download is starting
+Call log:
+  - navigating to "https://www.jobindex.dk/img/pdf/nordicalsvestjylland_sagskoordinator.pdf", waiting until "networkidle"
+
+2025-04-06 12:34:01 - [Job ID: 12924] Attempt 1: Accessing https://www.jobindex.dk/img/pdf/erhversmaegler_nordicals-aalborg_januar-2025.pdf
+2025-04-06 12:34:02 - [Job ID: 12924] Attempt 1 failed: Page.goto: Download is starting
+Call log:
+  - navigating to "https://www.jobindex.dk/img/pdf/erhversmaegler_nordicals-aalborg_januar-2025.pdf", waiting until "networkidle"
+
+2025-04-06 12:34:02 - [Job ID: 13045] Attempt 1: Accessing https://www.jobindex.dk/jobannonce/h1537211/project-manager-automation
+2025-04-06 12:34:02 - [Job ID: 13062] Attempt 1: Accessing https://www.jobindex.dk/jobannonce/h1544764/project-manager
+2025-04-06 12:34:03 - [Job ID: 12960] Attempt 1: Accessing https://home.hr-skyen.dk/show-job/227617
+2025-04-06 12:34:03 - [Job ID: 13112] Attempt 2: Accessing https://www.jobindex.dk/img/pdf/projektleder_kbh_foraar2025.pdf
+2025-04-06 12:34:03 - [Job ID: 13112] Attempt 2 failed: Page.goto: Download is starting
+Call log:
+  - navigating to "https://www.jobindex.dk/img/pdf/projektleder_kbh_foraar2025.pdf", waiting until "networkidle"
+
+2025-04-06 12:34:04 - [Job ID: 12967] Attempt 1: Accessing https://home.hr-skyen.dk/show-job/248787
+2025-04-06 12:34:04 - [Job ID: 12934] Attempt 2: Accessing https://www.jobindex.dk/img/pdf/nordicalsvestjylland_sagskoordinator.pdf
+2025-04-06 12:34:04 - [Job ID: 13010] Attempt 1: Accessing https://candidate.hr-manager.net/ApplicationInit.aspx?cid=316&ProjectId=187860&DepartmentId=9824&MediaId=5
+2025-04-06 12:34:05 - [Job ID: 12934] Attempt 2 failed: Page.goto: Download is starting
+Call log:
+  - navigating to "https://www.jobindex.dk/img/pdf/nordicalsvestjylland_sagskoordinator.pdf", waiting until "networkidle"
+
+2025-04-06 12:34:05 - [Job ID: 12924] Attempt 2: Accessing https://www.jobindex.dk/img/pdf/erhversmaegler_nordicals-aalborg_januar-2025.pdf
+2025-04-06 12:34:05 - [Job ID: 12924] Attempt 2 failed: Page.goto: Download is starting
+Call log:
+  - navigating to "https://www.jobindex.dk/img/pdf/erhversmaegler_nordicals-aalborg_januar-2025.pdf", waiting until "networkidle"
+
+2025-04-06 12:34:07 - [Job ID: 13112] Attempt 3: Accessing https://www.jobindex.dk/img/pdf/projektleder_kbh_foraar2025.pdf
+2025-04-06 12:34:07 - [Job ID: 13112] Attempt 3 failed: Page.goto: Download is starting
+Call log:
+  - navigating to "https://www.jobindex.dk/img/pdf/projektleder_kbh_foraar2025.pdf", waiting until "networkidle"
+
+2025-04-06 12:34:07 - [Job ID: 13112] All attempts failed for https://www.jobindex.dk/img/pdf/projektleder_kbh_foraar2025.pdf
+2025-04-06 12:34:07 - Error extracting HTML from frames: Page.wait_for_selector: Timeout 5000ms exceeded.
+Call log:
+  - waiting for locator("body") to be visible
+  -     14 × locator resolved to hidden <body>…</body>
+
+2025-04-06 12:34:07 - [Job ID: 12961] No content found on attempt 1
+2025-04-06 12:34:07 - [Job ID: 12961] Attempt 2: Accessing https://home.hr-skyen.dk/show-job/250364
+2025-04-06 12:34:08 - No content retrieved for job ID: 13112
+2025-04-06 12:34:08 - [Job ID: 12934] Attempt 3: Accessing https://www.jobindex.dk/img/pdf/nordicalsvestjylland_sagskoordinator.pdf
+2025-04-06 12:34:08 - [Job ID: 12934] Attempt 3 failed: Page.goto: Download is starting
+Call log:
+  - navigating to "https://www.jobindex.dk/img/pdf/nordicalsvestjylland_sagskoordinator.pdf", waiting until "networkidle"
+
+2025-04-06 12:34:08 - Error extracting HTML from frames: Page.wait_for_selector: Timeout 5000ms exceeded.
+Call log:
+  - waiting for locator("body") to be visible
+  -     14 × locator resolved to hidden <body>…</body>
+
+2025-04-06 12:34:08 - [Job ID: 12962] No content found on attempt 1
+2025-04-06 12:34:08 - [Job ID: 12962] Attempt 2: Accessing https://home.hr-skyen.dk/show-job/227612
+2025-04-06 12:34:08 - [Job ID: 12934] All attempts failed for https://www.jobindex.dk/img/pdf/nordicalsvestjylland_sagskoordinator.pdf
+2025-04-06 12:34:09 - [Job ID: 12924] Attempt 3: Accessing https://www.jobindex.dk/img/pdf/erhversmaegler_nordicals-aalborg_januar-2025.pdf
+2025-04-06 12:34:09 - [Job ID: 12924] Attempt 3 failed: Page.goto: Download is starting
+Call log:
+  - navigating to "https://www.jobindex.dk/img/pdf/erhversmaegler_nordicals-aalborg_januar-2025.pdf", waiting until "networkidle"
+
+2025-04-06 12:34:09 - No content retrieved for job ID: 12934
+2025-04-06 12:34:09 - [Job ID: 12924] All attempts failed for https://www.jobindex.dk/img/pdf/erhversmaegler_nordicals-aalborg_januar-2025.pdf
+2025-04-06 12:34:10 - No content retrieved for job ID: 12924
+2025-04-06 12:34:12 - Error extracting HTML from frames: Page.wait_for_selector: Timeout 5000ms exceeded.
+Call log:
+  - waiting for locator("body") to be visible
+  -     14 × locator resolved to hidden <body>…</body>
+
+2025-04-06 12:34:12 - [Job ID: 12960] No content found on attempt 1
+2025-04-06 12:34:12 - [Job ID: 12960] Attempt 2: Accessing https://home.hr-skyen.dk/show-job/227617
+2025-04-06 12:34:13 - Error extracting HTML from frames: Page.wait_for_selector: Timeout 5000ms exceeded.
+Call log:
+  - waiting for locator("body") to be visible
+  -     14 × locator resolved to hidden <body>…</body>
+
+2025-04-06 12:34:13 - [Job ID: 12967] No content found on attempt 1
+2025-04-06 12:34:13 - [Job ID: 12967] Attempt 2: Accessing https://home.hr-skyen.dk/show-job/248787
+2025-04-06 12:34:15 - Error extracting HTML from frames: Page.wait_for_selector: Timeout 5000ms exceeded.
+Call log:
+  - waiting for locator("body") to be visible
+  -     14 × locator resolved to hidden <body>…</body>
+
+2025-04-06 12:34:15 - [Job ID: 12961] No content found on attempt 2
+2025-04-06 12:34:15 - [Job ID: 12961] Attempt 3: Accessing https://home.hr-skyen.dk/show-job/250364
+2025-04-06 12:34:15 - Error extracting HTML from frames: Page.wait_for_selector: Timeout 5000ms exceeded.
+Call log:
+  - waiting for locator("body") to be visible
+  -     14 × locator resolved to hidden <body>…</body>
+
+2025-04-06 12:34:15 - [Job ID: 12962] No content found on attempt 2
+2025-04-06 12:34:16 - [Job ID: 12962] Attempt 3: Accessing https://home.hr-skyen.dk/show-job/227612
+2025-04-06 12:34:17 - [Job ID: 13045] Attempt 1 failed: Page.goto: Timeout 15000ms exceeded.
+Call log:
+  - navigating to "https://www.jobindex.dk/jobannonce/h1537211/project-manager-automation", waiting until "networkidle"
+
+2025-04-06 12:34:17 - [Job ID: 13062] Attempt 1 failed: Page.goto: Timeout 15000ms exceeded.
+Call log:
+  - navigating to "https://www.jobindex.dk/jobannonce/h1544764/project-manager", waiting until "networkidle"
+
+2025-04-06 12:34:19 - Error extracting HTML from frames: Page.wait_for_selector: Timeout 5000ms exceeded.
+Call log:
+  - waiting for locator("body") to be visible
+  -     15 × locator resolved to hidden <body>…</body>
+
+2025-04-06 12:34:19 - [Job ID: 12960] No content found on attempt 2
+2025-04-06 12:34:19 - [Job ID: 12960] Attempt 3: Accessing https://home.hr-skyen.dk/show-job/227617
+2025-04-06 12:34:19 - [Job ID: 13010] Attempt 1 failed: Page.goto: Timeout 15000ms exceeded.
+Call log:
+  - navigating to "https://candidate.hr-manager.net/ApplicationInit.aspx?cid=316&ProjectId=187860&DepartmentId=9824&MediaId=5", waiting until "networkidle"
+
+2025-04-06 12:34:20 - Error extracting HTML from frames: Page.wait_for_selector: Timeout 5000ms exceeded.
+Call log:
+  - waiting for locator("body") to be visible
+  -     14 × locator resolved to hidden <body>…</body>
+
+2025-04-06 12:34:20 - [Job ID: 12967] No content found on attempt 2
+2025-04-06 12:34:20 - [Job ID: 12967] Attempt 3: Accessing https://home.hr-skyen.dk/show-job/248787
+2025-04-06 12:34:20 - [Job ID: 13045] Attempt 2: Accessing https://www.jobindex.dk/jobannonce/h1537211/project-manager-automation
+2025-04-06 12:34:21 - [Job ID: 13062] Attempt 2: Accessing https://www.jobindex.dk/jobannonce/h1544764/project-manager
+2025-04-06 12:34:22 - Error extracting HTML from frames: Page.wait_for_selector: Timeout 5000ms exceeded.
+Call log:
+  - waiting for locator("body") to be visible
+  -     14 × locator resolved to hidden <body>…</body>
+
+2025-04-06 12:34:22 - [Job ID: 12961] No content found on attempt 3
+2025-04-06 12:34:22 - Error extracting HTML from frames: Page.wait_for_selector: Timeout 5000ms exceeded.
+Call log:
+  - waiting for locator("body") to be visible
+  -     14 × locator resolved to hidden <body>…</body>
+
+2025-04-06 12:34:22 - [Job ID: 12962] No content found on attempt 3
+2025-04-06 12:34:23 - [Job ID: 13010] Attempt 2: Accessing https://candidate.hr-manager.net/ApplicationInit.aspx?cid=316&ProjectId=187860&DepartmentId=9824&MediaId=5
+2025-04-06 12:34:26 - Error extracting HTML from frames: Page.wait_for_selector: Timeout 5000ms exceeded.
+Call log:
+  - waiting for locator("body") to be visible
+  -     14 × locator resolved to hidden <body>…</body>
+
+2025-04-06 12:34:26 - [Job ID: 12960] No content found on attempt 3
+2025-04-06 12:34:27 - Error extracting HTML from frames: Page.wait_for_selector: Timeout 5000ms exceeded.
+Call log:
+  - waiting for locator("body") to be visible
+  -     14 × locator resolved to hidden <body>…</body>
+
+2025-04-06 12:34:27 - [Job ID: 12967] No content found on attempt 3
+2025-04-06 12:34:33 - No content retrieved for job ID: 12962
+2025-04-06 12:34:35 - [Job ID: 13045] Attempt 2 failed: Page.goto: Timeout 15000ms exceeded.
+Call log:
+  - navigating to "https://www.jobindex.dk/jobannonce/h1537211/project-manager-automation", waiting until "networkidle"
+
+2025-04-06 12:34:36 - [Job ID: 13062] Attempt 2 failed: Page.goto: Timeout 15000ms exceeded.
+Call log:
+  - navigating to "https://www.jobindex.dk/jobannonce/h1544764/project-manager", waiting until "networkidle"
+
+2025-04-06 12:34:37 - No content retrieved for job ID: 12961
+2025-04-06 12:34:37 - No content retrieved for job ID: 12960
+2025-04-06 12:34:37 - No content retrieved for job ID: 12967
+2025-04-06 12:34:38 - [Job ID: 13010] Attempt 2 failed: Page.goto: Timeout 15000ms exceeded.
+Call log:
+  - navigating to "https://candidate.hr-manager.net/ApplicationInit.aspx?cid=316&ProjectId=187860&DepartmentId=9824&MediaId=5", waiting until "networkidle"
+
+2025-04-06 12:34:39 - [Job ID: 13045] Attempt 3: Accessing https://www.jobindex.dk/jobannonce/h1537211/project-manager-automation
+2025-04-06 12:34:39 - [Job ID: 13062] Attempt 3: Accessing https://www.jobindex.dk/jobannonce/h1544764/project-manager
+2025-04-06 12:34:41 - [Job ID: 13010] Attempt 3: Accessing https://candidate.hr-manager.net/ApplicationInit.aspx?cid=316&ProjectId=187860&DepartmentId=9824&MediaId=5
+2025-04-06 12:34:54 - [Job ID: 13045] Attempt 3 failed: Page.goto: Timeout 15000ms exceeded.
+Call log:
+  - navigating to "https://www.jobindex.dk/jobannonce/h1537211/project-manager-automation", waiting until "networkidle"
+
+2025-04-06 12:34:54 - [Job ID: 13062] Attempt 3 failed: Page.goto: Timeout 15000ms exceeded.
+Call log:
+  - navigating to "https://www.jobindex.dk/jobannonce/h1544764/project-manager", waiting until "networkidle"
+
+2025-04-06 12:34:55 - [Job ID: 13045] All attempts failed for https://www.jobindex.dk/jobannonce/h1537211/project-manager-automation
+2025-04-06 12:34:55 - [Job ID: 13062] All attempts failed for https://www.jobindex.dk/jobannonce/h1544764/project-manager
+2025-04-06 12:34:56 - No content retrieved for job ID: 13062
+2025-04-06 12:34:56 - No content retrieved for job ID: 13045
+2025-04-06 12:34:56 - [Job ID: 13010] Attempt 3 failed: Page.goto: Timeout 15000ms exceeded.
+Call log:
+  - navigating to "https://candidate.hr-manager.net/ApplicationInit.aspx?cid=316&ProjectId=187860&DepartmentId=9824&MediaId=5", waiting until "networkidle"
+
+2025-04-06 12:34:56 - [Job ID: 13010] All attempts failed for https://candidate.hr-manager.net/ApplicationInit.aspx?cid=316&ProjectId=187860&DepartmentId=9824&MediaId=5
+2025-04-06 12:34:57 - No content retrieved for job ID: 13010
+2025-04-06 12:34:58 - Processing jobs 81 to 90 of 8032...
+2025-04-06 12:35:00 - [Job ID: 13454] Attempt 1: Accessing https://www.jobindex.dk/jobannonce/r13073121/biodiversity-project-manager
+2025-04-06 12:35:00 - [Job ID: 13538] Attempt 1: Accessing https://candidate.hr-manager.net/ApplicationInit.aspx?cid=342&ProjectId=261794&DepartmentId=14422&MediaId=5
+2025-04-06 12:35:01 - [Job ID: 13453] Attempt 1: Accessing https://www.jobindex.dk/jobannonce/r13073115/ap-module-lead
+2025-04-06 12:35:01 - [Job ID: 13539] Attempt 1: Accessing https://candidate.hr-manager.net/ApplicationInit.aspx?cid=198&ProjectId=232100&DepartmentId=6875&MediaId=2897
+2025-04-06 12:35:02 - [Job ID: 13455] Attempt 1: Accessing https://www.jobindex.dk/jobannonce/r13073117/project-manager-for-fill-and-finish-expansion
+2025-04-06 12:35:03 - [Job ID: 13540] Attempt 1: Accessing https://www.jobindex.dk/jobannonce/r13083085/stabsmedarbejder-til-psykiatrien-oest
+2025-04-06 12:35:03 - [Job ID: 13158] Attempt 1: Accessing https://www.jobindex.dk/img/pdf/kloakingenioer_hartvig_consult_.pdf
+2025-04-06 12:35:04 - [Job ID: 13315] Attempt 1: Accessing https://www.jobindex.dk/jobannonce/h1539425/executive-assistant-to-ceo
+2025-04-06 12:35:04 - Updated content for job ID: 13454
+2025-04-06 12:35:05 - [Job ID: 13456] Attempt 1: Accessing https://www.jobindex.dk/jobannonce/r13072349/projektansvarlig-med-potentiale-til-salgschef-pisiffik-nuuk-groenland
+2025-04-06 12:35:05 - [Job ID: 13158] Attempt 1 failed: Page.goto: Download is starting
+Call log:
+  - navigating to "https://www.jobindex.dk/img/pdf/kloakingenioer_hartvig_consult_.pdf", waiting until "networkidle"
+
+2025-04-06 12:35:05 - Updated content for job ID: 13453
+2025-04-06 12:35:05 - [Job ID: 13541] Attempt 1: Accessing https://www.jobindex.dk/jobannonce/r13082776/deltidsstilling-som-receptionist-i-hjertet-af-frederiksberg
+2025-04-06 12:35:07 - Updated content for job ID: 13455
+2025-04-06 12:35:08 - [Job ID: 13158] Attempt 2: Accessing https://www.jobindex.dk/img/pdf/kloakingenioer_hartvig_consult_.pdf
+2025-04-06 12:35:09 - Updated content for job ID: 13538
+2025-04-06 12:35:09 - Updated content for job ID: 13539
+2025-04-06 12:35:09 - [Job ID: 13158] Attempt 2 failed: Page.goto: Download is starting
+Call log:
+  - navigating to "https://www.jobindex.dk/img/pdf/kloakingenioer_hartvig_consult_.pdf", waiting until "networkidle"
+
+2025-04-06 12:35:10 - Updated content for job ID: 13540
+2025-04-06 12:35:12 - Updated content for job ID: 13456
+2025-04-06 12:35:13 - Updated content for job ID: 13541
+2025-04-06 12:35:13 - [Job ID: 13158] Attempt 3: Accessing https://www.jobindex.dk/img/pdf/kloakingenioer_hartvig_consult_.pdf
+2025-04-06 12:35:13 - [Job ID: 13158] Attempt 3 failed: Page.goto: Download is starting
+Call log:
+  - navigating to "https://www.jobindex.dk/img/pdf/kloakingenioer_hartvig_consult_.pdf", waiting until "networkidle"
+
+2025-04-06 12:35:13 - [Job ID: 13158] All attempts failed for https://www.jobindex.dk/img/pdf/kloakingenioer_hartvig_consult_.pdf
+2025-04-06 12:35:14 - No content retrieved for job ID: 13158
+2025-04-06 12:35:19 - [Job ID: 13315] Attempt 1 failed: Page.goto: Timeout 15000ms exceeded.
+Call log:
+  - navigating to "https://www.jobindex.dk/jobannonce/h1539425/executive-assistant-to-ceo", waiting until "networkidle"
+
+2025-04-06 12:35:22 - [Job ID: 13315] Attempt 2: Accessing https://www.jobindex.dk/jobannonce/h1539425/executive-assistant-to-ceo
+2025-04-06 12:35:37 - [Job ID: 13315] Attempt 2 failed: Page.goto: Timeout 15000ms exceeded.
+Call log:
+  - navigating to "https://www.jobindex.dk/jobannonce/h1539425/executive-assistant-to-ceo", waiting until "networkidle"
+
+2025-04-06 12:35:40 - [Job ID: 13315] Attempt 3: Accessing https://www.jobindex.dk/jobannonce/h1539425/executive-assistant-to-ceo
