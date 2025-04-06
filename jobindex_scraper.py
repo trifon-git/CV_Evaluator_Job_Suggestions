@@ -48,6 +48,7 @@ def init_database():
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             title TEXT NOT NULL,
             url TEXT NOT NULL UNIQUE,
+            application_url TEXT,
             company_id INTEGER,
             area_id INTEGER,
             published_date TEXT NOT NULL,
@@ -95,11 +96,12 @@ def insert_jobs(conn, jobs_data, category_id):
             # Insert job with foreign keys
             cursor.execute('''
                 INSERT OR REPLACE INTO jobs 
-                (title, url, company_id, area_id, published_date, category_id)
-                VALUES (?, ?, ?, ?, ?, ?)
+                (title, url, application_url, company_id, area_id, published_date, category_id)
+                VALUES (?, ?, ?, ?, ?, ?, ?)
             ''', (
                 job['Title'],
                 job['URL'],
+                job['Application_URL'],
                 company_id,
                 area_id,
                 job['Published'],
@@ -134,9 +136,15 @@ def fetch_job_listings(keyword, page_limit=1, subid="1"):
                 break
 
             for job_ad in job_ads:
-                # Extract title and URL
-                title = job_ad.find('div', class_='jobad-element-menu-share')['data-share-title']
-                url = job_ad.find('div', class_='jobad-element-menu-share')['data-share-url']
+                # Extract title and URLs
+                share_div = job_ad.find('div', class_='jobad-element-menu-share')
+                title = share_div['data-share-title']
+                jobindex_url = share_div['data-share-url']
+                
+                # Extract direct application URL - look specifically for the job title link
+                application_link = job_ad.find('h4').find('a', href=True)
+                application_url = application_link['href'] if application_link else None
+
                 job_location = job_ad.find('span', class_='jix_robotjob--area')
 
                 # Extract company name with better error handling
@@ -153,7 +161,8 @@ def fetch_job_listings(keyword, page_limit=1, subid="1"):
                 # Append all required data to the list
                 job_listings.append({
                     "Title": title,
-                    "URL": url,
+                    "URL": jobindex_url,
+                    "Application_URL": application_url,
                     "Category_Job_ID": category_job_id,
                     "Category_Job": category_name,
                     "Company": company_name,
