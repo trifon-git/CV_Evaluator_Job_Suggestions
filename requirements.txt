@@ -1,4 +1,0 @@
-playwright==1.39.0
-beautifulsoup4==4.12.2
-nest-asyncio==1.5.8
-aiofiles==23.2.1

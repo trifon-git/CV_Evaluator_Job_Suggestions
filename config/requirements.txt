@@ -1,0 +1,10 @@
+requests
+beautifulsoup4
+pandas
+readability-lxml
+playwright
+sentence-transformers
+#sqlite-vss
+numpy<2
+fitz
+scipy
