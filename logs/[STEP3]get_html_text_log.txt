@@ -1,0 +1,130 @@
+2025-04-07 14:49:43 - Resuming from job ID: 0
+2025-04-07 14:49:44 - Processing jobs 326 to 1350
+2025-04-07 14:49:46 - [Job ID: 916] Attempt 1: Accessing https://candidate.hr-manager.net/ApplicationInit.aspx?cid=316&ProjectId=187855&DepartmentId=21682&MediaId=5
+2025-04-07 14:49:46 - [Job ID: 914] Attempt 1: Accessing https://candidate.hr-manager.net/ApplicationInit.aspx?cid=316&ProjectId=187871&DepartmentId=9823&MediaId=5
+2025-04-07 14:49:47 - [Job ID: 1350] Attempt 1: Accessing https://candidate.hr-manager.net/ApplicationInit.aspx?cid=316&ProjectId=187761&DepartmentId=21682&MediaId=5
+2025-04-07 14:49:48 - [Job ID: 798] Attempt 1: Accessing https://candidate.hr-manager.net/ApplicationInit.aspx?cid=316&ProjectId=187819&DepartmentId=21678&MediaId=5
+2025-04-07 14:49:49 - [Job ID: 675] Attempt 1: Accessing https://www.jobindex.dk/img/pdf/scleroseforeningen_crm_manager.pdf
+2025-04-07 14:49:49 - [Job ID: 326] Attempt 1: Accessing https://www.jobindex.dk/jobannonce/h1539409/senior-software-developer-front-end
+2025-04-07 14:49:49 - [Job ID: 675] Attempt 1 failed: Page.goto: Download is starting
+Call log:
+  - navigating to "https://www.jobindex.dk/img/pdf/scleroseforeningen_crm_manager.pdf", waiting until "networkidle"
+
+2025-04-07 14:49:50 - [Job ID: 1134] Attempt 1: Accessing https://www.jobindex.dk/jobannonce/h1538739/it-specialist-cax
+2025-04-07 14:49:51 - [Job ID: 1098] Attempt 1: Accessing https://candidate.hr-manager.net/ApplicationInit.aspx?cid=316&ProjectId=187792&DepartmentId=21682&MediaId=5
+2025-04-07 14:49:52 - [Job ID: 1036] Attempt 1: Accessing https://www.jobindex.dk/img/pdf/job_annonce_2025_application-manager.pdf
+2025-04-07 14:49:52 - [Job ID: 1069] Attempt 1: Accessing https://www.jobindex.dk/img/pdf/teamlead.pdf
+2025-04-07 14:49:53 - [Job ID: 675] Attempt 2: Accessing https://www.jobindex.dk/img/pdf/scleroseforeningen_crm_manager.pdf
+2025-04-07 14:49:53 - [Job ID: 675] Attempt 2 failed: Page.goto: Download is starting
+Call log:
+  - navigating to "https://www.jobindex.dk/img/pdf/scleroseforeningen_crm_manager.pdf", waiting until "networkidle"
+
+2025-04-07 14:49:53 - [Job ID: 1036] Attempt 1 failed: Page.goto: Download is starting
+Call log:
+  - navigating to "https://www.jobindex.dk/img/pdf/job_annonce_2025_application-manager.pdf", waiting until "networkidle"
+
+2025-04-07 14:49:56 - [Job ID: 675] Attempt 3: Accessing https://www.jobindex.dk/img/pdf/scleroseforeningen_crm_manager.pdf
+2025-04-07 14:49:56 - [Job ID: 675] Attempt 3 failed: Page.goto: Download is starting
+Call log:
+  - navigating to "https://www.jobindex.dk/img/pdf/scleroseforeningen_crm_manager.pdf", waiting until "networkidle"
+
+2025-04-07 14:49:57 - [Job ID: 675] All attempts failed for https://www.jobindex.dk/img/pdf/scleroseforeningen_crm_manager.pdf
+2025-04-07 14:49:57 - [Job ID: 1036] Attempt 2: Accessing https://www.jobindex.dk/img/pdf/job_annonce_2025_application-manager.pdf
+2025-04-07 14:49:57 - [Job ID: 1036] Attempt 2 failed: Page.goto: Download is starting
+Call log:
+  - navigating to "https://www.jobindex.dk/img/pdf/job_annonce_2025_application-manager.pdf", waiting until "networkidle"
+
+2025-04-07 14:49:58 - No content retrieved for job ID: 675
+2025-04-07 14:50:00 - [Job ID: 1069] Attempt 1 failed: Page.goto: Download is starting
+Call log:
+  - navigating to "https://www.jobindex.dk/img/pdf/teamlead.pdf", waiting until "networkidle"
+
+2025-04-07 14:50:00 - [Job ID: 1036] Attempt 3: Accessing https://www.jobindex.dk/img/pdf/job_annonce_2025_application-manager.pdf
+2025-04-07 14:50:00 - [Job ID: 1036] Attempt 3 failed: Page.goto: Download is starting
+Call log:
+  - navigating to "https://www.jobindex.dk/img/pdf/job_annonce_2025_application-manager.pdf", waiting until "networkidle"
+
+2025-04-07 14:50:01 - [Job ID: 1036] All attempts failed for https://www.jobindex.dk/img/pdf/job_annonce_2025_application-manager.pdf
+2025-04-07 14:50:01 - [Job ID: 916] Attempt 1 failed: Page.goto: Timeout 15000ms exceeded.
+Call log:
+  - navigating to "https://candidate.hr-manager.net/ApplicationInit.aspx?cid=316&ProjectId=187855&DepartmentId=21682&MediaId=5", waiting until "networkidle"
+
+2025-04-07 14:50:01 - [Job ID: 914] Attempt 1 failed: Page.goto: Timeout 15000ms exceeded.
+Call log:
+  - navigating to "https://candidate.hr-manager.net/ApplicationInit.aspx?cid=316&ProjectId=187871&DepartmentId=9823&MediaId=5", waiting until "networkidle"
+
+2025-04-07 14:50:02 - No content retrieved for job ID: 1036
+2025-04-07 14:50:02 - [Job ID: 1350] Attempt 1 failed: Page.goto: Timeout 15000ms exceeded.
+Call log:
+  - navigating to "https://candidate.hr-manager.net/ApplicationInit.aspx?cid=316&ProjectId=187761&DepartmentId=21682&MediaId=5", waiting until "networkidle"
+
+2025-04-07 14:50:03 - [Job ID: 798] Attempt 1 failed: Page.goto: Timeout 15000ms exceeded.
+Call log:
+  - navigating to "https://candidate.hr-manager.net/ApplicationInit.aspx?cid=316&ProjectId=187819&DepartmentId=21678&MediaId=5", waiting until "networkidle"
+
+2025-04-07 14:50:03 - [Job ID: 1069] Attempt 2: Accessing https://www.jobindex.dk/img/pdf/teamlead.pdf
+2025-04-07 14:50:03 - [Job ID: 1069] Attempt 2 failed: Page.goto: Download is starting
+Call log:
+  - navigating to "https://www.jobindex.dk/img/pdf/teamlead.pdf", waiting until "networkidle"
+
+2025-04-07 14:50:04 - [Job ID: 326] Attempt 1 failed: Page.goto: Timeout 15000ms exceeded.
+Call log:
+  - navigating to "https://www.jobindex.dk/jobannonce/h1539409/senior-software-developer-front-end", waiting until "networkidle"
+
+2025-04-07 14:50:04 - [Job ID: 916] Attempt 2: Accessing https://candidate.hr-manager.net/ApplicationInit.aspx?cid=316&ProjectId=187855&DepartmentId=21682&MediaId=5
+2025-04-07 14:50:05 - [Job ID: 914] Attempt 2: Accessing https://candidate.hr-manager.net/ApplicationInit.aspx?cid=316&ProjectId=187871&DepartmentId=9823&MediaId=5
+2025-04-07 14:50:05 - [Job ID: 1134] Attempt 1 failed: Page.goto: Timeout 15000ms exceeded.
+Call log:
+  - navigating to "https://www.jobindex.dk/jobannonce/h1538739/it-specialist-cax", waiting until "networkidle"
+
+2025-04-07 14:50:05 - [Job ID: 1350] Attempt 2: Accessing https://candidate.hr-manager.net/ApplicationInit.aspx?cid=316&ProjectId=187761&DepartmentId=21682&MediaId=5
+2025-04-07 14:50:06 - [Job ID: 1098] Attempt 1 failed: Page.goto: Timeout 15000ms exceeded.
+Call log:
+  - navigating to "https://candidate.hr-manager.net/ApplicationInit.aspx?cid=316&ProjectId=187792&DepartmentId=21682&MediaId=5", waiting until "networkidle"
+
+2025-04-07 14:50:06 - [Job ID: 798] Attempt 2: Accessing https://candidate.hr-manager.net/ApplicationInit.aspx?cid=316&ProjectId=187819&DepartmentId=21678&MediaId=5
+2025-04-07 14:50:06 - [Job ID: 1069] Attempt 3: Accessing https://www.jobindex.dk/img/pdf/teamlead.pdf
+2025-04-07 14:50:07 - [Job ID: 1069] Attempt 3 failed: Page.goto: Download is starting
+Call log:
+  - navigating to "https://www.jobindex.dk/img/pdf/teamlead.pdf", waiting until "networkidle"
+
+2025-04-07 14:50:07 - [Job ID: 1069] All attempts failed for https://www.jobindex.dk/img/pdf/teamlead.pdf
+2025-04-07 14:50:07 - [Job ID: 326] Attempt 2: Accessing https://www.jobindex.dk/jobannonce/h1539409/senior-software-developer-front-end
+2025-04-07 14:50:07 - No content retrieved for job ID: 1069
+2025-04-07 14:50:08 - [Job ID: 1134] Attempt 2: Accessing https://www.jobindex.dk/jobannonce/h1538739/it-specialist-cax
+2025-04-07 14:50:09 - [Job ID: 1098] Attempt 2: Accessing https://candidate.hr-manager.net/ApplicationInit.aspx?cid=316&ProjectId=187792&DepartmentId=21682&MediaId=5
+2025-04-07 14:50:19 - [Job ID: 916] Attempt 2 failed: Page.goto: Timeout 15000ms exceeded.
+Call log:
+  - navigating to "https://candidate.hr-manager.net/ApplicationInit.aspx?cid=316&ProjectId=187855&DepartmentId=21682&MediaId=5", waiting until "networkidle"
+
+2025-04-07 14:50:20 - [Job ID: 914] Attempt 2 failed: Page.goto: Timeout 15000ms exceeded.
+Call log:
+  - navigating to "https://candidate.hr-manager.net/ApplicationInit.aspx?cid=316&ProjectId=187871&DepartmentId=9823&MediaId=5", waiting until "networkidle"
+
+2025-04-07 14:50:20 - [Job ID: 1350] Attempt 2 failed: Page.goto: Timeout 15000ms exceeded.
+Call log:
+  - navigating to "https://candidate.hr-manager.net/ApplicationInit.aspx?cid=316&ProjectId=187761&DepartmentId=21682&MediaId=5", waiting until "networkidle"
+
+2025-04-07 14:50:21 - [Job ID: 798] Attempt 2 failed: Page.goto: Timeout 15000ms exceeded.
+Call log:
+  - navigating to "https://candidate.hr-manager.net/ApplicationInit.aspx?cid=316&ProjectId=187819&DepartmentId=21678&MediaId=5", waiting until "networkidle"
+
+2025-04-07 14:50:22 - [Job ID: 326] Attempt 2 failed: Page.goto: Timeout 15000ms exceeded.
+Call log:
+  - navigating to "https://www.jobindex.dk/jobannonce/h1539409/senior-software-developer-front-end", waiting until "networkidle"
+
+2025-04-07 14:50:23 - [Job ID: 1134] Attempt 2 failed: Page.goto: Timeout 15000ms exceeded.
+Call log:
+  - navigating to "https://www.jobindex.dk/jobannonce/h1538739/it-specialist-cax", waiting until "networkidle"
+
+2025-04-07 14:50:24 - [Job ID: 914] Attempt 3: Accessing https://candidate.hr-manager.net/ApplicationInit.aspx?cid=316&ProjectId=187871&DepartmentId=9823&MediaId=5
+2025-04-07 14:50:24 - [Job ID: 1098] Attempt 2 failed: Page.goto: Timeout 15000ms exceeded.
+Call log:
+  - navigating to "https://candidate.hr-manager.net/ApplicationInit.aspx?cid=316&ProjectId=187792&DepartmentId=21682&MediaId=5", waiting until "networkidle"
+
+2025-04-07 14:50:24 - [Job ID: 916] Attempt 3: Accessing https://candidate.hr-manager.net/ApplicationInit.aspx?cid=316&ProjectId=187855&DepartmentId=21682&MediaId=5
+2025-04-07 14:50:25 - [Job ID: 1350] Attempt 3: Accessing https://candidate.hr-manager.net/ApplicationInit.aspx?cid=316&ProjectId=187761&DepartmentId=21682&MediaId=5
+2025-04-07 14:50:25 - [Job ID: 798] Attempt 3: Accessing https://candidate.hr-manager.net/ApplicationInit.aspx?cid=316&ProjectId=187819&DepartmentId=21678&MediaId=5
+2025-04-07 14:50:27 - [Job ID: 326] Attempt 3: Accessing https://www.jobindex.dk/jobannonce/h1539409/senior-software-developer-front-end
+2025-04-07 14:50:27 - [Job ID: 1134] Attempt 3: Accessing https://www.jobindex.dk/jobannonce/h1538739/it-specialist-cax
+2025-04-07 14:50:28 - [Job ID: 1098] Attempt 3: Accessing https://candidate.hr-manager.net/ApplicationInit.aspx?cid=316&ProjectId=187792&DepartmentId=21682&MediaId=5

@@ -13,7 +13,7 @@ def log_message(message):
 def check_and_remove_duplicates(conn=None):
     """
     Check for and remove duplicate jobs, keeping only one instance.
-    Jobs are considered duplicates if they have the same title, URL, and application_url.
+    Jobs are considered duplicates if they have the same title, area_id, company_id, and category_id.
     """
     if conn is None:
         conn = sqlite3.connect(DB_PATH)
@@ -21,12 +21,12 @@ def check_and_remove_duplicates(conn=None):
     cursor = conn.cursor()
     
     try:
-        # Find duplicates based on title
-        log_message("Checking for duplicates based on title...")
+        # Find duplicates based on title and IDs
+        log_message("Checking for duplicates based on title, area, company, and category...")
         cursor.execute('''
-            SELECT title, COUNT(*) as count
+            SELECT title, area_id, company_id, category_id, COUNT(*) as count
             FROM jobs
-            GROUP BY title
+            GROUP BY title, area_id, company_id, category_id
             HAVING COUNT(*) > 1
         ''')
         
@@ -41,15 +41,18 @@ def check_and_remove_duplicates(conn=None):
         total_deleted = 0
         
         for dup in duplicates:
-            title, count = dup
-            log_message(f"Processing duplicates for title: '{title}'")
+            title, area_id, company_id, category_id, count = dup
+            log_message(f"Processing duplicates for title: '{title}' (Area: {area_id}, Company: {company_id}, Category: {category_id})")
             
             # Get all IDs for these duplicates, ordered by ID
             cursor.execute('''
                 SELECT id FROM jobs
-                WHERE title = ?
+                WHERE title = ? 
+                AND area_id = ? 
+                AND company_id = ? 
+                AND category_id = ?
                 ORDER BY id
-            ''', (title,))
+            ''', (title, area_id, company_id, category_id))
             
             ids = [row[0] for row in cursor.fetchall()]
             
