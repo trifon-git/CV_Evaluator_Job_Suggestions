@@ -14,14 +14,17 @@ nest_asyncio.apply()
 
 # Increase concurrent tasks
 SEMAPHORE = Semaphore(10)  # Increased from 3 to 10 concurrent tasks
-LOG_FILE = "get_archive_html_process_log.txt"
+# Get script name without extension for log file naming
+SCRIPT_NAME = os.path.splitext(os.path.basename(__file__))[0]
+LOG_FILE = f"{SCRIPT_NAME}_log.txt"
+PROGRESS_FILE = os.path.join(os.path.dirname(os.path.dirname(__file__)), "logs", f"{SCRIPT_NAME}_progress.txt")
 DB_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data", "job_listings.db")
 
 def log_message(message):
     """Log a message with timestamp."""
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     print(f"{timestamp} - {message}")
-    log_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "logs", "error_log.txt")
+    log_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "logs", f"{SCRIPT_NAME}_log.txt")
     with open(log_path, "a", encoding="utf-8") as log_file:
         log_file.write(f"{timestamp} - {message}\n")
 
@@ -149,6 +152,7 @@ async def scrape_job_content(conn, job_id, url):
 # Add after imports
 PROGRESS_FILE = os.path.join(os.path.dirname(os.path.dirname(__file__)), "logs", "scraping_progress.txt")
 
+# Update the PROGRESS_FILE reference
 def save_progress(last_id):
     """Save the last processed job ID."""
     with open(PROGRESS_FILE, "w") as f:
@@ -158,7 +162,9 @@ def load_progress():
     """Load the last processed job ID."""
     try:
         with open(PROGRESS_FILE, "r") as f:
-            return int(f.read().strip())
+            last_id = int(f.read().strip())
+            # Start 1000 IDs before the last recorded ID
+            return max(0, last_id - 1000)  # Ensure we don't go below 0
     except:
         return 0  # Start from beginning if no progress file
 

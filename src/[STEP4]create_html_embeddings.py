@@ -10,6 +10,9 @@ DB_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data", "job_
 MODEL_NAME = 'paraphrase-multilingual-mpnet-base-v2'
 BATCH_SIZE = 50
 
+# Get script name for log files
+SCRIPT_NAME = os.path.splitext(os.path.basename(__file__))[0]
+
 # Thread-local storage for database connections
 local_storage = threading.local()
 
@@ -25,14 +28,14 @@ def log_message(message, is_error=False):
     logs_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), "logs")
     os.makedirs(logs_dir, exist_ok=True)
     
-    # Log to process log file
-    process_log_path = os.path.join(logs_dir, "process_log.txt")
-    with open(process_log_path, "a", encoding="utf-8") as log_file:
+    # Log to script-specific log file
+    log_path = os.path.join(logs_dir, f"{SCRIPT_NAME}_log.txt")
+    with open(log_path, "a", encoding="utf-8") as log_file:
         log_file.write(f"{formatted_message}\n")
     
-    # Additionally log errors to error log file
+    # Additionally log errors to script-specific error log file
     if is_error:
-        error_log_path = os.path.join(logs_dir, "error_log.txt")
+        error_log_path = os.path.join(logs_dir, f"{SCRIPT_NAME}_error_log.txt")
         with open(error_log_path, "a", encoding="utf-8") as error_file:
             error_file.write(f"{formatted_message}\n")
 
