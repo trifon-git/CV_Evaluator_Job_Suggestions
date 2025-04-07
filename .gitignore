@@ -1,3 +1,7 @@
+# Add specific scripts to ignore
+src/delete_future_jobs.py
+src/delete_null_created_at.py
+
 # Database files
 *.db
-job_listings.db
+data/job_listings.db

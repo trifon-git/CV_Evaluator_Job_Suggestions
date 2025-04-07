@@ -138,25 +138,21 @@ def vector_to_blob(vector):
     return np.array(vector, dtype=np.float32).tobytes() if vector is not None else None
 
 def process_jobs_batch(model, db_manager, batch):
-    """Process a batch of jobs and update their embeddings and posting dates."""
+    """Process a batch of jobs and update their embeddings."""
     conn = db_manager.get_connection()
     cursor = conn.cursor()
     
     for job_id, html_content in batch:
         try:
-            # Extract posting date from HTML content (you'll need to implement this based on your HTML structure)
-            posting_date = extract_posting_date(html_content)
-            
             embedding = model.get_embedding(html_content)
             if embedding is not None:
                 blob = vector_to_blob(embedding)
                 cursor.execute('''
                     UPDATE jobs 
-                    SET embedding = ?,
-                        posting_date = ?
+                    SET embedding = ?
                     WHERE id = ?
-                ''', (blob, posting_date, job_id))
-                log_message(f"Updated embedding and posting date for job ID: {job_id}")
+                ''', (blob, job_id))
+                log_message(f"Updated embedding for job ID: {job_id}")
             else:
                 log_message(f"Could not generate embedding for job ID: {job_id}")
         except Exception as e:
@@ -179,13 +175,6 @@ def ensure_columns(conn):
             log_message("Successfully added embedding column to jobs table")
         else:
             log_message("Embedding column already exists in jobs table")
-            
-        if 'posting_date' not in column_names:
-            cursor.execute('ALTER TABLE jobs ADD COLUMN posting_date TEXT')
-            conn.commit()
-            log_message("Successfully added posting_date column to jobs table")
-        else:
-            log_message("Posting date column already exists in jobs table")
             
     except sqlite3.Error as e:
         log_message(f"Database error while checking/creating columns: {e}", is_error=True)

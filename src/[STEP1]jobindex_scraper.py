@@ -1,10 +1,10 @@
+import os
 import pandas as pd
 import requests
 from bs4 import BeautifulSoup
 import sqlite3
 from datetime import datetime
 import json
-import os
 
 category_job_id = 1
 category_name = "active"
@@ -42,10 +42,10 @@ def init_database():
         )
     ''')
     
-    # Create jobs table with foreign keys
+    # Create jobs table with foreign keys - removed AUTOINCREMENT
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS jobs (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            id INTEGER PRIMARY KEY,
             title TEXT NOT NULL,
             url TEXT NOT NULL UNIQUE,
             application_url TEXT,
@@ -53,7 +53,7 @@ def init_database():
             area_id INTEGER,
             published_date TEXT NOT NULL,
             category_id INTEGER,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            created_at TIMESTAMP,
             FOREIGN KEY (category_id) REFERENCES categories (id),
             FOREIGN KEY (company_id) REFERENCES companies (id),
             FOREIGN KEY (area_id) REFERENCES areas (id)
@@ -81,8 +81,17 @@ def insert_categories(conn, subid_mapping):
 
 def insert_jobs(conn, jobs_data, category_id):
     cursor = conn.cursor()
+    
+    # Get the current maximum ID from the jobs table
+    cursor.execute('SELECT MAX(id) FROM jobs')
+    result = cursor.fetchone()
+    last_id = result[0] if result[0] is not None else 0
+    
     for job in jobs_data:
         try:
+            # Get current timestamp for created_at
+            current_timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            
             # Insert or get company
             cursor.execute('INSERT OR IGNORE INTO companies (name) VALUES (?)', (job['Company'],))
             cursor.execute('SELECT id FROM companies WHERE name = ?', (job['Company'],))
@@ -93,87 +102,52 @@ def insert_jobs(conn, jobs_data, category_id):
             cursor.execute('SELECT id FROM areas WHERE name = ?', (job['Area'],))
             area_id = cursor.fetchone()[0]
             
-            # Insert job with foreign keys
-            cursor.execute('''
-                INSERT OR REPLACE INTO jobs 
-                (title, url, application_url, company_id, area_id, published_date, category_id)
-                VALUES (?, ?, ?, ?, ?, ?, ?)
-            ''', (
-                job['Title'],
-                job['URL'],
-                job['Application_URL'],
-                company_id,
-                area_id,
-                job['Published'],
-                category_id
-            ))
+            # Check if the job URL already exists
+            cursor.execute('SELECT id FROM jobs WHERE url = ?', (job['URL'],))
+            existing_job = cursor.fetchone()
+            
+            if existing_job:
+                # Update existing job
+                cursor.execute('''
+                    UPDATE jobs 
+                    SET title = ?, application_url = ?, company_id = ?, area_id = ?, 
+                        published_date = ?, category_id = ?
+                    WHERE url = ?
+                ''', (
+                    job['Title'],
+                    job['Application_URL'],
+                    company_id,
+                    area_id,
+                    job['Published'],
+                    category_id,
+                    job['URL']
+                ))
+            else:
+                # Increment the ID for new job
+                last_id += 1
+                
+                # Insert new job with manually assigned ID and explicit created_at timestamp
+                cursor.execute('''
+                    INSERT INTO jobs 
+                    (id, title, url, application_url, company_id, area_id, published_date, category_id, created_at)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ''', (
+                    last_id,
+                    job['Title'],
+                    job['URL'],
+                    job['Application_URL'],
+                    company_id,
+                    area_id,
+                    job['Published'],
+                    category_id,
+                    current_timestamp
+                ))
         except sqlite3.IntegrityError:
             # Skip duplicates
             continue
     conn.commit()
 
-# Add near the top with other constants
-JOB_AGE_PARAM = "jobage=1"  # Change this value as needed (1=New, 2=Recent, 3=Older)
-
-def log_message(message):
-    """Log a message with timestamp."""
-    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    print(f"{timestamp} - {message}")
-
-def check_and_remove_duplicates(conn):
-    """Check for and remove duplicate jobs based on title, keeping only one."""
-    cursor = conn.cursor()
-    
-    try:
-        # Query to find duplicates by title
-        cursor.execute('''
-            SELECT title, COUNT(*) as count
-            FROM jobs
-            GROUP BY title
-            HAVING COUNT(*) > 1
-        ''')
-        
-        duplicates = cursor.fetchall()
-        
-        if not duplicates:
-            log_message("No duplicate jobs found")
-            return
-            
-        log_message(f"Found {len(duplicates)} sets of duplicates")
-        
-        for dup in duplicates:
-            title, count = dup
-            log_message(f"\nProcessing duplicates for title: {title}")
-            
-            # Get all IDs for these duplicates, ordered by ID
-            cursor.execute('''
-                SELECT id FROM jobs
-                WHERE title = ?
-                ORDER BY id
-            ''', (title,))
-            
-            ids = [row[0] for row in cursor.fetchall()]
-            
-            # Keep the first ID and delete the rest
-            keep_id = ids[0]
-            delete_ids = ids[1:]
-            
-            if delete_ids:
-                cursor.execute('''
-                    DELETE FROM jobs
-                    WHERE id IN ({})
-                '''.format(','.join('?' for _ in delete_ids)), delete_ids)
-                
-                conn.commit()
-                log_message(f"Kept ID {keep_id}, deleted IDs: {delete_ids}")
-            else:
-                log_message(f"No duplicates to delete for title: {title}")
-                
-        log_message("\nDuplicate removal completed")
-        
-    except sqlite3.Error as e:
-        log_message(f"Database error: {e}")
-        conn.rollback()
+JOB_AGE_PARAM = "jobage=1"
 
 def fetch_job_listings(keyword, page_limit=1, subid="1"):
     base_url = f"https://www.jobindex.dk/jobsoegning.json?subid={subid}&{JOB_AGE_PARAM}"
@@ -294,11 +268,7 @@ def main():
             print(f"\nScraping jobs for subid {subid} ({info['category']})...")
             scrape_jobs(conn, keyword, info['id'], page_limit, subid)
 
-        # Check for and remove duplicates after all scraping is done
-        log_message("\nStarting duplicate check...")
-        check_and_remove_duplicates(conn)
-        
-        print("\nAll categories completed and duplicates removed.")
+        print("\nAll categories completed.")
         conn.close()
     except Exception as e:
         print(f"Critical error in the scraping pipeline: {e}")
