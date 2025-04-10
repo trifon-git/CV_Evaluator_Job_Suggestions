@@ -22,7 +22,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install pymongo python-dotenv
+          pip install pymongo python-dotenv tqdm
       
       - name: Create .env file with backup settings
         run: |
