@@ -40,7 +40,7 @@ jobs:
         run: python src/[LOOP]_backup_mongo.py
       
       - name: Upload backup as artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: mongodb-backup-${{ github.run_id }}
           path: backups/
