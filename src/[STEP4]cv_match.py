@@ -169,7 +169,8 @@ def find_similar_jobs(model, cv_text, top_n=None, active_only=True):
                 "Area": metadata.get('Area', 'N/A'),               
                 "url": metadata.get('Application_URL', '#'),       
                 "posting_date": metadata.get('Published_Date', 'N/A'), 
-                "content": content
+                "content": content,
+                "Status": metadata.get('Status', 'unknown')
             })
         
         print(f"Search completed in {time.time() - search_start:.2f}s")
@@ -223,6 +224,7 @@ def main():
         print(f"   Company: {job.get('Company', 'N/A')}")
         print(f"   Location: {job.get('Area', 'N/A')}")
         print(f"   Posted: {job.get('posting_date', 'N/A')}")
+        print(f"   Status: {job.get('Status', 'unknown')}")
         print(f"   Match score: {job.get('score', 0):.2f}")
         print(f"   URL: {job.get('url', '#')}")
         print()
