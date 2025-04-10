@@ -123,7 +123,7 @@ def generate_cv_embedding(model, cv_text):
         traceback.print_exc()
         return None
 
-def find_similar_jobs(model, cv_text, top_n=None):
+def find_similar_jobs(model, cv_text, top_n=None, active_only=True):
     """Find jobs similar to the provided CV text."""
     if top_n is None:
         top_n = TOP_N_RESULTS
@@ -140,10 +140,17 @@ def find_similar_jobs(model, cv_text, top_n=None):
         collection = chroma_client.get_collection(COLLECTION_NAME)
         
         search_start = time.time()
+        
+        # Add filter for active jobs if requested
+        where_filter = {"Status": "active"} if active_only else None
+        if active_only:
+            print("Filtering for active jobs only")
+        
         results = collection.query(
             query_embeddings=[cv_embedding.tolist()],
             n_results=top_n,
-            include=["metadatas", "distances", "documents"]
+            include=["metadatas", "distances", "documents"],
+            where=where_filter
         )
         
         matches = []
@@ -201,7 +208,7 @@ def main():
         return
         
     print("\nSearching for matching jobs...")
-    matches, method = find_similar_jobs(model, cv_text)
+    matches, method = find_similar_jobs(model, cv_text, active_only=True)
     
     print("\n=== Results ===")
     print(f"Search method: {method}")
