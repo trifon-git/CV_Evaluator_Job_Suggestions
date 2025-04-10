@@ -1,9 +1,9 @@
-name: Nightly Job Scraper
+name: Job Scraper Every 2 Hours
 
 on:
   schedule:
-    # Run at 2 AM UTC every day
-    - cron: '0 2 * * *'
+    # Run every 2 hours
+    - cron: '0 */2 * * *'
   workflow_dispatch:  # Allow manual triggering
 
 jobs:
@@ -61,4 +61,4 @@ jobs:
           echo "Step 3 completed"
       
       - name: Job Complete
-        run: echo "Nightly job scraper workflow completed successfully"
+        run: echo "Job scraper workflow completed successfully"
