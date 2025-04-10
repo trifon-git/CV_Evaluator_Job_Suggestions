@@ -1,6 +1,10 @@
+# Environment variables
+.env
+
 # Add specific scripts to ignore
 src/delete_future_jobs.py
 src/delete_null_created_at.py
+src/import_sql_to_mongo.py
 
 # Database files
 *.db

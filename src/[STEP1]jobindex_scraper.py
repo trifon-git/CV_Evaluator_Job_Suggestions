@@ -1,156 +1,94 @@
 import os
-import pandas as pd
 import requests
 from bs4 import BeautifulSoup
-import sqlite3
 from datetime import datetime
-import json
+from pymongo import MongoClient
+from tqdm import tqdm
+from collections import defaultdict
+from dotenv import load_dotenv
 
-category_job_id = 1
-category_name = "active"
+# Load environment variables
+load_dotenv()
 
-# Database setup
-DB_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data", "job_listings.db")
+# === CONFIG ===
+MONGO_URI = os.getenv('MONGO_URI')
+DB_NAME = os.getenv('MONGO_DB_NAME')
+COLLECTION_NAME = os.getenv('MONGO_COLLECTION')
 
-def init_database():
-    conn = sqlite3.connect(DB_PATH)
-    cursor = conn.cursor()
-    
-    # Create categories table
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS categories (
-            id INTEGER PRIMARY KEY,
-            subid TEXT NOT NULL,
-            name TEXT NOT NULL,
-            url_path TEXT NOT NULL
-        )
-    ''')
-    
-    # Create companies table
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS companies (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT NOT NULL UNIQUE
-        )
-    ''')
-    
-    # Create areas table
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS areas (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT NOT NULL UNIQUE
-        )
-    ''')
-    
-    # Create jobs table with foreign keys - removed AUTOINCREMENT
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS jobs (
-            id INTEGER PRIMARY KEY,
-            title TEXT NOT NULL,
-            url TEXT NOT NULL UNIQUE,
-            application_url TEXT,
-            company_id INTEGER,
-            area_id INTEGER,
-            published_date TEXT NOT NULL,
-            category_id INTEGER,
-            created_at TIMESTAMP,
-            FOREIGN KEY (category_id) REFERENCES categories (id),
-            FOREIGN KEY (company_id) REFERENCES companies (id),
-            FOREIGN KEY (area_id) REFERENCES areas (id)
-        )
-    ''')
-    
-    # Create indexes
-    cursor.execute('CREATE INDEX IF NOT EXISTS idx_jobs_url ON jobs(url)')
-    cursor.execute('CREATE INDEX IF NOT EXISTS idx_jobs_category ON jobs(category_id)')
-    cursor.execute('CREATE INDEX IF NOT EXISTS idx_jobs_published ON jobs(published_date)')
-    cursor.execute('CREATE INDEX IF NOT EXISTS idx_companies_name ON companies(name)')
-    cursor.execute('CREATE INDEX IF NOT EXISTS idx_areas_name ON areas(name)')
-    
-    conn.commit()
-    return conn
+# Add these variables after the existing CONFIG section
+COUNTER_PER_CATEGORY = defaultdict(int)
+DATE_FORMAT = "%Y%m%d"
+TIME_FORMAT = "%H%M%S"
 
-def insert_categories(conn, subid_mapping):
-    cursor = conn.cursor()
-    for subid, info in subid_mapping.items():
-        cursor.execute('''
-            INSERT OR REPLACE INTO categories (id, subid, name, url_path)
-            VALUES (?, ?, ?, ?)
-        ''', (info['id'], subid, info['category'], f"/jobsoegning/{info['category']}"))
-    conn.commit()
-
-def insert_jobs(conn, jobs_data, category_id):
-    cursor = conn.cursor()
+def init_mongodb():
+    client = MongoClient(MONGO_URI)
+    db = client[DB_NAME]
+    collection = db[COLLECTION_NAME]
     
-    # Get the current maximum ID from the jobs table
-    cursor.execute('SELECT MAX(id) FROM jobs')
-    result = cursor.fetchone()
-    last_id = result[0] if result[0] is not None else 0
+    # Create compound index for efficient duplicate checking
+    try:
+        collection.create_index([
+            ("Title", 1),
+            ("URL", 1),
+            ("Company", 1)
+        ], unique=True)
+        print("✅ Created compound index for duplicate checking")
+    except Exception as e:
+        print(f"Note: Index might already exist: {e}")
+    
+    return client, collection
+
+def insert_jobs(collection, jobs_data, category):
+    inserted_count = 0
+    duplicate_count = 0
+    
+    # Get current date and time components
+    current_date = datetime.now().strftime(DATE_FORMAT)
+    current_time = datetime.now().strftime(TIME_FORMAT)
     
     for job in jobs_data:
         try:
-            # Get current timestamp for created_at
+            # Increment counter for this category
+            COUNTER_PER_CATEGORY[category] += 1
+            
+            # Create unique job ID: category_YYYYMMDD_HHMMSS_counter
+            job_id = f"{category}_{current_date}_{current_time}_{COUNTER_PER_CATEGORY[category]:04d}"
+            
+            # Get current timestamp as string
             current_timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             
-            # Insert or get company
-            cursor.execute('INSERT OR IGNORE INTO companies (name) VALUES (?)', (job['Company'],))
-            cursor.execute('SELECT id FROM companies WHERE name = ?', (job['Company'],))
-            company_id = cursor.fetchone()[0]
+            doc = {
+                "job_id": job_id,
+                "Title": job["Title"],
+                "URL": job["URL"],
+                "Application_URL": job["Application_URL"],
+                "Company": job["Company"],
+                "Area": job["Area"],
+                "Category": category,
+                "Published_Date": job["Published"],
+                "Created_At": current_timestamp
+            }
             
-            # Insert or get area
-            cursor.execute('INSERT OR IGNORE INTO areas (name) VALUES (?)', (job['Area'],))
-            cursor.execute('SELECT id FROM areas WHERE name = ?', (job['Area'],))
-            area_id = cursor.fetchone()[0]
+            # Rest of the function remains the same
+            collection.insert_one(doc)
+            inserted_count += 1
             
-            # Check if the job URL already exists
-            cursor.execute('SELECT id FROM jobs WHERE url = ?', (job['URL'],))
-            existing_job = cursor.fetchone()
-            
-            if existing_job:
-                # Update existing job
-                cursor.execute('''
-                    UPDATE jobs 
-                    SET title = ?, application_url = ?, company_id = ?, area_id = ?, 
-                        published_date = ?, category_id = ?
-                    WHERE url = ?
-                ''', (
-                    job['Title'],
-                    job['Application_URL'],
-                    company_id,
-                    area_id,
-                    job['Published'],
-                    category_id,
-                    job['URL']
-                ))
+        except Exception as e:
+            if "duplicate key error" in str(e):
+                duplicate_count += 1
             else:
-                # Increment the ID for new job
-                last_id += 1
-                
-                # Insert new job with manually assigned ID and explicit created_at timestamp
-                cursor.execute('''
-                    INSERT INTO jobs 
-                    (id, title, url, application_url, company_id, area_id, published_date, category_id, created_at)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-                ''', (
-                    last_id,
-                    job['Title'],
-                    job['URL'],
-                    job['Application_URL'],
-                    company_id,
-                    area_id,
-                    job['Published'],
-                    category_id,
-                    current_timestamp
-                ))
-        except sqlite3.IntegrityError:
-            # Skip duplicates
-            continue
-    conn.commit()
+                print(f"Error inserting job {job['Title']}: {e}")
+    
+    print(f"✅ Inserted {inserted_count} new jobs")
+    print(f"ℹ️ Found {duplicate_count} duplicate jobs (skipped)")
+    return inserted_count, duplicate_count
 
 JOB_AGE_PARAM = "jobage=1"
 
 def fetch_job_listings(keyword, page_limit=1, subid="1"):
-    base_url = f"https://www.jobindex.dk/jobsoegning.json?subid={subid}&{JOB_AGE_PARAM}"
+    base_url = os.getenv('JOBINDEX_BASE_URL')
+    job_age = os.getenv('JOB_AGE_PARAM')
+    base_url = f"{base_url}?subid={subid}&{job_age}"
     job_listings = []
 
     for page in range(1, page_limit + 1):
@@ -178,30 +116,32 @@ def fetch_job_listings(keyword, page_limit=1, subid="1"):
                 title = share_div['data-share-title']
                 jobindex_url = share_div['data-share-url']
                 
-                # Extract direct application URL - look specifically for the job title link
+                # Extract direct application URL
                 application_link = job_ad.find('h4').find('a', href=True)
                 application_url = application_link['href'] if application_link else None
 
                 job_location = job_ad.find('span', class_='jix_robotjob--area')
 
-                # Extract company name with better error handling
+                # Extract company name
                 company_div = job_ad.find('div', class_='jix-toolbar-top__company')
-                if company_div and company_div.find('a'):
-                    company_name = company_div.find('a').text.strip()
-                else:
-                    company_name = 'Unknown'
+                company_name = company_div.find('a').text.strip() if company_div and company_div.find('a') else 'Unknown'
 
-                # Extract the publication date
+                # Extract publication date
                 published_tag = job_ad.find('time')
+                # Convert published date to string format if it's not already
                 published_date = published_tag['datetime'] if published_tag else 'Unknown'
+                if published_date != 'Unknown':
+                    try:
+                        # Parse and format the date to ensure consistent string format
+                        parsed_date = datetime.fromisoformat(published_date)
+                        published_date = parsed_date.strftime("%Y-%m-%d %H:%M:%S")
+                    except:
+                        published_date = 'Unknown'
 
-                # Append all required data to the list
                 job_listings.append({
                     "Title": title,
                     "URL": jobindex_url,
                     "Application_URL": application_url,
-                    "Category_Job_ID": category_job_id,
-                    "Category_Job": category_name,
                     "Company": company_name,
                     "Area": job_location.get_text(strip=True) if job_location else 'Unknown',
                     "Published": published_date
@@ -209,69 +149,16 @@ def fetch_job_listings(keyword, page_limit=1, subid="1"):
 
     return job_listings
 
-def update_json_if_new(output_file, new_data, update_threshold=5):
-    try:
-        with open(output_file, 'r') as f:
-            existing_data = json.load(f)
-    except (FileNotFoundError, json.JSONDecodeError):
-        print(f"Error loading JSON file: {output_file}. Starting with an empty dataset.")
-        existing_data = []
-
-    # Combine data and remove duplicates
-    combined_data = pd.DataFrame(existing_data + new_data).drop_duplicates(subset=["Title", "URL"]).to_dict(orient="records")
-
-    # Identify new rows
-    new_rows = [row for row in new_data if row not in existing_data]
-
-    # Update only if new rows exceed the threshold
-    if len(new_rows) >= update_threshold:
-        try:
-            with open(output_file, 'w') as f:
-                json.dump(combined_data, f, indent=4)
-            print(f"JSON updated with {len(new_rows)} new rows.")
-        except Exception as e:
-            print(f"Error writing to JSON file: {output_file}. Error: {e}")
-    else:
-        print(f"Only {len(new_rows)} new rows found. Waiting for {update_threshold - len(new_rows)} more.")
-
-def scrape_jobs(conn, keyword, category_id, page_limit=1, subid="1"):
-    print(f"Scraping data for keyword: {keyword} with subid: {subid}...")
+def scrape_jobs(collection, keyword, category, page_limit=1, subid="1"):
+    print(f"Scraping data for category: {category} with subid: {subid}...")
     try:
         new_data = fetch_job_listings(keyword, page_limit, subid)
         if new_data:
-            insert_jobs(conn, new_data, category_id)
-            print(f"Data saved to database for category {category_id}.")
+            insert_jobs(collection, new_data, category)
         else:
             print("No data found.")
     except Exception as e:
         print(f"Error scraping data: {e}")
-
-def main():
-    try:
-        # Initialize database
-        conn = init_database()
-        
-        # Get all available subids
-        SUBID_MAPPING = get_all_subids()
-        if not SUBID_MAPPING:
-            print("Failed to fetch subids. Exiting...")
-            return
-
-        # Insert categories into database
-        insert_categories(conn, SUBID_MAPPING)
-
-        keyword = ""  # Empty string to get all jobs
-        page_limit = 1000
-
-        # Iterate through each subid
-        for subid, info in SUBID_MAPPING.items():
-            print(f"\nScraping jobs for subid {subid} ({info['category']})...")
-            scrape_jobs(conn, keyword, info['id'], page_limit, subid)
-
-        print("\nAll categories completed.")
-        conn.close()
-    except Exception as e:
-        print(f"Critical error in the scraping pipeline: {e}")
 
 def get_all_subids():
     # Load the complete subid data
@@ -394,6 +281,31 @@ def get_all_subids():
     except Exception as e:
         print(f"Error processing subids: {e}")
         return {}
+
+def main():
+    try:
+        # Initialize MongoDB connection
+        mongo_client, collection = init_mongodb()
+        
+        # Get all available subids
+        SUBID_MAPPING = get_all_subids()
+        if not SUBID_MAPPING:
+            print("Failed to fetch subids. Exiting...")
+            return
+
+        keyword = ""  # Empty string to get all jobs
+        page_limit = 1000  # Adjust this value based on your needs
+
+        # Iterate through each subid
+        for subid, info in SUBID_MAPPING.items():
+            print(f"\nProcessing category: {info['category']} (subid: {subid})")
+            scrape_jobs(collection, keyword, info['category'], page_limit, subid)
+
+        print("\n✅ All categories completed")
+        mongo_client.close()
+        
+    except Exception as e:
+        print(f"❌ Critical error in the scraping pipeline: {e}")
 
 if __name__ == "__main__":
     main()

@@ -1,0 +1,12 @@
+beautifulsoup4==4.12.2
+chromadb==0.4.18
+numpy==1.24.3
+pymongo==4.5.0
+python-dotenv==1.0.0
+requests==2.31.0
+sentence-transformers==2.2.2
+tqdm==4.66.1
+nest_asyncio==1.5.8
+playwright==1.40.0
+scipy==1.11.3
+aiofiles==23.2.1
