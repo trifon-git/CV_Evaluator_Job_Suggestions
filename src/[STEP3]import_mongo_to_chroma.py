@@ -46,7 +46,14 @@ mongo_client = MongoClient(MONGO_URI)
 mongo_db = mongo_client["job_scraper"]
 mongo_collection = mongo_db["jobs"]
 
-chroma_client = HttpClient(host=CHROMA_HOST, port=CHROMA_PORT)
+# Update ChromaDB client initialization to use v2 API
+chroma_client = HttpClient(
+    host=CHROMA_HOST, 
+    port=CHROMA_PORT,
+    settings={
+        "api_version": "v2"  # Explicitly specify v2 API
+    }
+)
 chroma_collection = chroma_client.get_or_create_collection(COLLECTION_NAME)
 
 # === GET EXISTING IDS FROM CHROMADB ===
