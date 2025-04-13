@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { processCV } from '../../../lib/cv-processor';
+import pdfParse from 'pdf-parse';
 
 export async function POST(request) {
   try {
@@ -15,15 +16,40 @@ export async function POST(request) {
 
     // Read the file content
     const buffer = Buffer.from(await file.arrayBuffer());
-    let cvText;
+    let cvText = '';
     
     try {
-      cvText = buffer.toString('utf-8');
+      // Check file type and extract text accordingly
+      const fileName = file.name.toLowerCase();
+      
+      if (fileName.endsWith('.pdf')) {
+        console.log('Processing PDF file');
+        const pdfData = await pdfParse(buffer);
+        cvText = pdfData.text;
+      } else if (fileName.endsWith('.docx')) {
+        // For now, we'll return an error for docx files
+        return NextResponse.json(
+          { error: 'DOCX files are not supported yet. Please upload a PDF or TXT file.' },
+          { status: 400 }
+        );
+      } else {
+        // Assume it's a text file
+        console.log('Processing text file');
+        cvText = buffer.toString('utf-8');
+      }
+      
       console.log(`CV text loaded (${cvText.length} characters)`);
+      
+      if (!cvText || cvText.trim().length === 0) {
+        return NextResponse.json(
+          { error: 'Could not extract text from the uploaded file' },
+          { status: 400 }
+        );
+      }
     } catch (error) {
       console.error('Error reading file content:', error);
       return NextResponse.json(
-        { error: 'Failed to read CV file content' },
+        { error: 'Failed to read CV file content: ' + error.message },
         { status: 500 }
       );
     }
@@ -42,7 +68,7 @@ export async function POST(request) {
   } catch (error) {
     console.error('Error processing CV request:', error);
     return NextResponse.json(
-      { error: 'Failed to process CV request' },
+      { error: 'Failed to process CV request: ' + error.message },
       { status: 500 }
     );
   }
