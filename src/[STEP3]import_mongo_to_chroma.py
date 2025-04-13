@@ -1,9 +1,11 @@
 from pymongo import MongoClient
 from chromadb import HttpClient
-from sentence_transformers import SentenceTransformer
 from tqdm import tqdm
 from dotenv import load_dotenv
 import os
+import requests
+import numpy as np
+import time
 
 # Load environment variables
 load_dotenv()
@@ -12,14 +14,32 @@ load_dotenv()
 MONGO_URI = os.getenv('MONGO_URI')
 CHROMA_HOST = os.getenv('CHROMA_HOST')
 CHROMA_PORT = int(os.getenv('CHROMA_PORT'))
-MODEL_NAME = os.getenv('MODEL_NAME')
 COLLECTION_NAME = os.getenv('CHROMA_COLLECTION')
-BATCH_SIZE = int(os.getenv('BATCH_SIZE'))
+BATCH_SIZE = int(os.getenv('BATCH_SIZE', '10'))
+# Remote embedding API configuration
+EMBEDDING_API_URL = os.getenv('EMBEDDING_API_URL')
+VERIFY_SSL = os.getenv('VERIFY_SSL', 'true').lower() == 'true'
  
 # === CHUNKING FUNCTION ===
 def chunk_list(lst, chunk_size):
     for i in range(0, len(lst), chunk_size):
         yield lst[i:i + chunk_size]
+
+# === REMOTE EMBEDDING FUNCTION ===
+def get_remote_embeddings(texts):
+    """Call remote API to get embeddings for texts."""
+    try:
+        print(f"Calling remote embedding API at {EMBEDDING_API_URL}")
+        response = requests.post(EMBEDDING_API_URL, json={"texts": texts}, verify=VERIFY_SSL)
+        response.raise_for_status()
+        embeddings = response.json().get("embeddings", [])
+        if not embeddings:
+            print("Warning: Empty embedding response from API")
+            return []
+        return embeddings
+    except Exception as e:
+        print(f"Error calling embedding API: {e}")
+        return []
 
 # === CONNECT TO MONGODB AND CHROMADB ===
 mongo_client = MongoClient(MONGO_URI)
@@ -28,9 +48,6 @@ mongo_collection = mongo_db["jobs"]
 
 chroma_client = HttpClient(host=CHROMA_HOST, port=CHROMA_PORT)
 chroma_collection = chroma_client.get_or_create_collection(COLLECTION_NAME)
-
-# === LOAD EMBEDDING MODEL ===
-model = SentenceTransformer(MODEL_NAME)
 
 # === GET EXISTING IDS FROM CHROMADB ===
 existing_ids = set(chroma_collection.get()['ids'])
@@ -64,15 +81,32 @@ for batch in tqdm(chunk_list(jobs, BATCH_SIZE), total=len(jobs) // BATCH_SIZE + 
             "Published_Date": str(job["Published_Date"]) if job["Published_Date"] else None,
             "Company": job["Company"],
             "Area": job["Area"],
-            "Category": job["Category"]
+            "Category": job["Category"],
+            "Status": job.get("Status", "active")  # Include Status field with default "active"
         })
 
     if not ids:
         continue
 
     try:
-        embeddings = model.encode(texts, normalize_embeddings=True)
+        # Use remote embedding API instead of local model
+        embeddings = get_remote_embeddings(texts)
+        
+        if not embeddings:
+            print("❌ No embeddings returned from API for this batch")
+            continue
+            
+        # Ensure embeddings are properly formatted
+        if len(embeddings) != len(ids):
+            print(f"❌ Mismatch: got {len(embeddings)} embeddings for {len(ids)} texts")
+            continue
+            
         chroma_collection.add(ids=ids, embeddings=embeddings, metadatas=metadatas)
+        print(f"✓ Added {len(ids)} jobs to ChromaDB")
+        
+        # Add a small delay to avoid overwhelming the API
+        time.sleep(0.5)
+        
     except Exception as e:
         print(f"❌ Failed to add batch: {e}")
 

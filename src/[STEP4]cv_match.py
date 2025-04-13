@@ -7,6 +7,7 @@ import chromadb
 from chromadb.config import Settings
 from dotenv import load_dotenv
 from chromadb import HttpClient
+import requests
 
 # Load environment variables
 load_dotenv()
@@ -22,11 +23,15 @@ except ImportError:
 
 # Configuration from environment variables
 MODEL_NAME = os.getenv('MODEL_NAME', 'paraphrase-multilingual-mpnet-base-v2')
+# Configuration from environment variables
 TOP_N_RESULTS = int(os.getenv('TOP_N_RESULTS', '10'))
 CV_FILE_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data", os.getenv('CV_FILE_PATH'))
 CHROMA_HOST = os.getenv('CHROMA_HOST')
 CHROMA_PORT = int(os.getenv('CHROMA_PORT'))
 COLLECTION_NAME = os.getenv('CHROMA_COLLECTION')
+# Remote embedding API configuration
+EMBEDDING_API_URL = os.getenv('EMBEDDING_API_URL', '')
+VERIFY_SSL = os.getenv('VERIFY_SSL', 'true').lower() == 'true'
 
 def cosine_similarity(vec1, vec2):
     """Calculate cosine similarity between two vectors."""
@@ -123,15 +128,88 @@ def generate_cv_embedding(model, cv_text):
         traceback.print_exc()
         return None
 
-def find_similar_jobs(model, cv_text, top_n=None, active_only=True):
+def get_remote_embedding(texts):
+    """Call remote API to get embeddings for texts."""
+    try:
+        print(f"Calling remote embedding API at {EMBEDDING_API_URL}")
+        response = requests.post(EMBEDDING_API_URL, json={"texts": texts}, verify=VERIFY_SSL)
+        response.raise_for_status()
+        embeddings = response.json().get("embeddings", [])
+        if not embeddings:
+            print("Warning: Empty embedding response from API")
+            return []
+        return embeddings
+    except Exception as e:
+        print(f"Error calling embedding API: {e}")
+        traceback.print_exc()
+        return []
+
+def generate_cv_embedding_remote(cv_text):
+    """Generate embeddings for CV text using remote API with chunking for long texts."""
+    print("Generating CV embedding via remote API...")
+    start_time = time.time()
+    
+    if not cv_text or not isinstance(cv_text, str):
+        print("Error: Invalid CV text")
+        return None
+        
+    try:
+        # Split text into chunks
+        chunk_size = 1000  # characters per chunk
+        overlap = 200      # character overlap between chunks
+
+        chunks = []
+        start = 0
+        while start < len(cv_text):
+            end = start + chunk_size
+            chunk = cv_text[start:end]
+            if chunk.strip():
+                chunks.append(chunk)
+            start = end - overlap  # step with overlap
+
+        print(f"Split CV into {len(chunks)} chunks for remote embedding")
+
+        chunk_embeddings = []
+        for i, chunk in enumerate(chunks):
+            print(f"Processing chunk {i+1}/{len(chunks)}")
+            embedding_response = get_remote_embedding([chunk])
+            if embedding_response:
+                chunk_embeddings.append(embedding_response[0])
+            else:
+                print("⚠️ Skipped a chunk due to empty embedding response")
+
+        if not chunk_embeddings:
+            print("Error: No valid chunks were embedded")
+            return None
+
+        # Average the embeddings
+        avg_embedding = np.mean(chunk_embeddings, axis=0)
+        
+        # Normalize
+        norm = np.linalg.norm(avg_embedding)
+        if norm > 0:
+            avg_embedding = avg_embedding / norm
+            
+        print(f"Remote embedding generated in {time.time() - start_time:.2f}s")
+        return avg_embedding
+        
+    except Exception as e:
+        print(f"Error generating remote embedding: {e}")
+        traceback.print_exc()
+        return None
+
+def find_similar_jobs(cv_text, top_n=None, active_only=True):
     """Find jobs similar to the provided CV text."""
     if top_n is None:
         top_n = TOP_N_RESULTS
+    
+    # Always use remote embedding
+    print("Using remote embedding API")
+    cv_embedding = generate_cv_embedding_remote(cv_text)
         
-    cv_embedding = generate_cv_embedding(model, cv_text)
     if cv_embedding is None:
         return None, "Error: Failed to generate CV embedding"
-        
+    
     print(f"CV embedding shape: {cv_embedding.shape}")
     
     print("Connecting to ChromaDB...")
@@ -199,17 +277,15 @@ def main():
     if not cv_text.strip():
         print("Error: CV file is empty")
         return
-        
-    print(f"Loading model: {MODEL_NAME}")
-    try:
-        model = SentenceTransformer(MODEL_NAME)
-        print("Model loaded successfully")
-    except Exception as e:
-        print(f"Error loading model: {e}")
+    
+    # Check if embedding API URL is set
+    print(f"Using remote embedding API: {EMBEDDING_API_URL}")
+    if not EMBEDDING_API_URL:
+        print("Error: EMBEDDING_API_URL is not set in environment variables")
         return
-        
+    
     print("\nSearching for matching jobs...")
-    matches, method = find_similar_jobs(model, cv_text, active_only=True)
+    matches, method = find_similar_jobs(cv_text, active_only=True)
     
     print("\n=== Results ===")
     print(f"Search method: {method}")

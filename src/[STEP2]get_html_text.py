@@ -63,6 +63,11 @@ async def extract_html_from_frames(page):
 
 async def scrape_and_clean_text(url, job_id):
     """Scrape visible text from a webpage, clean it, and return it."""
+    # Skip URLs containing 'youngcrm'
+    if 'youngcrm' in url.lower():
+        log_message(f"[Job ID: {job_id}] Skipping youngcrm URL: {url}")
+        return "Skipped youngcrm URL"
+        
     # Check if URL is a PDF file
     if url.lower().endswith('.pdf'):
         log_message(f"[Job ID: {job_id}] URL is a PDF file: {url}")
