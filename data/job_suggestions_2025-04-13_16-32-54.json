@@ -1,0 +1,117 @@
+{
+  "timestamp": "2025-04-13T16:32:54.852482",
+  "search_method": "ChromaDB Vector Search",
+  "total_matches": 10,
+  "matches": [
+    {
+      "score": 40.92978452391829,
+      "type": "ChromaDB similarity",
+      "Title": "Ledsager",
+      "Company": "DUOS A/S",
+      "Area": "Nærum",
+      "url": "https://www.formidlingen.dk/ledige-jobs.aspx?id=159379",
+      "posting_date": "2025-04-10 00:00:00",
+      "content": null,
+      "Status": "active"
+    },
+    {
+      "score": 39.51540065770169,
+      "type": "ChromaDB similarity",
+      "Title": "Ledsager",
+      "Company": "DUOS A/S",
+      "Area": "Næstved",
+      "url": "https://www.formidlingen.dk/ledige-jobs.aspx?id=159376",
+      "posting_date": "2025-04-10 00:00:00",
+      "content": null,
+      "Status": "active"
+    },
+    {
+      "score": 39.01362858518544,
+      "type": "ChromaDB similarity",
+      "Title": "Ledsager",
+      "Company": "DUOS A/S",
+      "Area": "Farum",
+      "url": "https://www.formidlingen.dk/ledige-jobs.aspx?id=159360",
+      "posting_date": "2025-04-10 00:00:00",
+      "content": null,
+      "Status": "active"
+    },
+    {
+      "score": 38.3120966592974,
+      "type": "ChromaDB similarity",
+      "Title": "Ledsager",
+      "Company": "DUOS A/S",
+      "Area": "Ballerup",
+      "url": "https://www.formidlingen.dk/ledige-jobs.aspx?id=159362",
+      "posting_date": "2025-04-10 00:00:00",
+      "content": null,
+      "Status": "active"
+    },
+    {
+      "score": 36.34787656803519,
+      "type": "ChromaDB similarity",
+      "Title": "Experienced SAP S/4HANA consultant - Business controlling",
+      "Company": "Capgemini Danmark A/S",
+      "Area": "Vallensbæk, Vallensbæk Strand",
+      "url": "https://www.it-jobbank.dk/c?t=h1555005&ctx=j&utm_source=partner&utm_medium=jobindex&utm_campaign=jobannonce",
+      "posting_date": "2025-04-08",
+      "content": null,
+      "Status": "active"
+    },
+    {
+      "score": 36.34787656803519,
+      "type": "ChromaDB similarity",
+      "Title": "Senior Android-udvikler (genopslag)",
+      "Company": "Clever A/S",
+      "Area": "København SV",
+      "url": "https://www.it-jobbank.dk/c?t=h1556127&ctx=j&utm_source=partner&utm_medium=jobindex&utm_campaign=jobannonce",
+      "posting_date": "2025-04-10 00:00:00",
+      "content": null,
+      "Status": "active"
+    },
+    {
+      "score": 36.34787656803519,
+      "type": "ChromaDB similarity",
+      "Title": "DPO og databeskyttelsesrådgiver til DPO-funktionen i Statens It",
+      "Company": "Statens IT",
+      "Area": "Ballerup",
+      "url": "https://www.it-jobbank.dk/c?t=h1556117&ctx=j&utm_source=partner&utm_medium=jobindex&utm_campaign=jobannonce",
+      "posting_date": "2025-04-10 00:00:00",
+      "content": null,
+      "Status": "active"
+    },
+    {
+      "score": 36.34787656803519,
+      "type": "ChromaDB similarity",
+      "Title": "Student Worker for Talent Acquisition",
+      "Company": "KMD A/S",
+      "Area": "Ballerup",
+      "url": "https://www.it-jobbank.dk/c?t=h1556085&ctx=j&utm_source=partner&utm_medium=jobindex&utm_campaign=jobannonce",
+      "posting_date": "2025-04-10 00:00:00",
+      "content": null,
+      "Status": "active"
+    },
+    {
+      "score": 36.04057856370017,
+      "type": "ChromaDB similarity",
+      "Title": "Timelærer i euphonium",
+      "Company": "DKDM",
+      "Area": "Frederiksberg C",
+      "url": "https://www.jobindex.dk/jobannonce/r13097307/timelaerer-i-euphonium",
+      "posting_date": "2025-04-08",
+      "content": null,
+      "Status": "active"
+    },
+    {
+      "score": 36.04057856370017,
+      "type": "ChromaDB similarity",
+      "Title": "Dygtige og selvstændige tømrer",
+      "Company": "MUFFBYG ApS",
+      "Area": "Sjælland",
+      "url": "https://www.jobindex.dk/jobannonce/r13097481/dygtige-og-selvstaendige-toemrer",
+      "posting_date": "2025-04-08",
+      "content": null,
+      "Status": "active"
+    }
+  ]
+}

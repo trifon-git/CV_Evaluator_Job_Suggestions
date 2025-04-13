@@ -150,7 +150,7 @@ def generate_cv_embedding(model, cv_text):
 def get_remote_embedding(texts):
     """Call remote API to get embeddings for texts."""
     try:
-        print(f"Calling remote embedding API at {EMBEDDING_API_URL}")
+        print("Calling remote embedding API...")  # Removed URL from print
         response = requests.post(EMBEDDING_API_URL, json={"texts": texts}, verify=VERIFY_SSL)
         response.raise_for_status()
         embeddings = response.json().get("embeddings", [])
@@ -159,7 +159,7 @@ def get_remote_embedding(texts):
             return []
         return embeddings
     except Exception as e:
-        print(f"Error calling embedding API: {e}")
+        print(f"Error calling embedding API: {str(e)}")  # Changed to not show URL in error
         traceback.print_exc()
         return []
 
