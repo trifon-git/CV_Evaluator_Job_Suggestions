@@ -9,17 +9,36 @@ const TOP_N_RESULTS = parseInt(process.env.TOP_N_RESULTS || '10');
 const VERIFY_SSL = process.env.VERIFY_SSL === 'true';
 
 export async function processCV(cvText) {
+  console.log('Starting CV processing...');
+  
+  if (!EMBEDDING_API_URL) {
+    throw new Error('EMBEDDING_API_URL environment variable is not set');
+  }
+  
+  if (!CHROMA_HOST) {
+    throw new Error('CHROMA_HOST environment variable is not set');
+  }
+  
+  if (!COLLECTION_NAME) {
+    throw new Error('CHROMA_COLLECTION environment variable is not set');
+  }
+  
   try {
     // Generate embedding for the CV
+    console.log('Generating CV embedding...');
     const cvEmbedding = await generateCvEmbeddingRemote(cvText);
     
     if (!cvEmbedding) {
       throw new Error('Failed to generate CV embedding');
     }
     
+    console.log('CV embedding generated successfully');
+    
     // Find similar jobs
+    console.log('Finding similar jobs...');
     const { matches, method } = await findSimilarJobs(cvEmbedding);
     
+    console.log(`Found ${matches.length} matching jobs`);
     return { matches, method };
   } catch (error) {
     console.error('Error in CV processing:', error);
@@ -83,21 +102,37 @@ async function generateCvEmbeddingRemote(cvText) {
     return avgEmbedding;
   } catch (error) {
     console.error('Error generating remote embedding:', error);
-    return null;
+    throw new Error(`Embedding generation failed: ${error.message}`);
   }
 }
 
 async function getRemoteEmbedding(texts) {
   try {
     if (!EMBEDDING_API_URL) {
-      console.error("Error: EMBEDDING_API_URL is not set");
-      return null;
+      throw new Error("EMBEDDING_API_URL is not set");
     }
     
     console.log(`Calling remote embedding API at ${EMBEDDING_API_URL}`);
-    const response = await axios.post(EMBEDDING_API_URL, { texts }, {
-      verify: VERIFY_SSL
-    });
+    
+    const response = await axios.post(
+      EMBEDDING_API_URL, 
+      { texts }, 
+      { 
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        validateStatus: false,
+        timeout: 30000, // 30 second timeout
+        httpsAgent: VERIFY_SSL ? undefined : new (require('https').Agent)({ rejectUnauthorized: false })
+      }
+    );
+    
+    if (response.status !== 200) {
+      console.error(`API returned status ${response.status}: ${JSON.stringify(response.data)}`);
+      throw new Error(`API returned status ${response.status}`);
+    }
+    
     const embeddings = response.data.embeddings || [];
     
     if (embeddings.length === 0) {
@@ -108,26 +143,45 @@ async function getRemoteEmbedding(texts) {
     return embeddings;
   } catch (error) {
     console.error('Error calling embedding API:', error);
-    return null;
+    throw new Error(`Embedding API call failed: ${error.message}`);
   }
 }
 
 async function findSimilarJobs(cvEmbedding) {
   try {
+    console.log(`Connecting to ChromaDB at ${CHROMA_HOST}:${CHROMA_PORT}`);
+    
     // Connect to ChromaDB
-    const response = await axios.post(`http://${CHROMA_HOST}:${CHROMA_PORT}/api/v1/collections/${COLLECTION_NAME}/query`, {
-      query_embeddings: [cvEmbedding],
-      n_results: TOP_N_RESULTS,
-      include: ["metadatas", "distances", "documents"],
-      where: { "Status": "active" }
-    }, {
-      headers: {
-        "accept": "application/json", 
-        "Content-Type": "application/json"
+    const response = await axios.post(
+      `http://${CHROMA_HOST}:${CHROMA_PORT}/api/v1/collections/${COLLECTION_NAME}/query`, 
+      {
+        query_embeddings: [cvEmbedding],
+        n_results: TOP_N_RESULTS,
+        include: ["metadatas", "distances", "documents"],
+        where: { "Status": "active" }
+      }, 
+      {
+        headers: {
+          "accept": "application/json", 
+          "Content-Type": "application/json"
+        },
+        timeout: 30000, // 30 second timeout
+        validateStatus: false
       }
-    });
+    );
+    
+    if (response.status !== 200) {
+      console.error(`ChromaDB returned status ${response.status}: ${JSON.stringify(response.data)}`);
+      throw new Error(`ChromaDB returned status ${response.status}`);
+    }
     
     const results = response.data;
+    
+    if (!results.metadatas || !results.metadatas[0] || results.metadatas[0].length === 0) {
+      console.warn("No matching jobs found in ChromaDB");
+      return { matches: [], method: "ChromaDB Vector Search (No matches)" };
+    }
+    
     const matches = [];
     
     for (let i = 0; i < results.metadatas[0].length; i++) {
@@ -154,6 +208,6 @@ async function findSimilarJobs(cvEmbedding) {
     return { matches, method: "ChromaDB Vector Search" };
   } catch (error) {
     console.error('Error during ChromaDB search:', error);
-    throw new Error('ChromaDB search failed');
+    throw new Error(`ChromaDB search failed: ${error.message}`);
   }
 }

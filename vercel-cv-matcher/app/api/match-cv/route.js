@@ -1,5 +1,4 @@
 import { NextResponse } from 'next/server';
-// Change this import path to use a relative path instead of the alias
 import { processCV } from '../../../lib/cv-processor';
 
 export async function POST(request) {
@@ -16,16 +15,34 @@ export async function POST(request) {
 
     // Read the file content
     const buffer = Buffer.from(await file.arrayBuffer());
-    const cvText = buffer.toString('utf-8');
+    let cvText;
+    
+    try {
+      cvText = buffer.toString('utf-8');
+      console.log(`CV text loaded (${cvText.length} characters)`);
+    } catch (error) {
+      console.error('Error reading file content:', error);
+      return NextResponse.json(
+        { error: 'Failed to read CV file content' },
+        { status: 500 }
+      );
+    }
     
     // Process the CV using our matching algorithm
-    const results = await processCV(cvText);
-    
-    return NextResponse.json({ results });
+    try {
+      const results = await processCV(cvText);
+      return NextResponse.json({ results });
+    } catch (error) {
+      console.error('Error in CV processing:', error);
+      return NextResponse.json(
+        { error: `Failed to process CV: ${error.message}` },
+        { status: 500 }
+      );
+    }
   } catch (error) {
-    console.error('Error processing CV:', error);
+    console.error('Error processing CV request:', error);
     return NextResponse.json(
-      { error: 'Failed to process CV' },
+      { error: 'Failed to process CV request' },
       { status: 500 }
     );
   }
