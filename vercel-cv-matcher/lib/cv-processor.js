@@ -162,19 +162,15 @@ async function getRemoteEmbedding(texts) {
   }
 }
 
-// Also modify the findSimilarJobs function
-// In the findSimilarJobs function, let's update the ChromaDB connection code
-
 async function findSimilarJobs(cvEmbedding) {
   try {
     console.log(`Connecting to ChromaDB at ${CHROMA_HOST}:${CHROMA_PORT}`);
     
-    // Updated for ChromaDB v2 API format
-    const chromaUrl = `http://${CHROMA_HOST}:${CHROMA_PORT}/api/v1/query`;
-    console.log(`Making request to: ${chromaUrl}`);
+    // Try different API endpoint formats to find the correct one
+    let chromaUrl = `http://${CHROMA_HOST}:${CHROMA_PORT}/api/v1/collections/${COLLECTION_NAME}/query`;
+    console.log(`Attempting connection to: ${chromaUrl}`);
     
     const requestData = {
-      collection_name: COLLECTION_NAME,
       query_embeddings: [cvEmbedding],
       n_results: TOP_N_RESULTS,
       include: ["metadatas", "distances", "documents"],
@@ -183,56 +179,55 @@ async function findSimilarJobs(cvEmbedding) {
     
     console.log('Request payload:', JSON.stringify(requestData).substring(0, 200) + '...');
     
-    const response = await axios({
-      method: 'post',
-      url: chromaUrl,
-      data: requestData,
-      headers: {
-        "Accept": "application/json", 
-        "Content-Type": "application/json"
-      },
-      timeout: 30000, // 30 second timeout
-      validateStatus: false // Don't throw on error status codes
-    });
-    
-    console.log(`ChromaDB response status: ${response.status}`);
-    
-    // Rest of the function remains the same
-    if (response.status !== 200) {
-      // Try a fallback approach if we get a 405 Method Not Allowed
-      if (response.status === 405) {
-        console.log('Received 405 Method Not Allowed, trying alternative approach');
-        
-        // Return some mock results for demonstration
-        return { 
-          matches: [
-            {
-              score: 95.5,
-              type: "Fallback match",
-              Title: "Software Developer",
-              Company: "Tech Solutions Inc.",
-              Area: "Copenhagen",
-              url: "https://example.com/job1",
-              posting_date: "2023-05-15",
-              content: "Looking for a skilled software developer...",
-              Status: "active"
-            },
-            {
-              score: 87.3,
-              type: "Fallback match",
-              Title: "Frontend Engineer",
-              Company: "Digital Innovations",
-              Area: "Aarhus",
-              url: "https://example.com/job2",
-              posting_date: "2023-05-10",
-              content: "Join our team of frontend specialists...",
-              Status: "active"
-            }
-          ], 
-          method: "Fallback matching (ChromaDB unavailable)" 
-        };
-      }
+    let response;
+    try {
+      response = await axios({
+        method: 'post',
+        url: chromaUrl,
+        data: requestData,
+        headers: {
+          "Accept": "application/json", 
+          "Content-Type": "application/json"
+        },
+        timeout: 30000, // 30 second timeout
+        validateStatus: false // Don't throw on error status codes
+      });
       
+      console.log(`ChromaDB response status: ${response.status}`);
+      
+      // If we get a 405, try the v2 API format
+      if (response.status === 405) {
+        console.log('Received 405 Method Not Allowed, trying v2 API format');
+        chromaUrl = `http://${CHROMA_HOST}:${CHROMA_PORT}/api/v1/query`;
+        
+        const v2RequestData = {
+          collection_name: COLLECTION_NAME,
+          query_embeddings: [cvEmbedding],
+          n_results: TOP_N_RESULTS,
+          include: ["metadatas", "distances", "documents"],
+          where: { "Status": "active" }
+        };
+        
+        response = await axios({
+          method: 'post',
+          url: chromaUrl,
+          data: v2RequestData,
+          headers: {
+            "Accept": "application/json", 
+            "Content-Type": "application/json"
+          },
+          timeout: 30000,
+          validateStatus: false
+        });
+        
+        console.log(`ChromaDB v2 API response status: ${response.status}`);
+      }
+    } catch (connectionError) {
+      console.error('Connection error:', connectionError);
+      throw new Error(`Failed to connect to ChromaDB: ${connectionError.message}`);
+    }
+    
+    if (response.status !== 200) {
       console.error(`ChromaDB returned status ${response.status}`);
       if (typeof response.data === 'string') {
         console.error('Response data:', response.data.substring(0, 500));
