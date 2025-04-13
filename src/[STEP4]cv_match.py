@@ -8,7 +8,17 @@ from chromadb.config import Settings
 from dotenv import load_dotenv
 from chromadb import HttpClient
 import requests
+# Add these imports at the top
+import tkinter as tk
+from tkinter import filedialog, ttk, scrolledtext
+from tkinter.messagebox import showerror, showinfo
 
+# Add this import near the top with other imports
+import PyPDF2
+
+# Add these imports at the top
+import docx
+import markdown
 # Load environment variables
 load_dotenv()
 
@@ -39,6 +49,8 @@ import urllib3
 # Disable SSL warnings if VERIFY_SSL is set to false
 if os.getenv('VERIFY_SSL', 'true').lower() != 'true':
     urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+
+
 
 def cosine_similarity(vec1, vec2):
     """Calculate cosine similarity between two vectors."""
@@ -272,75 +284,150 @@ def find_similar_jobs(cv_text, top_n=None, active_only=True):
         traceback.print_exc()
         return None, "Error: ChromaDB search failed"
 
+def create_ui():
+    root = tk.Tk()
+    root.title("CV Job Matcher")
+    root.geometry("800x600")
+    
+    def select_file():
+        file_path = filedialog.askopenfilename(
+            filetypes=[
+                ("All supported files", "*.txt *.pdf *.doc *.docx *.md"),
+                ("Text files", "*.txt"),
+                ("PDF files", "*.pdf"),
+                ("Word files", "*.doc *.docx"),
+                ("Markdown files", "*.md"),
+                ("All files", "*.*")
+            ]
+        )
+        if file_path:
+            file_entry.delete(0, tk.END)
+            file_entry.insert(0, file_path)
+
+    def process_cv():
+        file_path = file_entry.get()
+        if not file_path:
+            showerror("Error", "Please select a CV file first")
+            return
+
+        try:
+            # Clear previous results
+            results_text.delete(1.0, tk.END)
+            results_text.insert(tk.END, "Processing CV...\n\n")
+            root.update()
+
+            # Read the file based on extension
+            cv_text = ""
+            file_ext = file_path.lower()
+
+            if file_ext.endswith('.pdf'):
+                with open(file_path, 'rb') as file:
+                    pdf_reader = PyPDF2.PdfReader(file)
+                    for page in pdf_reader.pages:
+                        cv_text += page.extract_text() + "\n"
+            
+            elif file_ext.endswith('.docx'):
+                doc = docx.Document(file_path)
+                cv_text = "\n".join([paragraph.text for paragraph in doc.paragraphs])
+            
+            elif file_ext.endswith('.md'):
+                with open(file_path, 'r', encoding='utf-8') as file:
+                    md_text = file.read()
+                    # Convert markdown to plain text
+                    cv_text = markdown.markdown(md_text)
+                    # Remove HTML tags
+                    cv_text = cv_text.replace('<p>', '').replace('</p>', '\n')
+                    cv_text = cv_text.replace('<br>', '\n')
+            
+            else:  # Handle as text file
+                try:
+                    with open(file_path, "r", encoding="utf-8") as f:
+                        cv_text = f.read()
+                except UnicodeDecodeError:
+                    with open(file_path, "r", encoding="latin-1") as f:
+                        cv_text = f.read()
+
+            if not cv_text.strip():
+                showerror("Error", "Could not extract text from file")
+                return
+
+            # Check if embedding API URL is set
+            if not EMBEDDING_API_URL:
+                showerror("Error", "EMBEDDING_API_URL is not set in environment variables")
+                return
+
+            results_text.insert(tk.END, "Searching for matching jobs...\n\n")
+            root.update()
+
+            matches, method = find_similar_jobs(cv_text, active_only=True)
+
+            if not matches or method.startswith("Error"):
+                results_text.insert(tk.END, "No matches found or search failed\n")
+                return
+
+            results_text.insert(tk.END, f"Found {len(matches)} potential matches:\n\n")
+            
+            for i, job in enumerate(matches):
+                results_text.insert(tk.END, f"{i+1}. {job.get('Title', 'Unknown Position')}\n")
+                results_text.insert(tk.END, f"   Company: {job.get('Company', 'N/A')}\n")
+                results_text.insert(tk.END, f"   Location: {job.get('Area', 'N/A')}\n")
+                results_text.insert(tk.END, f"   Posted: {job.get('posting_date', 'N/A')}\n")
+                results_text.insert(tk.END, f"   Status: {job.get('Status', 'unknown')}\n")
+                results_text.insert(tk.END, f"   Match score: {job.get('score', 0):.2f}\n")
+                results_text.insert(tk.END, f"   URL: {job.get('url', '#')}\n\n")
+
+            # Save results to JSON
+            import json
+            from datetime import datetime
+            
+            timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+            json_filename = os.path.join(os.path.dirname(os.path.dirname(__file__)), 
+                                       "data", 
+                                       f"job_suggestions_{timestamp}.json")
+            
+            export_data = {
+                "timestamp": datetime.now().isoformat(),
+                "search_method": method,
+                "total_matches": len(matches),
+                "matches": matches
+            }
+            
+            with open(json_filename, 'w', encoding='utf-8') as f:
+                json.dump(export_data, f, ensure_ascii=False, indent=2)
+            
+            results_text.insert(tk.END, f"\nResults saved to {json_filename}\n")
+            showinfo("Success", "Job matching complete!")
+
+        except Exception as e:
+            showerror("Error", f"An error occurred: {str(e)}")
+
+    # Create UI elements
+    frame = ttk.Frame(root, padding="10")
+    frame.grid(row=0, column=0, sticky=(tk.W, tk.E, tk.N, tk.S))
+
+    # File selection
+    ttk.Label(frame, text="CV File:").grid(row=0, column=0, sticky=tk.W)
+    file_entry = ttk.Entry(frame, width=60)
+    file_entry.grid(row=0, column=1, padx=5)
+    ttk.Button(frame, text="Browse", command=select_file).grid(row=0, column=2)
+
+    # Process button
+    ttk.Button(frame, text="Process CV", command=process_cv).grid(row=1, column=0, columnspan=3, pady=10)
+
+    # Results area
+    results_text = scrolledtext.ScrolledText(frame, width=80, height=30)
+    results_text.grid(row=2, column=0, columnspan=3, pady=5)
+
+    # Configure grid
+    root.columnconfigure(0, weight=1)
+    root.rowconfigure(0, weight=1)
+    frame.columnconfigure(1, weight=1)
+
+    return root
+
 def main():
-    print("\n=== Job Matcher ===\n")
-    
-    print(f"Reading CV from {CV_FILE_PATH}")
-    try:
-        with open(CV_FILE_PATH, "r", encoding="utf-8") as f:
-            cv_text = f.read()
-        print(f"CV text loaded ({len(cv_text)} characters)")
-    except FileNotFoundError:
-        print(f"Error: File not found: {CV_FILE_PATH}")
-        return
-    except Exception as e:
-        print(f"Error reading file: {e}")
-        return
-        
-    if not cv_text.strip():
-        print("Error: CV file is empty")
-        return
-    
-    # Check if embedding API URL is set
-    print(f"Using remote embedding API: {EMBEDDING_API_URL}")
-    if not EMBEDDING_API_URL:
-        print("Error: EMBEDDING_API_URL is not set in environment variables")
-        return
-    
-    print("\nSearching for matching jobs...")
-    matches, method = find_similar_jobs(cv_text, active_only=True)
-    
-    print("\n=== Results ===")
-    print(f"Search method: {method}")
-    
-    if not matches or method.startswith("Error"):
-        print("No matches found or search failed")
-        return
-        
-    print(f"Found {len(matches)} potential matches:\n")
-    for i, job in enumerate(matches):
-        print(f"{i+1}. {job.get('Title', 'Unknown Position')}")
-        print(f"   Company: {job.get('Company', 'N/A')}")
-        print(f"   Location: {job.get('Area', 'N/A')}")
-        print(f"   Posted: {job.get('posting_date', 'N/A')}")
-        print(f"   Status: {job.get('Status', 'unknown')}")
-        print(f"   Match score: {job.get('score', 0):.2f}")
-        print(f"   URL: {job.get('url', '#')}")
-        print()
-    
-    # Save results to JSON file with timestamp
-    import json
-    from datetime import datetime
-    
-    timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-    json_filename = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data", f"job_suggestions_{timestamp}.json")
-    
-    # Prepare data for JSON export
-    export_data = {
-        "timestamp": datetime.now().isoformat(),
-        "search_method": method,
-        "total_matches": len(matches),
-        "matches": matches
-    }
-    
-    try:
-        with open(json_filename, 'w', encoding='utf-8') as f:
-            json.dump(export_data, f, ensure_ascii=False, indent=2)
-        print(f"Results saved to {json_filename}")
-    except Exception as e:
-        print(f"Error saving results to JSON: {e}")
-        
-    print("Job matching complete")
+    root = create_ui()
+    root.mainloop()
 
 if __name__ == "__main__":
     main()
