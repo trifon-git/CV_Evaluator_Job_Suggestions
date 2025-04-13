@@ -39,6 +39,8 @@ jobs:
           echo "JOBINDEX_BASE_URL=${{ secrets.JOBINDEX_BASE_URL }}" >> .env
           echo "JOB_AGE_PARAM=${{ secrets.JOB_AGE_PARAM }}" >> .env
           echo "CV_FILE_PATH=${{ secrets.CV_FILE_PATH }}" >> .env
+          echo "EMBEDDING_API_URL=${{ secrets.EMBEDDING_API_URL }}" >> .env
+          echo "VERIFY_SSL=${{ secrets.VERIFY_SSL || 'true' }}" >> .env
           echo "MAX_CONCURRENT=10" >> .env
           echo "PAGE_TIMEOUT=10000" >> .env
       

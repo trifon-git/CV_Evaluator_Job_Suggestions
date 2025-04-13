@@ -32,6 +32,8 @@ jobs:
           echo "CHROMA_HOST=${{ secrets.CHROMA_HOST }}" >> .env
           echo "CHROMA_PORT=${{ secrets.CHROMA_PORT }}" >> .env
           echo "CHROMA_COLLECTION=${{ secrets.CHROMA_COLLECTION }}" >> .env
+          echo "EMBEDDING_API_URL=${{ secrets.EMBEDDING_API_URL }}" >> .env
+          echo "VERIFY_SSL=${{ secrets.VERIFY_SSL || 'true' }}" >> .env
       
       - name: Run job status update script
         run: python src/[LOOP]jobindex_scraper_CHECK.py

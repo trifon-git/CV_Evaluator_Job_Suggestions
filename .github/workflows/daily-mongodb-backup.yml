@@ -29,6 +29,8 @@ jobs:
           echo "MONGO_URI=${{ secrets.MONGO_URI }}" > .env
           echo "MONGO_DB_NAME=${{ secrets.MONGO_DB_NAME }}" >> .env
           echo "MONGO_COLLECTION=${{ secrets.MONGO_COLLECTION }}" >> .env
+          echo "EMBEDDING_API_URL=${{ secrets.EMBEDDING_API_URL }}" >> .env
+          echo "VERIFY_SSL=${{ secrets.VERIFY_SSL || 'true' }}" >> .env
           echo "BACKUP_DIR=${{ github.workspace }}/backups" >> .env
           echo "DAILY_RETENTION=${{ secrets.DAILY_RETENTION || '7' }}" >> .env
           echo "WEEKLY_RETENTION=${{ secrets.WEEKLY_RETENTION || '4' }}" >> .env
