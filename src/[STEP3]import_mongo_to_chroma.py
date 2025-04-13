@@ -7,6 +7,11 @@ import os
 import requests
 import numpy as np
 import time
+import urllib3
+
+# Disable SSL warnings if VERIFY_SSL is set to false
+if os.getenv('VERIFY_SSL', 'true').lower() != 'true':
+    urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 # Load environment variables
 load_dotenv()

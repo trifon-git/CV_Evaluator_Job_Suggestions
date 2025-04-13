@@ -33,6 +33,13 @@ COLLECTION_NAME = os.getenv('CHROMA_COLLECTION')
 EMBEDDING_API_URL = os.getenv('EMBEDDING_API_URL', '')
 VERIFY_SSL = os.getenv('VERIFY_SSL', 'true').lower() == 'true'
 
+# Add these imports at the top of the file
+import urllib3
+
+# Disable SSL warnings if VERIFY_SSL is set to false
+if os.getenv('VERIFY_SSL', 'true').lower() != 'true':
+    urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+
 def cosine_similarity(vec1, vec2):
     """Calculate cosine similarity between two vectors."""
     if vec1 is None or vec2 is None or not isinstance(vec1, np.ndarray) or not isinstance(vec2, np.ndarray):
