@@ -11,3 +11,4 @@ playwright==1.40.0
 scipy==1.11.3
 aiofiles==23.2.1
 fastapi>=0.95.0
+streamlit==1.33.0
