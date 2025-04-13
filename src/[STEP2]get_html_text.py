@@ -67,11 +67,10 @@ async def scrape_and_clean_text(url, job_id):
     if 'youngcrm' in url.lower():
         log_message(f"[Job ID: {job_id}] Skipping youngcrm URL: {url}")
         return "Skipped youngcrm URL"
-        
-    # Check if URL is a PDF file
-    if url.lower().endswith('.pdf'):
-        log_message(f"[Job ID: {job_id}] URL is a PDF file: {url}")
-        # For PDFs, just store the URL as we can't easily extract text
+    
+    # More comprehensive PDF detection
+    if url.lower().endswith('.pdf') or 'pdf' in url.lower():
+        log_message(f"[Job ID: {job_id}] Likely PDF file: {url}")
         return f"PDF document available at: {url}"
         
     async with SEMAPHORE:
@@ -123,6 +122,9 @@ async def process_jobs_in_batches(batch_size=None):
     try:
         client, collection = init_mongodb()
         
+        # Track failed job IDs to avoid repeated processing
+        failed_job_ids = set()
+        
         # Get total count of jobs to process
         total_jobs = collection.count_documents({
             'Application_URL': {'$ne': None},
@@ -139,7 +141,8 @@ async def process_jobs_in_batches(batch_size=None):
             # Query for jobs without html_content, sorted by most recent first
             query = {
                 'Application_URL': {'$ne': None},
-                'html_content': {'$exists': False}
+                'html_content': {'$exists': False},
+                '_id': {'$nin': list(failed_job_ids)}  # Skip previously failed jobs
             }
 
             # Get batch of jobs, sorted by creation date in descending order (newest first)
@@ -164,6 +167,10 @@ async def process_jobs_in_batches(batch_size=None):
                         {'$set': {'html_content': cleaned_text}}
                     )
                     successful_updates += 1
+                else:
+                    # Mark as failed to avoid retrying
+                    failed_job_ids.add(job['_id'])
+                    log_message(f"Marking job {job['_id']} as failed to avoid retrying")
                 processed_count += 1
                 # Update progress bar
                 progress_bar.update(1)
