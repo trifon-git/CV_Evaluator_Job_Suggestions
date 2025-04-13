@@ -214,8 +214,13 @@ def find_similar_jobs(cv_text, top_n=None, active_only=True):
     
     print("Connecting to ChromaDB...")
     try:
-        # Update ChromaDB client initialization
-        chroma_client = HttpClient(host=CHROMA_HOST, port=CHROMA_PORT)
+        # Update ChromaDB client initialization to use v2 API
+        chroma_client = HttpClient(
+            host=CHROMA_HOST, 
+            port=CHROMA_PORT,
+            ssl=False,
+            headers={"accept": "application/json", "Content-Type": "application/json"}
+        )
         collection = chroma_client.get_collection(COLLECTION_NAME)
         
         search_start = time.time()
@@ -305,6 +310,28 @@ def main():
         print(f"   Match score: {job.get('score', 0):.2f}")
         print(f"   URL: {job.get('url', '#')}")
         print()
+    
+    # Save results to JSON file with timestamp
+    import json
+    from datetime import datetime
+    
+    timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+    json_filename = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data", f"job_suggestions_{timestamp}.json")
+    
+    # Prepare data for JSON export
+    export_data = {
+        "timestamp": datetime.now().isoformat(),
+        "search_method": method,
+        "total_matches": len(matches),
+        "matches": matches
+    }
+    
+    try:
+        with open(json_filename, 'w', encoding='utf-8') as f:
+            json.dump(export_data, f, ensure_ascii=False, indent=2)
+        print(f"Results saved to {json_filename}")
+    except Exception as e:
+        print(f"Error saving results to JSON: {e}")
         
     print("Job matching complete")
 

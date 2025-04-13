@@ -47,12 +47,12 @@ mongo_client = MongoClient(MONGO_URI)
 mongo_db = mongo_client["job_scraper"]
 mongo_collection = mongo_db["jobs"]
 
-# Update ChromaDB client initialization
-# Use HttpClient with direct parameters instead of Settings object
+# Update ChromaDB client initialization to use v2 API
 chroma_client = HttpClient(
-    host=CHROMA_HOST,
+    host=CHROMA_HOST, 
     port=CHROMA_PORT,
-    ssl=False
+    ssl=False,
+    headers={"accept": "application/json", "Content-Type": "application/json"}
 )
 chroma_collection = chroma_client.get_or_create_collection(COLLECTION_NAME)
 
