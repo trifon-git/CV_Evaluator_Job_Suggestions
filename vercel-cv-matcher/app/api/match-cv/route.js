@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { processCV } from '../../../lib/cv-processor';
-import pdfParse from 'pdf-parse';
+import { parsePdf } from '../../../lib/pdf-parser';
 
 export async function POST(request) {
   try {
@@ -25,7 +25,7 @@ export async function POST(request) {
       if (fileName.endsWith('.pdf')) {
         console.log('Processing PDF file');
         try {
-          const pdfData = await pdfParse(buffer);
+          const pdfData = await parsePdf(buffer);
           cvText = pdfData.text;
           console.log('PDF parsing successful');
         } catch (pdfError) {
