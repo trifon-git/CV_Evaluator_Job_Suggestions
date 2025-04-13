@@ -24,8 +24,17 @@ export async function POST(request) {
       
       if (fileName.endsWith('.pdf')) {
         console.log('Processing PDF file');
-        const pdfData = await pdfParse(buffer);
-        cvText = pdfData.text;
+        try {
+          const pdfData = await pdfParse(buffer);
+          cvText = pdfData.text;
+          console.log('PDF parsing successful');
+        } catch (pdfError) {
+          console.error('PDF parsing error:', pdfError);
+          return NextResponse.json(
+            { error: `Failed to parse PDF: ${pdfError.message}` },
+            { status: 500 }
+          );
+        }
       } else if (fileName.endsWith('.docx')) {
         // For now, we'll return an error for docx files
         return NextResponse.json(
@@ -56,19 +65,22 @@ export async function POST(request) {
     
     // Process the CV using our matching algorithm
     try {
+      console.log('Starting CV processing...');
       const results = await processCV(cvText);
+      console.log('CV processing completed successfully');
       return NextResponse.json({ results });
     } catch (error) {
       console.error('Error in CV processing:', error);
+      // Return a more detailed error message
       return NextResponse.json(
-        { error: `Failed to process CV: ${error.message}` },
+        { error: `Failed to process CV: ${error.message || 'Unknown error'}` },
         { status: 500 }
       );
     }
   } catch (error) {
     console.error('Error processing CV request:', error);
     return NextResponse.json(
-      { error: 'Failed to process CV request: ' + error.message },
+      { error: 'Failed to process CV request: ' + (error.message || 'Unknown error') },
       { status: 500 }
     );
   }

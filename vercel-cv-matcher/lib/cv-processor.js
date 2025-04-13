@@ -106,6 +106,18 @@ async function generateCvEmbeddingRemote(cvText) {
   }
 }
 
+// Add this function at the beginning of the file, after the imports
+async function safeJsonParse(response) {
+  try {
+    return response.data;
+  } catch (error) {
+    console.error('Error parsing JSON response:', error);
+    console.error('Response data:', response.data);
+    throw new Error(`Invalid JSON response: ${error.message}`);
+  }
+}
+
+// Then modify the getRemoteEmbedding function
 async function getRemoteEmbedding(texts) {
   try {
     if (!EMBEDDING_API_URL) {
@@ -129,11 +141,14 @@ async function getRemoteEmbedding(texts) {
     );
     
     if (response.status !== 200) {
-      console.error(`API returned status ${response.status}: ${JSON.stringify(response.data)}`);
-      throw new Error(`API returned status ${response.status}`);
+      console.error(`API returned status ${response.status}`);
+      console.error('Response data:', response.data);
+      throw new Error(`API returned status ${response.status}: ${typeof response.data === 'string' ? response.data : JSON.stringify(response.data)}`);
     }
     
-    const embeddings = response.data.embeddings || [];
+    // Safely parse the JSON response
+    const data = await safeJsonParse(response);
+    const embeddings = data.embeddings || [];
     
     if (embeddings.length === 0) {
       console.warn("Warning: Empty embedding response from API");
@@ -147,6 +162,7 @@ async function getRemoteEmbedding(texts) {
   }
 }
 
+// Also modify the findSimilarJobs function
 async function findSimilarJobs(cvEmbedding) {
   try {
     console.log(`Connecting to ChromaDB at ${CHROMA_HOST}:${CHROMA_PORT}`);
@@ -171,11 +187,13 @@ async function findSimilarJobs(cvEmbedding) {
     );
     
     if (response.status !== 200) {
-      console.error(`ChromaDB returned status ${response.status}: ${JSON.stringify(response.data)}`);
-      throw new Error(`ChromaDB returned status ${response.status}`);
+      console.error(`ChromaDB returned status ${response.status}`);
+      console.error('Response data:', response.data);
+      throw new Error(`ChromaDB returned status ${response.status}: ${typeof response.data === 'string' ? response.data : JSON.stringify(response.data)}`);
     }
     
-    const results = response.data;
+    // Safely parse the JSON response
+    const results = await safeJsonParse(response);
     
     if (!results.metadatas || !results.metadatas[0] || results.metadatas[0].length === 0) {
       console.warn("No matching jobs found in ChromaDB");
