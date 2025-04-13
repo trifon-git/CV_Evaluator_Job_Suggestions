@@ -162,11 +162,12 @@ async function getRemoteEmbedding(texts) {
   }
 }
 
+// In the findSimilarJobs function
 async function findSimilarJobs(cvEmbedding) {
   try {
     console.log(`Connecting to ChromaDB at ${CHROMA_HOST}:${CHROMA_PORT}`);
     
-    // Try different API endpoint formats to find the correct one
+    // Try different API endpoint formats with better error handling
     let chromaUrl = `http://${CHROMA_HOST}:${CHROMA_PORT}/api/v1/collections/${COLLECTION_NAME}/query`;
     console.log(`Attempting connection to: ${chromaUrl}`);
     
@@ -181,6 +182,7 @@ async function findSimilarJobs(cvEmbedding) {
     
     let response;
     try {
+      // Increase timeout and add retry logic
       response = await axios({
         method: 'post',
         url: chromaUrl,
@@ -189,25 +191,29 @@ async function findSimilarJobs(cvEmbedding) {
           "Accept": "application/json", 
           "Content-Type": "application/json"
         },
-        timeout: 30000, // 30 second timeout
-        validateStatus: false // Don't throw on error status codes
+        timeout: 60000, // Increase timeout to 60 seconds
+        validateStatus: false, // Don't throw on error status codes
+        maxRedirects: 5,
+        proxy: false // Disable proxy to avoid connection issues
       });
       
       console.log(`ChromaDB response status: ${response.status}`);
+    } catch (connectionError) {
+      console.error('Connection error with v1 API:', connectionError);
       
-      // If we get a 405, try the v2 API format
-      if (response.status === 405) {
-        console.log('Received 405 Method Not Allowed, trying v2 API format');
-        chromaUrl = `http://${CHROMA_HOST}:${CHROMA_PORT}/api/v1/query`;
-        
-        const v2RequestData = {
-          collection_name: COLLECTION_NAME,
-          query_embeddings: [cvEmbedding],
-          n_results: TOP_N_RESULTS,
-          include: ["metadatas", "distances", "documents"],
-          where: { "Status": "active" }
-        };
-        
+      // Try v2 API format as fallback
+      console.log('Trying v2 API format after connection error');
+      chromaUrl = `http://${CHROMA_HOST}:${CHROMA_PORT}/api/v1/query`;
+      
+      const v2RequestData = {
+        collection_name: COLLECTION_NAME,
+        query_embeddings: [cvEmbedding],
+        n_results: TOP_N_RESULTS,
+        include: ["metadatas", "distances", "documents"],
+        where: { "Status": "active" }
+      };
+      
+      try {
         response = await axios({
           method: 'post',
           url: chromaUrl,
@@ -216,25 +222,29 @@ async function findSimilarJobs(cvEmbedding) {
             "Accept": "application/json", 
             "Content-Type": "application/json"
           },
-          timeout: 30000,
-          validateStatus: false
+          timeout: 60000,
+          validateStatus: false,
+          maxRedirects: 5,
+          proxy: false
         });
         
         console.log(`ChromaDB v2 API response status: ${response.status}`);
+      } catch (v2Error) {
+        console.error('Connection error with v2 API:', v2Error);
+        throw new Error(`Failed to connect to ChromaDB: ${v2Error.message}`);
       }
-    } catch (connectionError) {
-      console.error('Connection error:', connectionError);
-      throw new Error(`Failed to connect to ChromaDB: ${connectionError.message}`);
     }
     
-    if (response.status !== 200) {
-      console.error(`ChromaDB returned status ${response.status}`);
-      if (typeof response.data === 'string') {
-        console.error('Response data:', response.data.substring(0, 500));
-      } else {
-        console.error('Response data:', JSON.stringify(response.data).substring(0, 500));
+    if (!response || response.status !== 200) {
+      console.error(`ChromaDB returned status ${response ? response.status : 'unknown'}`);
+      if (response && response.data) {
+        if (typeof response.data === 'string') {
+          console.error('Response data:', response.data.substring(0, 500));
+        } else {
+          console.error('Response data:', JSON.stringify(response.data).substring(0, 500));
+        }
       }
-      throw new Error(`ChromaDB returned status ${response.status}`);
+      throw new Error(`ChromaDB returned status ${response ? response.status : 'unknown'}`);
     }
     
     const results = response.data;
