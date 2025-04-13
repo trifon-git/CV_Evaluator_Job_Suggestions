@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
-import { processCV } from '@/lib/cv-processor';
+// Change this import path to use a relative path instead of the alias
+import { processCV } from '../../../lib/cv-processor';
 
 export async function POST(request) {
   try {
