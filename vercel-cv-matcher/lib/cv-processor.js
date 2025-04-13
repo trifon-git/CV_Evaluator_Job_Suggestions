@@ -167,10 +167,11 @@ async function findSimilarJobs(cvEmbedding) {
   try {
     console.log(`Connecting to ChromaDB at ${CHROMA_HOST}:${CHROMA_PORT}`);
     
-    // Try different API endpoint formats with better error handling
-    let chromaUrl = `http://${CHROMA_HOST}:${CHROMA_PORT}/api/v1/collections/${COLLECTION_NAME}/query`;
+    // Use the same endpoint format as the Python client
+    const chromaUrl = `http://${CHROMA_HOST}:${CHROMA_PORT}/api/v1/collections/${COLLECTION_NAME}/query`;
     console.log(`Attempting connection to: ${chromaUrl}`);
     
+    // Match the Python client's request format exactly
     const requestData = {
       query_embeddings: [cvEmbedding],
       n_results: TOP_N_RESULTS,
@@ -180,71 +181,28 @@ async function findSimilarJobs(cvEmbedding) {
     
     console.log('Request payload:', JSON.stringify(requestData).substring(0, 200) + '...');
     
-    let response;
-    try {
-      // Increase timeout and add retry logic
-      response = await axios({
-        method: 'post',
-        url: chromaUrl,
-        data: requestData,
-        headers: {
-          "Accept": "application/json", 
-          "Content-Type": "application/json"
-        },
-        timeout: 60000, // Increase timeout to 60 seconds
-        validateStatus: false, // Don't throw on error status codes
-        maxRedirects: 5,
-        proxy: false // Disable proxy to avoid connection issues
-      });
-      
-      console.log(`ChromaDB response status: ${response.status}`);
-    } catch (connectionError) {
-      console.error('Connection error with v1 API:', connectionError);
-      
-      // Try v2 API format as fallback
-      console.log('Trying v2 API format after connection error');
-      chromaUrl = `http://${CHROMA_HOST}:${CHROMA_PORT}/api/v1/query`;
-      
-      const v2RequestData = {
-        collection_name: COLLECTION_NAME,
-        query_embeddings: [cvEmbedding],
-        n_results: TOP_N_RESULTS,
-        include: ["metadatas", "distances", "documents"],
-        where: { "Status": "active" }
-      };
-      
-      try {
-        response = await axios({
-          method: 'post',
-          url: chromaUrl,
-          data: v2RequestData,
-          headers: {
-            "Accept": "application/json", 
-            "Content-Type": "application/json"
-          },
-          timeout: 60000,
-          validateStatus: false,
-          maxRedirects: 5,
-          proxy: false
-        });
-        
-        console.log(`ChromaDB v2 API response status: ${response.status}`);
-      } catch (v2Error) {
-        console.error('Connection error with v2 API:', v2Error);
-        throw new Error(`Failed to connect to ChromaDB: ${v2Error.message}`);
-      }
-    }
+    const response = await axios({
+      method: 'post',
+      url: chromaUrl,
+      data: requestData,
+      headers: {
+        "Accept": "application/json", 
+        "Content-Type": "application/json"
+      },
+      timeout: 60000,
+      validateStatus: false
+    });
     
-    if (!response || response.status !== 200) {
-      console.error(`ChromaDB returned status ${response ? response.status : 'unknown'}`);
-      if (response && response.data) {
-        if (typeof response.data === 'string') {
-          console.error('Response data:', response.data.substring(0, 500));
-        } else {
-          console.error('Response data:', JSON.stringify(response.data).substring(0, 500));
-        }
+    console.log(`ChromaDB response status: ${response.status}`);
+    
+    if (response.status !== 200) {
+      console.error(`ChromaDB returned status ${response.status}`);
+      if (response.data) {
+        console.error('Response data:', typeof response.data === 'string' 
+          ? response.data.substring(0, 500) 
+          : JSON.stringify(response.data).substring(0, 500));
       }
-      throw new Error(`ChromaDB returned status ${response ? response.status : 'unknown'}`);
+      throw new Error(`ChromaDB returned status ${response.status}`);
     }
     
     const results = response.data;
@@ -256,13 +214,14 @@ async function findSimilarJobs(cvEmbedding) {
     
     const matches = [];
     
+    // Process results exactly like the Python code
     for (let i = 0; i < results.metadatas[0].length; i++) {
       const metadata = results.metadatas[0][i];
       const distance = results.distances[0][i];
       const content = results.documents[0][i];
       
-      // Using exponential decay for more intuitive scoring
-      const similarityScore = Math.exp(-distance) * 100;  // Will give scores between 0-100
+      // Using exponential decay for more intuitive scoring (same as Python)
+      const similarityScore = Math.exp(-distance) * 100;
       
       matches.push({
         score: similarityScore,
