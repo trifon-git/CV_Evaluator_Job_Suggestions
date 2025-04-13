@@ -214,6 +214,7 @@ def find_similar_jobs(cv_text, top_n=None, active_only=True):
     
     print("Connecting to ChromaDB...")
     try:
+        # Update ChromaDB client initialization
         chroma_client = HttpClient(host=CHROMA_HOST, port=CHROMA_PORT)
         collection = chroma_client.get_collection(COLLECTION_NAME)
         

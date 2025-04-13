@@ -46,13 +46,10 @@ mongo_client = MongoClient(MONGO_URI)
 mongo_db = mongo_client["job_scraper"]
 mongo_collection = mongo_db["jobs"]
 
-# Update ChromaDB client initialization to use v2 API
+# Update ChromaDB client initialization
 chroma_client = HttpClient(
     host=CHROMA_HOST, 
-    port=CHROMA_PORT,
-    settings={
-        "api_version": "v2"  # Explicitly specify v2 API
-    }
+    port=CHROMA_PORT
 )
 chroma_collection = chroma_client.get_or_create_collection(COLLECTION_NAME)
 

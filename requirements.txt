@@ -10,3 +10,4 @@ nest_asyncio==1.5.8
 playwright==1.40.0
 scipy==1.11.3
 aiofiles==23.2.1
+fastapi>=0.95.0
