@@ -167,13 +167,30 @@ async function findSimilarJobs(cvEmbedding) {
   try {
     console.log(`Connecting to ChromaDB at ${CHROMA_HOST}:${CHROMA_PORT}`);
     
-    // Update to match Python client's endpoint format
-    const chromaUrl = `http://${CHROMA_HOST}:${CHROMA_PORT}/_api/v1/collections/${COLLECTION_NAME}/query`;
-    console.log(`Attempting connection to: ${chromaUrl}`);
+    // Match Python's HttpClient endpoint format exactly
+    const chromaUrl = `http://${CHROMA_HOST}:${CHROMA_PORT}/api/v1/collections/${COLLECTION_NAME}/get`;
+    console.log(`Checking if collection exists: ${chromaUrl}`);
     
-    // Match Python client's request format
+    // First verify the collection exists
+    try {
+      const collectionResponse = await axios.get(chromaUrl, {
+        headers: {
+          "Accept": "application/json"
+        },
+        timeout: 30000,
+        validateStatus: false
+      });
+      console.log(`Collection check response: ${collectionResponse.status}`);
+    } catch (collectionError) {
+      console.error('Collection check failed:', collectionError.message);
+    }
+
+    // Use the exact same query endpoint and format as Python
+    const queryUrl = `http://${CHROMA_HOST}:${CHROMA_PORT}/api/v1/collections/${COLLECTION_NAME}/query`;
+    console.log(`Querying collection at: ${queryUrl}`);
+    
     const requestData = {
-      vectors: [cvEmbedding],
+      query_embeddings: [cvEmbedding],
       n_results: TOP_N_RESULTS,
       include: ["metadatas", "distances", "documents"],
       where: { "Status": "active" }
@@ -183,7 +200,7 @@ async function findSimilarJobs(cvEmbedding) {
     
     const response = await axios({
       method: 'post',
-      url: chromaUrl,
+      url: queryUrl,
       data: requestData,
       headers: {
         "Accept": "application/json", 
@@ -191,7 +208,7 @@ async function findSimilarJobs(cvEmbedding) {
       },
       timeout: 60000,
       validateStatus: false,
-      // Add these options to match Python's urllib3 behavior
+      // Match Python's SSL behavior
       httpsAgent: new (require('https').Agent)({
         rejectUnauthorized: false
       })
