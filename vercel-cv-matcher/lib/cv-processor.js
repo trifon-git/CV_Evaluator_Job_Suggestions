@@ -167,13 +167,13 @@ async function findSimilarJobs(cvEmbedding) {
   try {
     console.log(`Connecting to ChromaDB at ${CHROMA_HOST}:${CHROMA_PORT}`);
     
-    // Use the same endpoint format as the Python client
-    const chromaUrl = `http://${CHROMA_HOST}:${CHROMA_PORT}/api/v1/collections/${COLLECTION_NAME}/query`;
+    // Update to match Python client's endpoint format
+    const chromaUrl = `http://${CHROMA_HOST}:${CHROMA_PORT}/_api/v1/collections/${COLLECTION_NAME}/query`;
     console.log(`Attempting connection to: ${chromaUrl}`);
     
-    // Match the Python client's request format exactly
+    // Match Python client's request format
     const requestData = {
-      query_embeddings: [cvEmbedding],
+      vectors: [cvEmbedding],
       n_results: TOP_N_RESULTS,
       include: ["metadatas", "distances", "documents"],
       where: { "Status": "active" }
@@ -190,7 +190,11 @@ async function findSimilarJobs(cvEmbedding) {
         "Content-Type": "application/json"
       },
       timeout: 60000,
-      validateStatus: false
+      validateStatus: false,
+      // Add these options to match Python's urllib3 behavior
+      httpsAgent: new (require('https').Agent)({
+        rejectUnauthorized: false
+      })
     });
     
     console.log(`ChromaDB response status: ${response.status}`);
