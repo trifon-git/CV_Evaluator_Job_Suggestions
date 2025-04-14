@@ -2,6 +2,8 @@
 
 ## Workflow / Pipeline Steps
 
+![CV Job Matcher](images/cv_job_matcher_pipeline.png)
+
 The project operates through a sequence of steps, managed by different scripts:
 
 1.  **Initial Data Population (Run Manually/Infrequently):**
