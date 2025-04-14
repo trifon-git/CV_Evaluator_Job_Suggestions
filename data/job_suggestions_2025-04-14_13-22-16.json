@@ -1,0 +1,117 @@
+{
+  "timestamp": "2025-04-14T13:22:16.333958",
+  "search_method": "ChromaDB Vector Search",
+  "total_matches": 10,
+  "matches": [
+    {
+      "score": 53.97300887669713,
+      "type": "ChromaDB similarity",
+      "Title": "Salgschef til voksende værft",
+      "Company": "P&S Shipyard A/S",
+      "Area": "Svendborg",
+      "url": "https://www.processupport.dk/aktuelle-jobs/?hr=show-job%2F243980%26locale%3Dda_DK",
+      "posting_date": "2025-03-31",
+      "content": null,
+      "Status": "active"
+    },
+    {
+      "score": 49.479403198788205,
+      "type": "ChromaDB similarity",
+      "Title": "Category Manager / Offentligt indkøb – Afd. for Økonomi og Regnskab",
+      "Company": "DTU, Danmarks Tekniske Universitet",
+      "Area": "Kgs. Lyngby og mulighed for hjemmearbejde",
+      "url": "https://efzu.fa.em2.oraclecloud.com/hcmUI/CandidateExperience/da/sites/CX_1/job/4947",
+      "posting_date": "2025-03-27",
+      "content": null,
+      "Status": "active"
+    },
+    {
+      "score": 45.83282951545796,
+      "type": "ChromaDB similarity",
+      "Title": "Business Analyst with MS Purview experience",
+      "Company": "Unknown",
+      "Area": "København",
+      "url": "https://emagine.dk/konsulenter/freelance-jobs/206511/business-analyst-with-ms-purview-experience/?id=167397&utm_source=jSl6kXsIq4Kdejsjpl1LUuyMUbuelXZKkkk%2bGMC2gb8uzxBCA3qEFRSrCsqPD5uxp3BaSZGyg4JFSfI8TRJQzMlOsehNRPQNGugG7YAnyAU%3d",
+      "posting_date": "2025-04-10 00:00:00",
+      "content": null,
+      "Status": "active"
+    },
+    {
+      "score": 45.72293929892937,
+      "type": "ChromaDB similarity",
+      "Title": "Salgs- og marketingchef",
+      "Company": "Talenttrack ApS",
+      "Area": "Åbyhøj",
+      "url": "https://talenttrack.dk/jobs/salgs-og-marketingchef/",
+      "posting_date": "2025-03-17",
+      "content": null,
+      "Status": "active"
+    },
+    {
+      "score": 45.642732137549466,
+      "type": "ChromaDB similarity",
+      "Title": "International Partnership Manager (barselsvikar) – Afd. for Uddannelse og Studerende",
+      "Company": "DTU, Danmarks Tekniske Universitet",
+      "Area": "Kgs. Lyngby",
+      "url": "https://efzu.fa.em2.oraclecloud.com/hcmUI/CandidateExperience/da/sites/CX_1/job/5025",
+      "posting_date": "2025-04-08",
+      "content": null,
+      "Status": "active"
+    },
+    {
+      "score": 45.13646814076307,
+      "type": "ChromaDB similarity",
+      "Title": "Service Delivery Manager – drift af IT-løsninger – IT Service",
+      "Company": "DTU, Danmarks Tekniske Universitet",
+      "Area": "Kgs. Lyngby",
+      "url": "https://efzu.fa.em2.oraclecloud.com/hcmUI/CandidateExperience/da/sites/CX_1/job/5032",
+      "posting_date": "2025-04-09",
+      "content": null,
+      "Status": "active"
+    },
+    {
+      "score": 45.0749511792358,
+      "type": "ChromaDB similarity",
+      "Title": "Engageret og resultatorienteret Product Manager/Junior Product Manager for varebiler",
+      "Company": "Wismo Group A/S",
+      "Area": "Glostrup",
+      "url": "https://wismo.career.emply.com/ad/wismo-automotive-a-s-soger-en-engageret-og-resultatorienteret-product-manager-jun/4164di/da",
+      "posting_date": "2025-04-11 00:00:00",
+      "content": null,
+      "Status": "active"
+    },
+    {
+      "score": 45.067658642117166,
+      "type": "ChromaDB similarity",
+      "Title": "Studentermedhjælper til drift og udvikling af Metroens digitale kontaktpunkter",
+      "Company": "Metroselskabet og Hovedstadens Letbane",
+      "Area": "København S",
+      "url": "https://metroselskabet.career.emply.com/ad/studentermedhjaelper-til-drift-og-udvikling-af-metroens-digitale-kontaktpunkter/fkyw83/da",
+      "posting_date": "2025-04-03",
+      "content": null,
+      "Status": "active"
+    },
+    {
+      "score": 44.50984879802103,
+      "type": "ChromaDB similarity",
+      "Title": "Afdelingsleder for Projekt & Udvikling - DevOps",
+      "Company": "Tusass A/S",
+      "Area": "Nuuk",
+      "url": "https://www.tusass.gl/da/karriere/job/?id=2025-04-12",
+      "posting_date": "2025-04-08",
+      "content": null,
+      "Status": "active"
+    },
+    {
+      "score": 44.38166110719026,
+      "type": "ChromaDB similarity",
+      "Title": "2 coaches til vores Retail partnerskaber i Jylland og på Fyn",
+      "Company": "Telmore A/S",
+      "Area": "Unknown",
+      "url": "https://tdc.csod.com/ux/ats/careersite/17/home/requisition/9649?c=tdc",
+      "posting_date": "2025-03-26",
+      "content": null,
+      "Status": "active"
+    }
+  ]
+}

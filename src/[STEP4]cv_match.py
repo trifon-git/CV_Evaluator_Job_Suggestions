@@ -19,8 +19,10 @@ import PyPDF2
 # Add these imports at the top
 import docx
 import markdown
-# Load environment variables
-load_dotenv()
+from dotenv import load_dotenv, find_dotenv
+
+# Reset environment variables
+load_dotenv(find_dotenv(), override=True)
 
 # Try to use scipy for faster cosine calculations if available
 try:
