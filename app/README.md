@@ -1,12 +1,7 @@
----
-title: CV Evaluator Job Suggestions
-emoji: 👔
-colorFrom: indigo
-colorTo: blue
-sdk: streamlit
-sdk_version: 1.44.1
-app_file: app.py
-pinned: false
----
+# 🇩🇰 CV Job Matcher - Denmark
 
-Check out the configuration reference at https://huggingface.co/docs/hub/spaces-config-reference
+An AI app to match your CV with relevant job postings in Denmark.
+
+**[▶️ Try it live on Hugging Face Spaces](https://huggingface.co/spaces/Lpiziks2/CV_Evaluator_Job_Suggestions)**
+
+Uses Streamlit, vector embeddings, and ChromaDB to find semantic matches between CVs and active job listings.
