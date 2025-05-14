@@ -14,7 +14,7 @@ MONGO_URI = os.getenv('MONGO_URI')
 DB_NAME = os.getenv('MONGO_DB_NAME')
 COLLECTION_NAME = os.getenv('MONGO_COLLECTION')
 BATCH_SIZE = int(os.getenv('BATCH_SIZE', '10'))
-HTML_CHUNK_SIZE = int(os.getenv('HTML_CHUNK_SIZE', 2000)) # Max characters per chunk for LLM
+HTML_CHUNK_SIZE = int(os.getenv('HTML_CHUNK_SIZE', 500)) # Max characters per chunk for LLM
 
 def log_message(message):
     """Log a message with timestamp."""
@@ -56,10 +56,10 @@ def extract_and_store_skills(job_id, html_content, collection):
             log_message(f"[Job ID: {job_id}] HTML content is empty. Skipping skill extraction.")
             return False
 
+        log_message(f"[Job ID: {job_id}] HTML content length: {len(html_content)} characters")
+
         html_chunks = chunk_html_content(html_content, HTML_CHUNK_SIZE)
-        if len(html_chunks) > 50:
-            log_message(f"[Job ID: {job_id}] Skipping job because it has {len(html_chunks)} chunks (more than 50).")
-            return False
+        
 
         all_extracted_skills = set() # Use a set to store unique skills
 
@@ -82,8 +82,7 @@ def extract_and_store_skills(job_id, html_content, collection):
                 log_message(f"[Job ID: {job_id}] Invalid or no skills data from LLM for chunk {i+1}. Data: {skills_data}")
 
         if all_extracted_skills:
-            final_skills_list = sorted(list(all_extracted_skills)) # Convert set to sorted list
-            # Update MongoDB with extracted skills
+            final_skills_list = sorted(list(all_extracted_skills)) 
             collection.update_one(
                 {'_id': job_id},
                 {'$set': {
@@ -94,10 +93,10 @@ def extract_and_store_skills(job_id, html_content, collection):
             return True
         else:
             log_message(f"[Job ID: {job_id}] No skills extracted after processing all chunks.")
-            # Optionally, store an empty list if no skills are found, or handle as an error
+
             collection.update_one(
                 {'_id': job_id},
-                {'$set': {'Skills': []}} # Store empty list if no skills found
+                {'$set': {'Skills': []}} 
             )
             return False
             
@@ -113,16 +112,13 @@ def process_jobs_with_html_content(batch_size=None, process_all=False):
     try:
         client, collection = init_mongodb()
         
-        # Query to process jobs with HTML content where Skills field is empty or doesn't exist
+        # Modified query to only check for HTML content existence
         query = {
             'html_content': {'$exists': True, '$ne': None},
-            '$or': [
-                {'Skills': {'$exists': False}},  # No Skills field
-                {'Skills': {'$size': 0}}        # Skills field exists but is empty
-            ],
+            'Skills': {'$exists': False},  # Only process jobs without skills
             'Status': 'active'  # Only process active jobs
         }
-        log_message("Processing active jobs with HTML content where Skills field is empty or doesn't exist.")
+        log_message("Processing active jobs with HTML content but no skills.")
         
         total_jobs = collection.count_documents(query)
         log_message(f"Found {total_jobs} active jobs to process")
@@ -167,5 +163,5 @@ def process_jobs_with_html_content(batch_size=None, process_all=False):
         client.close()
 
 if __name__ == "__main__":
-    log_message("Starting skill extraction for active jobs with HTML content and no existing Skills field...")
+    log_message("Starting skill extraction for active jobs with HTML content...")
     process_jobs_with_html_content(process_all=False)
