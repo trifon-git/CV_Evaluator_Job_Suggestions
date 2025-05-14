@@ -59,7 +59,7 @@ def extract_and_store_skills(job_id, html_content, collection):
         log_message(f"[Job ID: {job_id}] HTML content length: {len(html_content)} characters")
 
         html_chunks = chunk_html_content(html_content, HTML_CHUNK_SIZE)
-        
+        log_message(f"[Job ID: {job_id}] HTML content split into {len(html_chunks)} chunks.")
 
         all_extracted_skills = set() # Use a set to store unique skills
 
@@ -68,6 +68,7 @@ def extract_and_store_skills(job_id, html_content, collection):
         for i, chunk in enumerate(html_chunks):
             log_message(f"[Job ID: {job_id}] Processing chunk {i+1}/{len(html_chunks)}")
             skills_data = extract_skills_with_llm(chunk)
+            log_message(f"[Job ID: {job_id}] Received skills data for chunk {i+1}: {skills_data}")
             
             if skills_data and isinstance(skills_data, dict) and 'skills' in skills_data:
                 skills_list_from_chunk = skills_data['skills']
