@@ -38,6 +38,9 @@ jobs:
       - name: Run job status update script
         run: python src/[LOOP]jobindex_scraper_CHECK.py
       
+      - name: Run delete inactive jobs script
+        run: python src/[LOOP]_delete_inactive_jobs.py
+      
       - name: Upload log as artifact
         uses: actions/upload-artifact@v4
         with:

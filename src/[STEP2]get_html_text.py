@@ -10,11 +10,11 @@ from datetime import datetime
 from pymongo import MongoClient
 from tqdm import tqdm
 from dotenv import load_dotenv
+import importlib.util
+import sys
 
-# Apply nest_asyncio for compatibility
 nest_asyncio.apply()
 
-# Load environment variables
 load_dotenv()
 
 MONGO_URI = os.getenv('MONGO_URI')
@@ -162,6 +162,7 @@ async def process_jobs_in_batches(batch_size=None):
             successful_updates = 0
             for job, cleaned_text in zip(jobs, results):
                 if cleaned_text:
+                    # Update with HTML content
                     collection.update_one(
                         {'_id': job['_id']},
                         {'$set': {'html_content': cleaned_text}}
@@ -187,13 +188,6 @@ async def process_jobs_in_batches(batch_size=None):
     finally:
         client.close()
 
-# Remove save_progress and load_progress functions
-
-async def main():
-    try:
-        await process_jobs_in_batches()
-    except Exception as e:
-        log_message(f"Unexpected error: {e}")
-
 if __name__ == "__main__":
-    asyncio.run(main())
+    # Run the main function
+    asyncio.run(process_jobs_in_batches())

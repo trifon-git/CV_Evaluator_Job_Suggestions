@@ -66,7 +66,8 @@ def insert_jobs(collection, jobs_data, category):
                 "Area": job["Area"],
                 "Category": category,
                 "Published_Date": job["Published"],
-                "Created_At": current_timestamp
+                "Created_At": current_timestamp,
+                "Status": "active"  # Add Status field with value "active"
             }
             
             # Rest of the function remains the same
@@ -83,7 +84,7 @@ def insert_jobs(collection, jobs_data, category):
     print(f"ℹ️ Found {duplicate_count} duplicate jobs (skipped)")
     return inserted_count, duplicate_count
 
-JOB_AGE_PARAM = "jobage=1"
+JOB_AGE_PARAM = "jobage=2"
 
 def fetch_job_listings(keyword, page_limit=1, subid="1"):
     base_url = os.getenv('JOBINDEX_BASE_URL')

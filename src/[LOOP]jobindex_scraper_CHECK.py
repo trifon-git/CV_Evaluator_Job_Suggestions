@@ -327,6 +327,8 @@ def get_all_subids():
         print(f"Error processing subids: {e}")
         return {}
 
+
+
 def main():
     try:
         # Initialize MongoDB connection
@@ -362,12 +364,12 @@ def main():
         print("\nUpdating job status in MongoDB collection...")
         active_jobs_count = update_job_status(edit_collection, active_job_urls)
         
+
         # Update ChromaDB with status information
         if chroma_collection:
             update_chromadb_status(chroma_collection, edit_collection)
             print(f"\n✅ ChromaDB has been updated with status information.")
-            print(f"[STEP4]cv_match.py can now filter for only active jobs ({active_jobs_count} jobs).")
-        
+            print(f"[STEP4]cv_match.py can now filter for only active jobs ({active_jobs_count} jobs).")  
         mongo_client.close()
         
     except Exception as e:

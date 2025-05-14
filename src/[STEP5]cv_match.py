@@ -8,18 +8,23 @@ from chromadb.config import Settings
 from dotenv import load_dotenv
 from chromadb import HttpClient
 import requests
-# Add these imports at the top
 import tkinter as tk
 from tkinter import filedialog, ttk, scrolledtext
 from tkinter.messagebox import showerror, showinfo
-
-# Add this import near the top with other imports
 import PyPDF2
-
-# Add these imports at the top
 import docx
 import markdown
 from dotenv import load_dotenv, find_dotenv
+import importlib.util
+import sys
+
+# Dynamically import [STEP3]llm_skill_extractor.py
+skill_extractor_path = os.path.join(os.path.dirname(__file__), '[STEP3]llm_skill_extractor.py')
+spec = importlib.util.spec_from_file_location('skill_extractor', skill_extractor_path)
+skill_extractor = importlib.util.module_from_spec(spec)
+sys.modules['skill_extractor'] = skill_extractor
+spec.loader.exec_module(skill_extractor)
+extract_skills_with_llm = skill_extractor.extract_skills_with_llm
 
 # Reset environment variables
 load_dotenv(find_dotenv(), override=True)
@@ -219,19 +224,61 @@ def generate_cv_embedding_remote(cv_text):
         traceback.print_exc()
         return None
 
+def generate_skills_embedding_remote(skills_list: list[str]):
+    """Generate an averaged embedding for a list of skill strings using remote API."""
+    if not skills_list:
+        print("Error: No skills provided to generate embedding.")
+        return None
+
+    print(f"Generating embedding for {len(skills_list)} skills via remote API...")
+    start_time = time.time()
+
+    skill_embeddings = []
+    for i, skill in enumerate(skills_list):
+        if not skill.strip():
+            continue
+        print(f"Processing skill {i+1}/{len(skills_list)}: '{skill}'")
+        embedding_response = get_remote_embedding([skill]) # get_remote_embedding expects a list
+        if embedding_response and len(embedding_response) > 0:
+            # Assuming embedding_response[0] is the actual embedding vector
+            skill_embeddings.append(np.array(embedding_response[0]))
+        else:
+            print(f"⚠️ Skipped skill '{skill}' due to empty embedding response")
+
+    if not skill_embeddings:
+        print("Error: No valid skill embeddings were generated.")
+        return None
+
+    # Average the embeddings
+    avg_embedding = np.mean(skill_embeddings, axis=0)
+    
+    # Normalize
+    norm = np.linalg.norm(avg_embedding)
+    if norm > 0:
+        avg_embedding = avg_embedding / norm
+        
+    print(f"Skills embedding generated in {time.time() - start_time:.2f}s")
+    return avg_embedding
+
 def find_similar_jobs(cv_text, top_n=None, active_only=True):
-    """Find jobs similar to the provided CV text."""
+    """Find jobs similar to the provided CV text based on extracted skills."""
     if top_n is None:
         top_n = TOP_N_RESULTS
     
-    # Always use remote embedding
-    print("Using remote embedding API")
-    cv_embedding = generate_cv_embedding_remote(cv_text)
+    # Step 1: Extract skills using LLM (imported function)
+    extracted_skills = extract_skills_with_llm(cv_text)
+    if not extracted_skills:
+        print("Error: Failed to extract skills from CV.")
+        return None, "Error: Failed to extract skills from CV"
+
+    # Step 2: Generate embedding from extracted skills
+    print("Generating embedding from extracted skills...")
+    cv_skill_embedding = generate_skills_embedding_remote(extracted_skills)
         
-    if cv_embedding is None:
-        return None, "Error: Failed to generate CV embedding"
+    if cv_skill_embedding is None:
+        return None, "Error: Failed to generate CV skill embedding"
     
-    print(f"CV embedding shape: {cv_embedding.shape}")
+    print(f"CV skill embedding shape: {cv_skill_embedding.shape}")
     
     print("Connecting to ChromaDB...")
     try:
@@ -252,7 +299,7 @@ def find_similar_jobs(cv_text, top_n=None, active_only=True):
             print("Filtering for active jobs only")
         
         results = collection.query(
-            query_embeddings=[cv_embedding.tolist()],
+            query_embeddings=[cv_skill_embedding.tolist()],  # <-- FIXED: use cv_skill_embedding
             n_results=top_n,
             include=["metadatas", "distances", "documents"],
             where=where_filter

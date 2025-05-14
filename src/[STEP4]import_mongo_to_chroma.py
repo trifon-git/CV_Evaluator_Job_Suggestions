@@ -66,9 +66,13 @@ existing_ids = set(chroma_collection.get()['ids'])
 print(f"Found {len(existing_ids)} existing embeddings in ChromaDB")
 
 # === FETCH JOBS FROM MONGODB ===
-jobs_cursor = mongo_collection.find({"html_content": {"$exists": True, "$ne": None}})
+# Modified to look for jobs with Skills field instead of html_content
+jobs_cursor = mongo_collection.find({
+    "Skills": {"$exists": True, "$ne": []},  # Jobs must have non-empty Skills array
+    "Status": "active"  # Only process active jobs
+})
 jobs = [job for job in jobs_cursor if str(job.get("_id")) not in existing_ids]
-print(f"Found {len(jobs)} new jobs to process")
+print(f"Found {len(jobs)} new active jobs with skills to process")
 
 # === PROCESS AND EMBED ===
 for batch in tqdm(chunk_list(jobs, BATCH_SIZE), total=len(jobs) // BATCH_SIZE + 1, desc="Embedding new jobs"):
@@ -78,23 +82,32 @@ for batch in tqdm(chunk_list(jobs, BATCH_SIZE), total=len(jobs) // BATCH_SIZE + 
 
     for job in batch:
         job_id = str(job.get("_id"))
-        html = job.get("html_content")
+        skills = job.get("Skills", [])
 
-        if not html or len(html) < 50:
+        # Skip jobs with no skills
+        if not skills:
+            continue
+
+        # Convert skills list to a string for embedding
+        skills_text = ", ".join(skills)
+        
+        # Skip if skills text is too short
+        if len(skills_text) < 3:
             continue
 
         ids.append(job_id)
-        texts.append(html)
+        texts.append(skills_text)  # Use skills text instead of HTML content
         metadatas.append({
             "Title": job["Title"],
             "URL": job["URL"],
             "Application_URL": job["Application_URL"],
             "Created_At": str(job["Created_At"]),
-            "Published_Date": str(job["Published_Date"]) if job["Published_Date"] else None,
+            "Published_Date": str(job["Published_Date"]) if job.get("Published_Date") else None,
             "Company": job["Company"],
             "Area": job["Area"],
             "Category": job["Category"],
-            "Status": job.get("Status", "active")  # Include Status field with default "active"
+            "Status": job.get("Status", "active"),  # Include Status field with default "active"
+            "Skills": skills  # Include the skills list in metadata
         })
 
     if not ids:
@@ -122,4 +135,4 @@ for batch in tqdm(chunk_list(jobs, BATCH_SIZE), total=len(jobs) // BATCH_SIZE + 
     except Exception as e:
         print(f"❌ Failed to add batch: {e}")
 
-print("✅ Done syncing new jobs into ChromaDB")
+print("✅ Done syncing new jobs with skills into ChromaDB")
