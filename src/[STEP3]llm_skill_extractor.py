@@ -4,7 +4,7 @@ import json
 import re
 
 SYSTEM_PROMPT = """
-You are a Head HR Manager with 20 years of experience in talent acquisition and skills assessment.
+You are a Head HR Manager with 20 years of experience in talent acquisition and skills assessment both in English and in Danish.
 
 Your TASK:
 Extract ALL skills mentioned in the job description text and return ONLY a list of skills in JSON format.
