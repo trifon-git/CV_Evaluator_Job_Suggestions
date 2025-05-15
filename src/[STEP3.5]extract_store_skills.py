@@ -14,7 +14,7 @@ MONGO_URI = os.getenv('MONGO_URI')
 DB_NAME = os.getenv('MONGO_DB_NAME')
 COLLECTION_NAME = os.getenv('MONGO_COLLECTION')
 BATCH_SIZE = int(os.getenv('BATCH_SIZE', '10'))
-HTML_CHUNK_SIZE = int(os.getenv('HTML_CHUNK_SIZE', 500)) # Max characters per chunk for LLM
+HTML_CHUNK_SIZE = int(os.getenv('HTML_CHUNK_SIZE', 2000)) # Max characters per chunk for LLM
 
 def log_message(message):
     """Log a message with timestamp."""
@@ -60,6 +60,13 @@ def extract_and_store_skills(job_id, html_content, collection):
 
         html_chunks = chunk_html_content(html_content, HTML_CHUNK_SIZE)
         log_message(f"[Job ID: {job_id}] HTML content split into {len(html_chunks)} chunks.")
+
+        # New check for maximum number of chunks
+        if len(html_chunks) > 10:
+            log_message(f"[Job ID: {job_id}] HTML content split into {len(html_chunks)} chunks, which exceeds the limit of 10. Skipping skill extraction for this job.")
+            # Optionally, update the job status or add a note in MongoDB if needed
+            # For now, just returning False to skip processing
+            return False
 
         all_extracted_skills = set() # Use a set to store unique skills
 
