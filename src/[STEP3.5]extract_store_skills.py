@@ -8,7 +8,7 @@ from pymongo import MongoClient
 from langdetect import detect, LangDetectException
 from datetime import datetime
 
-print("--- test_llm.py: Script Started ---", flush=True)
+print("--- exctract_store_skills.py: Script Started ---", flush=True)
 
 # --- Configuration ---
 HTML_CHUNK_SIZE_FOR_TEST = int(os.getenv('HTML_CHUNK_SIZE', 2000))
@@ -22,7 +22,7 @@ OUTPUT_FILENAME = f"test_llm_chunked_extractions_{TIMESTAMP_STR}.jsonl"
 PROJECT_ROOT_FOR_OUTPUT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OUTPUT_FILE_PATH = os.path.join(PROJECT_ROOT_FOR_OUTPUT, "data", OUTPUT_FILENAME)
 os.makedirs(os.path.join(PROJECT_ROOT_FOR_OUTPUT, "data"), exist_ok=True)
-print(f"test_llm.py: Output (Chunked Method Only) will be saved to: {OUTPUT_FILE_PATH}", flush=True)
+print(f"exctract_store_skills.py: Output (Chunked Method Only) will be saved to: {OUTPUT_FILE_PATH}", flush=True)
 
 
 LANG_CODE_TO_NAME_MAP_TEST = {
@@ -41,39 +41,39 @@ try:
     dotenv_path = os.path.join(project_root_dir, '.env')
     skill_extractor_module_name_on_disk = '[STEP3]llm_skill_extractor.py' 
     skill_extractor_module_path = os.path.join(current_script_dir, skill_extractor_module_name_on_disk)
-except Exception as e: print(f"test_llm.py: ERROR during path determination: {e}", flush=True); sys.exit(1)
-print(f"test_llm.py: Current script directory: {current_script_dir}", flush=True);print(f"test_llm.py: Determined project root: {project_root_dir}", flush=True)
-print(f"test_llm.py: Expected .env path: {dotenv_path}", flush=True); print(f"test_llm.py: Expected skill_extractor module path: {skill_extractor_module_path}", flush=True)
-print("test_llm.py: Attempting to load .env file...", flush=True)
+except Exception as e: print(f"exctract_store_skills.py: ERROR during path determination: {e}", flush=True); sys.exit(1)
+print(f"exctract_store_skills.py: Current script directory: {current_script_dir}", flush=True);print(f"exctract_store_skills.py: Determined project root: {project_root_dir}", flush=True)
+print(f"exctract_store_skills.py: Expected .env path: {dotenv_path}", flush=True); print(f"exctract_store_skills.py: Expected skill_extractor module path: {skill_extractor_module_path}", flush=True)
+print("exctract_store_skills.py: Attempting to load .env file...", flush=True)
 if os.path.exists(dotenv_path):
     loaded_dotenv = load_dotenv(dotenv_path=dotenv_path, override=True)
-    if loaded_dotenv: print("test_llm.py: .env file loaded successfully.", flush=True)
-    else: print("test_llm.py: WARNING: load_dotenv() returned False.", flush=True)
-else: print(f"test_llm.py: WARNING: .env file NOT found at {dotenv_path}.", flush=True)
+    if loaded_dotenv: print("exctract_store_skills.py: .env file loaded successfully.", flush=True)
+    else: print("exctract_store_skills.py: WARNING: load_dotenv() returned False.", flush=True)
+else: print(f"exctract_store_skills.py: WARNING: .env file NOT found at {dotenv_path}.", flush=True)
 NGROK_API_URL_FROM_ENV = os.getenv('NGROK_API_URL'); OLLAMA_API_URL_FROM_ENV = os.getenv('OLLAMA_API_URL'); OLLAMA_MODEL_NAME_FROM_ENV = os.getenv('OLLAMA_MODEL_NAME')
 MONGO_URI_FROM_ENV = os.getenv('MONGO_URI'); MONGO_DB_NAME_FROM_ENV = os.getenv('MONGO_DB_NAME'); MONGO_COLLECTION_FROM_ENV = os.getenv('MONGO_COLLECTION')
-if OLLAMA_API_URL_FROM_ENV and OLLAMA_MODEL_NAME_FROM_ENV: print(f"test_llm.py: [STEP3]llm_skill_extractor.py will use Local Ollama: {OLLAMA_API_URL_FROM_ENV}, Model: {OLLAMA_MODEL_NAME_FROM_ENV}", flush=True)
-elif NGROK_API_URL_FROM_ENV: print(f"test_llm.py: [STEP3]llm_skill_extractor.py will use NGROK API: ", flush=True)
-else: print("test_llm.py: WARNING: No LLM API URLs configured in .env for [STEP3]!", flush=True)
-print(f"test_llm.py: MONGO_URI from env: {'***' if MONGO_URI_FROM_ENV else None}", flush=True); print(f"test_llm.py: MONGO_DB_NAME from env: {MONGO_DB_NAME_FROM_ENV}", flush=True); print(f"test_llm.py: MONGO_COLLECTION from env: {MONGO_COLLECTION_FROM_ENV}", flush=True)
-print(f"test_llm.py: HTML_CHUNK_SIZE_FOR_TEST: {HTML_CHUNK_SIZE_FOR_TEST}", flush=True); print(f"test_llm.py: MAX_CHUNKS_FOR_TEST: {MAX_CHUNKS_FOR_TEST}", flush=True)
-print(f"test_llm.py: PRINT_PROCESSED_TEXT_IN_LOG: {PRINT_PROCESSED_TEXT_IN_LOG}", flush=True)
-if not PRINT_PROCESSED_TEXT_IN_LOG: print(f"test_llm.py: MAX_SOURCE_TEXT_PRINT_SNIPPET_LENGTH (if not printing full to log): {MAX_SOURCE_TEXT_PRINT_SNIPPET_LENGTH}", flush=True)
+if OLLAMA_API_URL_FROM_ENV and OLLAMA_MODEL_NAME_FROM_ENV: print(f"exctract_store_skills.py: [STEP3]llm_skill_extractor.py will use Local Ollama: {OLLAMA_API_URL_FROM_ENV}, Model: {OLLAMA_MODEL_NAME_FROM_ENV}", flush=True)
+elif NGROK_API_URL_FROM_ENV: print(f"exctract_store_skills.py: [STEP3]llm_skill_extractor.py will use NGROK API: ", flush=True)
+else: print("exctract_store_skills.py: WARNING: No LLM API URLs configured in .env for [STEP3]!", flush=True)
+print(f"exctract_store_skills.py: MONGO_URI from env: {'***' if MONGO_URI_FROM_ENV else None}", flush=True); print(f"exctract_store_skills.py: MONGO_DB_NAME from env: {MONGO_DB_NAME_FROM_ENV}", flush=True); print(f"exctract_store_skills.py: MONGO_COLLECTION from env: {MONGO_COLLECTION_FROM_ENV}", flush=True)
+print(f"exctract_store_skills.py: HTML_CHUNK_SIZE_FOR_TEST: {HTML_CHUNK_SIZE_FOR_TEST}", flush=True); print(f"exctract_store_skills.py: MAX_CHUNKS_FOR_TEST: {MAX_CHUNKS_FOR_TEST}", flush=True)
+print(f"exctract_store_skills.py: PRINT_PROCESSED_TEXT_IN_LOG: {PRINT_PROCESSED_TEXT_IN_LOG}", flush=True)
+if not PRINT_PROCESSED_TEXT_IN_LOG: print(f"exctract_store_skills.py: MAX_SOURCE_TEXT_PRINT_SNIPPET_LENGTH (if not printing full to log): {MAX_SOURCE_TEXT_PRINT_SNIPPET_LENGTH}", flush=True)
 
-print(f"test_llm.py: Attempting to import module: {skill_extractor_module_name_on_disk}", flush=True)
+print(f"exctract_store_skills.py: Attempting to import module: {skill_extractor_module_name_on_disk}", flush=True)
 imported_llm_function = None
-if not os.path.exists(skill_extractor_module_path): print(f"test_llm.py: ERROR: Module file not found at {skill_extractor_module_path}", flush=True); sys.exit(1)
+if not os.path.exists(skill_extractor_module_path): print(f"exctract_store_skills.py: ERROR: Module file not found at {skill_extractor_module_path}", flush=True); sys.exit(1)
 try:
     module_name_for_import = 'skill_extractor_module_step3_for_test'; spec = importlib.util.spec_from_file_location(module_name_for_import, skill_extractor_module_path)
-    if spec is None: print(f"test_llm.py: ERROR: Could not load spec for module at {skill_extractor_module_path}", flush=True); sys.exit(1)
+    if spec is None: print(f"exctract_store_skills.py: ERROR: Could not load spec for module at {skill_extractor_module_path}", flush=True); sys.exit(1)
     skill_extractor_module_object = importlib.util.module_from_spec(spec); sys.modules[module_name_for_import] = skill_extractor_module_object; spec.loader.exec_module(skill_extractor_module_object)
     imported_llm_function = getattr(skill_extractor_module_object, 'extract_job_details_with_llm', None)
     if imported_llm_function is None: 
         imported_llm_function = getattr(skill_extractor_module_object, 'extract_skills_with_llm', None)
-        if imported_llm_function: print("test_llm.py: WARNING: Using fallback function name 'extract_skills_with_llm'.")
-        else: print("test_llm.py: ERROR: 'extract_job_details_with_llm' or 'extract_skills_with_llm' function not found.", flush=True); sys.exit(1)
-    print(f"test_llm.py: Successfully imported LLM extraction function.", flush=True)
-except Exception as e: print(f"test_llm.py: ERROR during module import: {e}", flush=True); import traceback; traceback.print_exc(); sys.exit(1)
+        if imported_llm_function: print("exctract_store_skills.py: WARNING: Using fallback function name 'extract_skills_with_llm'.")
+        else: print("exctract_store_skills.py: ERROR: 'extract_job_details_with_llm' or 'extract_skills_with_llm' function not found.", flush=True); sys.exit(1)
+    print(f"exctract_store_skills.py: Successfully imported LLM extraction function.", flush=True)
+except Exception as e: print(f"exctract_store_skills.py: ERROR during module import: {e}", flush=True); import traceback; traceback.print_exc(); sys.exit(1)
 
 # --- Helper Functions ---
 def chunk_html_content(html_content, chunk_size):
@@ -96,14 +96,14 @@ def save_extraction_to_file(data_to_save, source_details):
             json.dump(output_record, f, ensure_ascii=False)
             f.write('\n')
     except Exception as e:
-        print(f"test_llm.py: ERROR writing to output file {OUTPUT_FILE_PATH}: {e}", flush=True)
+        print(f"exctract_store_skills.py: ERROR writing to output file {OUTPUT_FILE_PATH}: {e}", flush=True)
 
 # --- Main Test Execution Function (Chunked Only) ---
 def test_llm_with_chunking(description_text, source_identifier, job_title_for_file="N/A", mongo_doc_id_for_file="N/A"):
-    print(f"\n--- test_llm.py: Testing LLM WITH CHUNKING on text from: {source_identifier} ---", flush=True)
-    if not (OLLAMA_API_URL_FROM_ENV or NGROK_API_URL_FROM_ENV): print("test_llm.py: ERROR: No API URL configured.", flush=True); return
-    if imported_llm_function is None: print("test_llm.py: ERROR: extraction function is not available.", flush=True); return
-    if not description_text or not isinstance(description_text, str) or not description_text.strip(): print("test_llm.py: INFO: Provided text is empty or invalid. Skipping.", flush=True); return
+    print(f"\n--- exctract_store_skills.py: Testing LLM WITH CHUNKING on text from: {source_identifier} ---", flush=True)
+    if not (OLLAMA_API_URL_FROM_ENV or NGROK_API_URL_FROM_ENV): print("exctract_store_skills.py: ERROR: No API URL configured.", flush=True); return
+    if imported_llm_function is None: print("exctract_store_skills.py: ERROR: extraction function is not available.", flush=True); return
+    if not description_text or not isinstance(description_text, str) or not description_text.strip(): print("exctract_store_skills.py: INFO: Provided text is empty or invalid. Skipping.", flush=True); return
 
     detected_main_language_name_test = "Unknown"
     try:
@@ -111,18 +111,18 @@ def test_llm_with_chunking(description_text, source_identifier, job_title_for_fi
         if sample_text_for_lang_detect_test.strip():
             lang_code_test = detect(sample_text_for_lang_detect_test)
             detected_main_language_name_test = LANG_CODE_TO_NAME_MAP_TEST.get(lang_code_test, lang_code_test.capitalize())
-            # print(f"test_llm.py: Auto-detected main document language: {detected_main_language_name_test} (code: {lang_code_test})", flush=True) # Less verbose
+            # print(f"exctract_store_skills.py: Auto-detected main document language: {detected_main_language_name_test} (code: {lang_code_test})", flush=True) # Less verbose
     except Exception: pass # Silently pass lang detect errors for test script
 
-    # print(f"test_llm.py: Original text length: {len(description_text)} chars", flush=True); print(f"test_llm.py: Using chunk_size: {HTML_CHUNK_SIZE_FOR_TEST}", flush=True) # Less verbose
+    # print(f"exctract_store_skills.py: Original text length: {len(description_text)} chars", flush=True); print(f"exctract_store_skills.py: Using chunk_size: {HTML_CHUNK_SIZE_FOR_TEST}", flush=True) # Less verbose
     html_chunks_full = chunk_html_content(description_text, HTML_CHUNK_SIZE_FOR_TEST);
-    if not html_chunks_full: print(f"test_llm.py: No chunks generated for {source_identifier}. Skipping.", flush=True); return
+    if not html_chunks_full: print(f"exctract_store_skills.py: No chunks generated for {source_identifier}. Skipping.", flush=True); return
     
     html_chunks_to_process = html_chunks_full; processed_text_concatenated_for_log = ""
     if len(html_chunks_full) > MAX_CHUNKS_FOR_TEST:
-        print(f"test_llm.py: WARNING for {source_identifier}: Text split into {len(html_chunks_full)} chunks. Limiting to first {MAX_CHUNKS_FOR_TEST} chunks.", flush=True)
+        print(f"exctract_store_skills.py: WARNING for {source_identifier}: Text split into {len(html_chunks_full)} chunks. Limiting to first {MAX_CHUNKS_FOR_TEST} chunks.", flush=True)
         html_chunks_to_process = html_chunks_full[:MAX_CHUNKS_FOR_TEST]
-    # print(f"test_llm.py: Processing {len(html_chunks_to_process)} chunk(s) for {source_identifier}.", flush=True) # Less verbose
+    # print(f"exctract_store_skills.py: Processing {len(html_chunks_to_process)} chunk(s) for {source_identifier}.", flush=True) # Less verbose
     
     aggregated_details_accumulator_test = { "skills": set(), "experience_level_required": "Not specified", "language_requirements": [], "education_level_preferred": "Not specified", "job_type": "Not specified" }
     llm_extracted_languages_map_test = {}; total_api_calls = 0
@@ -195,7 +195,7 @@ def test_llm_with_chunking(description_text, source_identifier, job_title_for_fi
     final_aggregated_dict_to_print['language_requirements'] = sorted(final_test_languages, key=lambda x: x.get('language', ''))
 
 
-    print(f"\n  test_llm.py: Final Aggregated Details for '{source_identifier}' (Chunked - {total_api_calls} API calls):", flush=True)
+    print(f"\n  exctract_store_skills.py: Final Aggregated Details for '{source_identifier}' (Chunked - {total_api_calls} API calls):", flush=True)
     print(json.dumps(final_aggregated_dict_to_print, indent=2, ensure_ascii=False), flush=True)
 
     save_extraction_to_file(
@@ -233,11 +233,11 @@ test_llm_with_chunking(sample_job_description_hardcoded, source_identifier="Hard
 # Removed direct test for hardcoded sample
 
 if MONGO_URI_FROM_ENV and MONGO_DB_NAME_FROM_ENV and MONGO_COLLECTION_FROM_ENV:
-    print("\n--- test_llm.py: Fetching samples from MongoDB ---", flush=True)
+    print("\n--- exctract_store_skills.py: Fetching samples from MongoDB ---", flush=True)
     mongo_client = None
     try:
         mongo_client = MongoClient(MONGO_URI_FROM_ENV, serverSelectionTimeoutMS=5000)
-        mongo_client.admin.command('ping'); print("test_llm.py: Successfully connected to MongoDB.", flush=True)
+        mongo_client.admin.command('ping'); print("exctract_store_skills.py: Successfully connected to MongoDB.", flush=True)
         db = mongo_client[MONGO_DB_NAME_FROM_ENV]; collection = db[MONGO_COLLECTION_FROM_ENV]
         mongo_samples = list(collection.find(
             {
@@ -252,14 +252,14 @@ if MONGO_URI_FROM_ENV and MONGO_DB_NAME_FROM_ENV and MONGO_COLLECTION_FROM_ENV:
             {"_id": 1, "Title": 1, "html_content": 1}
         )) # Fetch 30 samples for testing
         if mongo_samples:
-            print(f"test_llm.py: Found {len(mongo_samples)} active samples from MongoDB that are missing extraction data.", flush=True)
+            print(f"exctract_store_skills.py: Found {len(mongo_samples)} active samples from MongoDB that are missing extraction data.", flush=True)
             for i, sample_doc in enumerate(mongo_samples):
                 doc_id = sample_doc.get('_id') # Keep as ObjectId for query
                 doc_id_str = str(doc_id)
                 job_title = sample_doc.get("Title", f"Unknown Title {doc_id_str}")
                 html_content = sample_doc.get("html_content")
                 if not html_content or not html_content.strip():
-                    print(f"test_llm.py: INFO: MongoDB Sample {i+1} - \"{job_title}\" has empty/whitespace html_content. Skipping.", flush=True); continue
+                    print(f"exctract_store_skills.py: INFO: MongoDB Sample {i+1} - \"{job_title}\" has empty/whitespace html_content. Skipping.", flush=True); continue
 
                 # Call the extraction function
                 extracted_data = test_llm_with_chunking(
@@ -288,32 +288,32 @@ if MONGO_URI_FROM_ENV and MONGO_DB_NAME_FROM_ENV and MONGO_COLLECTION_FROM_ENV:
                             )
 
                             if update_result.matched_count > 0:
-                                print(f"  test_llm.py: Successfully updated MongoDB document {doc_id_str} with extracted data.", flush=True)
+                                print(f"  exctract_store_skills.py: Successfully updated MongoDB document {doc_id_str} with extracted data.", flush=True)
                             else:
-                                print(f"  test_llm.py: WARNING: MongoDB document {doc_id_str} not found for update after fetching.", flush=True)
+                                print(f"  exctract_store_skills.py: WARNING: MongoDB document {doc_id_str} not found for update after fetching.", flush=True)
                         else:
-                            print(f"  test_llm.py: INFO: No valid data extracted for MongoDB document {doc_id_str}. Skipping update.", flush=True)
+                            print(f"  exctract_store_skills.py: INFO: No valid data extracted for MongoDB document {doc_id_str}. Skipping update.", flush=True)
 
 
                     except Exception as e:
-                        print(f"  test_llm.py: ERROR updating MongoDB document {doc_id_str}: {e}", flush=True)
+                        print(f"  exctract_store_skills.py: ERROR updating MongoDB document {doc_id_str}: {e}", flush=True)
 
                 # Removed direct test for MongoDB samples
-        else: print("test_llm.py: No suitable active samples found in MongoDB that are missing extraction data.", flush=True)
-    except Exception as e: print(f"test_llm.py: ERROR connecting to or querying MongoDB: {e}", flush=True)
+        else: print("exctract_store_skills.py: No suitable active samples found in MongoDB that are missing extraction data.", flush=True)
+    except Exception as e: print(f"exctract_store_skills.py: ERROR connecting to or querying MongoDB: {e}", flush=True)
     finally:
-        if mongo_client: mongo_client.close(); print("test_llm.py: MongoDB connection closed.", flush=True)
-else: print("\n--- test_llm.py: Skipping MongoDB samples (config not fully set). ---", flush=True)
+        if mongo_client: mongo_client.close(); print("exctract_store_skills.py: MongoDB connection closed.", flush=True)
+else: print("\n--- exctract_store_skills.py: Skipping MongoDB samples (config not fully set). ---", flush=True)
 
 # --- Direct test of imported_llm_function with empty/None text (still useful) ---
-print("\n--- test_llm.py: Direct test of imported_llm_function with empty/None text ---", flush=True)
+print("\n--- exctract_store_skills.py: Direct test of imported_llm_function with empty/None text ---", flush=True)
 if imported_llm_function:
     try:
-        print("test_llm.py: Testing with '   ' (whitespace only)", flush=True)
-        empty_text_result = imported_llm_function("   "); print(f"test_llm.py: Result for '   ': {json.dumps(empty_text_result, indent=2, ensure_ascii=False)}", flush=True)
-        print("test_llm.py: Testing with None", flush=True)
-        none_text_result = imported_llm_function(None); print(f"test_llm.py: Result for None: {json.dumps(none_text_result, indent=2, ensure_ascii=False)}", flush=True)
-    except Exception as e: print(f"test_llm.py: ERROR during empty/None text test: {e}", flush=True)
-else: print("test_llm.py: Skipping direct empty/None text test (extractor not available).", flush=True)
+        print("exctract_store_skills.py: Testing with '   ' (whitespace only)", flush=True)
+        empty_text_result = imported_llm_function("   "); print(f"exctract_store_skills.py: Result for '   ': {json.dumps(empty_text_result, indent=2, ensure_ascii=False)}", flush=True)
+        print("exctract_store_skills.py: Testing with None", flush=True)
+        none_text_result = imported_llm_function(None); print(f"exctract_store_skills.py: Result for None: {json.dumps(none_text_result, indent=2, ensure_ascii=False)}", flush=True)
+    except Exception as e: print(f"exctract_store_skills.py: ERROR during empty/None text test: {e}", flush=True)
+else: print("exctract_store_skills.py: Skipping direct empty/None text test (extractor not available).", flush=True)
 
-print(f"\n--- test_llm.py: Script Finished. Output saved to {OUTPUT_FILE_PATH} ---", flush=True)
+print(f"\n--- exctract_store_skills.py: Script Finished. Output saved to {OUTPUT_FILE_PATH} ---", flush=True)
