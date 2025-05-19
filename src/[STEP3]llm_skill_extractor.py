@@ -69,11 +69,11 @@ USE_LOCAL_OLLAMA = False
 if OLLAMA_API_URL and OLLAMA_MODEL:
     API_URL = OLLAMA_API_URL
     USE_LOCAL_OLLAMA = True
-    print(f"INFO ([STEP3]llm_skill_extractor): Using Local Ollama API: {API_URL} with model: {OLLAMA_MODEL}")
+    print(f"INFO ([STEP3]llm_skill_extractor): Using Local Ollama API: with model: {OLLAMA_MODEL}")
 elif NGROK_URL:
     API_URL = NGROK_URL
     USE_LOCAL_OLLAMA = False
-    print(f"INFO ([STEP3]llm_skill_extractor): Using NGROK (hosted) API: {API_URL}")
+    print(f"INFO ([STEP3]llm_skill_extractor): Using NGROK (hosted) API")
 else:
     raise ValueError("Neither OLLAMA_API_URL/OLLAMA_MODEL_NAME nor NGROK_API_URL are set in .env for [STEP3]llm_skill_extractor.py")
 

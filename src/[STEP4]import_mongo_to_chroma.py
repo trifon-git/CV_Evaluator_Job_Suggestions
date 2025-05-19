@@ -22,10 +22,10 @@ CHROMA_PORT = int(os.getenv('CHROMA_PORT', '8000'))
 COLLECTION_NAME = os.getenv('CHROMA_COLLECTION')
 BATCH_SIZE = int(os.getenv('BATCH_SIZE', '10'))
 VERIFY_SSL = os.getenv('VERIFY_SSL', 'true').lower() == 'true'
-# Remote embedding API configuration
+
 EMBEDDING_API_URL = os.getenv('EMBEDDING_API_URL')
 USE_REMOTE_EMBEDDING = os.getenv('USE_REMOTE_EMBEDDING', 'false').lower() == 'true'
-OUTPUT_EMBEDDINGS_FILE = None  # Will be set dynamically
+OUTPUT_EMBEDDINGS_FILE = None  
 
 # Disable SSL warnings if VERIFY_SSL is set to false
 if os.getenv('VERIFY_SSL', 'true').lower() != 'true':
@@ -124,7 +124,7 @@ def process_mongodb_skills():
 
     # Connect to MongoDB
     try:
-        log_message(f"Connecting to MongoDB at {MONGO_URI}")
+        log_message(f"Connecting to MongoDB")
         mongo_client = MongoClient(MONGO_URI)
         mongo_db = mongo_client["job_scraper"]
         jobs_collection = mongo_db["jobs"]
@@ -135,7 +135,7 @@ def process_mongodb_skills():
 
     # Connect to ChromaDB
     try:
-        log_message(f"Connecting to ChromaDB at {CHROMA_HOST}:{CHROMA_PORT}")
+        log_message(f"Connecting to ChromaDB")
         chroma_client = HttpClient(
             host=CHROMA_HOST, 
             port=CHROMA_PORT,
@@ -208,7 +208,7 @@ def process_mongodb_skills():
             batch_embeddings = None
             
             if USE_REMOTE_EMBEDDING and EMBEDDING_API_URL:
-                log_message(f"Attempting remote embedding for batch via {EMBEDDING_API_URL}...")
+                log_message(f"Attempting remote embedding for batch...")
                 # Convert skills lists to strings for API
                 skill_texts = [", ".join(skills) for skills in batch_skills]
                 remote_embeddings = get_remote_embeddings(skill_texts)

@@ -60,11 +60,11 @@ USE_LOCAL_OLLAMA = False
 if OLLAMA_API_URL and OLLAMA_MODEL:
     API_URL = OLLAMA_API_URL
     USE_LOCAL_OLLAMA = True
-    print(f"INFO: Using Local Ollama API: {API_URL} with model: {OLLAMA_MODEL}")
+    print(f"INFO: Using Local Ollama API with model: {OLLAMA_MODEL}")
 elif NGROK_API_URL:
     API_URL = NGROK_API_URL
     USE_LOCAL_OLLAMA = False
-    print(f"INFO: Using NGROK (hosted) API: {API_URL}")
+    print(f"INFO: Using NGROK (hosted) API")
 else:
     print("ERROR: Neither OLLAMA_API_URL/OLLAMA_MODEL_NAME nor NGROK_API_URL are set in .env.")
     API_URL = None # Ensure API_URL is None if not configured
