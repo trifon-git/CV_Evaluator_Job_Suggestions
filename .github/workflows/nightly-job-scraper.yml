@@ -59,7 +59,7 @@ jobs:
       - name: Run Step 3 - Generate Embeddings
         run: |
           echo "Starting Step 3: Generating embeddings for job listings"
-          python src/[STEP3]import_mongo_to_chroma.py
+          python src/[STEP4]import_mongo_to_chroma.py
           echo "Step 3 completed"
       
       - name: Job Complete
