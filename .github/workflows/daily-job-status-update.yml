@@ -28,6 +28,7 @@ jobs:
         run: |
           echo "MONGO_URI=${{ secrets.MONGO_URI }}" > .env
           echo "MONGO_DB_NAME=${{ secrets.MONGO_DB_NAME }}" >> .env
+          echo "MONGO_COLLECTION=${{ secrets.MONGO_COLLECTION }}" >> .env # Add this line
           echo "JOBINDEX_BASE_URL=${{ secrets.JOBINDEX_BASE_URL }}" >> .env
           echo "CHROMA_HOST=${{ secrets.CHROMA_HOST }}" >> .env
           echo "CHROMA_PORT=${{ secrets.CHROMA_PORT }}" >> .env
