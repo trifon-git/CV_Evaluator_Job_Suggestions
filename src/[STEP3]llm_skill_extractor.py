@@ -60,22 +60,28 @@ IMPORTANT RULES:
 OLLAMA_API_URL = os.getenv("OLLAMA_API_URL")
 OLLAMA_MODEL = os.getenv("OLLAMA_MODEL_NAME")
 NGROK_URL = os.getenv("NGROK_API_URL")
+CUSTOM_LLM_API_URL = os.getenv("CUSTOM_LLM_API_URL")
+CUSTOM_LLM_MODEL = os.getenv("CUSTOM_LLM_MODEL_NAME")
 
 # Figure out which API we're using
 API_URL = None
 USE_LOCAL_OLLAMA = False
 
-# Pick the API to use based on what's available
-if OLLAMA_API_URL and OLLAMA_MODEL:
-    API_URL = OLLAMA_API_URL
-    USE_LOCAL_OLLAMA = True
-    print(f"INFO ([STEP3]llm_skill_extractor): Using Local Ollama API: with model: {OLLAMA_MODEL}")
+# Prioritize: Custom LLM > NGROK > Local Ollama
+if CUSTOM_LLM_API_URL and CUSTOM_LLM_MODEL:
+    API_URL = CUSTOM_LLM_API_URL
+    USE_LOCAL_OLLAMA = False
+    print(f"INFO ([STEP3]llm_skill_extractor): Using Custom LLM API: {CUSTOM_LLM_API_URL} with model: {CUSTOM_LLM_MODEL}")
 elif NGROK_URL:
     API_URL = NGROK_URL
     USE_LOCAL_OLLAMA = False
     print(f"INFO ([STEP3]llm_skill_extractor): Using NGROK (hosted) API")
+elif OLLAMA_API_URL and OLLAMA_MODEL:
+    API_URL = OLLAMA_API_URL
+    USE_LOCAL_OLLAMA = True
+    print(f"INFO ([STEP3]llm_skill_extractor): Using Local Ollama API: with model: {OLLAMA_MODEL}")
 else:
-    raise ValueError("Neither OLLAMA_API_URL/OLLAMA_MODEL_NAME nor NGROK_API_URL are set in .env for [STEP3]llm_skill_extractor.py")
+    raise ValueError("No valid LLM API configuration found.")
 
 def extract_job_details_with_llm(job_text):
     # Default response structure if everything goes wrong
@@ -113,6 +119,13 @@ def extract_job_details_with_llm(job_text):
                 "num_predict": 2048
             }
         }
+    elif API_URL == CUSTOM_LLM_API_URL:
+        payload = {
+            "model": CUSTOM_LLM_MODEL,
+            "prompt": prompt,
+            "options": {"num_predict": 2048},
+            "stream": False
+        }
     else:
         payload = {"prompt": prompt}
     
@@ -144,6 +157,18 @@ def extract_job_details_with_llm(job_text):
             except json.JSONDecodeError:
                 # This happens if response.text isn't valid JSON
                 print(f"Error ([STEP3]llm_skill_extractor): Failed to parse Ollama response as JSON. Raw: {response.text[:500]}")
+                return fallback_response
+        elif API_URL == CUSTOM_LLM_API_URL:
+            try:
+                resp_json = response.json()
+                # The custom endpoint may return the result in a "response" field
+                if "response" in resp_json and isinstance(resp_json["response"], str):
+                    json_data = resp_json["response"]
+                else:
+                    print(f"Error ([STEP3]llm_skill_extractor): Custom API response format unexpected. Raw: {response.text[:500]}")
+                    return fallback_response
+            except json.JSONDecodeError:
+                print(f"Error ([STEP3]llm_skill_extractor): Failed to parse Custom API response as JSON. Raw: {response.text[:500]}")
                 return fallback_response
         else:  
             # Handle hosted API response
