@@ -55,7 +55,13 @@ jobs:
           echo "Starting Step 2: Extracting HTML content from job listings"
           python src/[STEP2]get_html_text.py
           echo "Step 2 completed"
-      
+
+      - name: Run Step 3.5 - Extract and Store Skills
+        run: |
+          echo "Starting Step 3.5: Extracting and storing skills from job descriptions"
+          python src/[STEP3.5]extract_store_skills.py
+          echo "Step 3.5 completed"
+
       - name: Run Step 3 - Generate Embeddings
         run: |
           echo "Starting Step 3: Generating embeddings for job listings"
