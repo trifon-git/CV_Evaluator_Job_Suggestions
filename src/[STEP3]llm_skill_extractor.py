@@ -57,31 +57,20 @@ IMPORTANT RULES:
 """
 
 # Grab API config from environment
-OLLAMA_API_URL = os.getenv("OLLAMA_API_URL")
-OLLAMA_MODEL = os.getenv("OLLAMA_MODEL_NAME")
-NGROK_URL = os.getenv("NGROK_API_URL")
 CUSTOM_LLM_API_URL = os.getenv("CUSTOM_LLM_API_URL")
 CUSTOM_LLM_MODEL = os.getenv("CUSTOM_LLM_MODEL_NAME")
 
 # Figure out which API we're using
 API_URL = None
-USE_LOCAL_OLLAMA = False
+USE_LOCAL_OLLAMA = False # This will always be false now
 
 # Prioritize: Custom LLM > NGROK > Local Ollama
 if CUSTOM_LLM_API_URL and CUSTOM_LLM_MODEL:
     API_URL = CUSTOM_LLM_API_URL
-    USE_LOCAL_OLLAMA = False
+    # USE_LOCAL_OLLAMA is already False
     print(f"INFO ([STEP3]llm_skill_extractor): Using Custom LLM API: {CUSTOM_LLM_API_URL} with model: {CUSTOM_LLM_MODEL}")
-elif NGROK_URL:
-    API_URL = NGROK_URL
-    USE_LOCAL_OLLAMA = False
-    print(f"INFO ([STEP3]llm_skill_extractor): Using NGROK (hosted) API")
-elif OLLAMA_API_URL and OLLAMA_MODEL:
-    API_URL = OLLAMA_API_URL
-    USE_LOCAL_OLLAMA = True
-    print(f"INFO ([STEP3]llm_skill_extractor): Using Local Ollama API: with model: {OLLAMA_MODEL}")
 else:
-    raise ValueError("No valid LLM API configuration found.")
+    raise ValueError("CUSTOM_LLM_API_URL and CUSTOM_LLM_MODEL_NAME must be set in the environment.")
 
 def extract_job_details_with_llm(job_text):
     # Default response structure if everything goes wrong
@@ -100,34 +89,36 @@ def extract_job_details_with_llm(job_text):
 
     # Set up request headers
     headers = {"Content-Type": "application/json"}
-    if not USE_LOCAL_OLLAMA and API_URL and "ngrok" in API_URL:
-        headers["ngrok-skip-browser-warning"] = "true"
+    # The ngrok check is no longer needed here as we are not using ngrok
+    # if not USE_LOCAL_OLLAMA and API_URL and "ngrok" in API_URL:
+    #     headers["ngrok-skip-browser-warning"] = "true"
 
     # Construct the full prompt for the LLM
     prompt = f"{SYSTEM_PROMPT}\n\nJob Description Text:\n\"\"\"\n{job_text}\n\"\"\"\n\nBased on the instructions and the text above, provide the JSON output:"
     
     # Build the request payload based on API type
     payload = {}
-    if USE_LOCAL_OLLAMA:
-        payload = {
-            "model": OLLAMA_MODEL,
-            "prompt": prompt,
-            "stream": False,
-            "format": "json",  # Request JSON format directly from Ollama
-            "options": {
-                "temperature": 0.1,
-                "num_predict": 2048
-            }
-        }
-    elif API_URL == CUSTOM_LLM_API_URL:
-        payload = {
-            "model": CUSTOM_LLM_MODEL,
-            "prompt": prompt,
-            "options": {"num_predict": 2048},
-            "stream": False
-        }
-    else:
-        payload = {"prompt": prompt}
+    # USE_LOCAL_OLLAMA is always False, so this branch is never taken
+    # if USE_LOCAL_OLLAMA:
+    #     payload = {
+    #         "model": OLLAMA_MODEL,
+    #         "prompt": prompt,
+    #         "stream": False,
+    #         "format": "json",  # Request JSON format directly from Ollama
+    #         "options": {
+    #             "temperature": 0.1,
+    #             "num_predict": 2048
+    #         }
+    #     }
+    # elif API_URL == CUSTOM_LLM_API_URL: # This will always be true if API_URL is set
+    payload = {
+        "model": CUSTOM_LLM_MODEL,
+        "prompt": prompt,
+        "options": {"num_predict": 2048},
+        "stream": False
+    }
+    # else: # This branch is no longer reachable
+    #     payload = {"prompt": prompt}
     
     try:
         # Make the API call
@@ -137,52 +128,56 @@ def extract_job_details_with_llm(job_text):
         json_data = None
 
         # Handle the response differently based on API type
-        if USE_LOCAL_OLLAMA:
-            try:
-                resp_json = response.json()
+        # The USE_LOCAL_OLLAMA branch is no longer needed
+        # if USE_LOCAL_OLLAMA:
+        #     try:
+        #         resp_json = response.json()
                 
-                # Try to extract the JSON data from various response formats
-                if "response" in resp_json and isinstance(resp_json["response"], str):
-                    # Case 1: Ollama returns a JSON string in "response" field
-                    json_data = resp_json["response"]
-                elif "response" in resp_json and isinstance(resp_json["response"], dict):
-                    # Case 2: Ollama returns a parsed JSON object in "response" field
-                    json_data = json.dumps(resp_json["response"])
-                elif isinstance(resp_json, dict) and all(key in resp_json for key in fallback_response.keys()):
-                    # Case 3: The entire response IS the JSON object 
-                    json_data = json.dumps(resp_json)
-                else:
-                    print(f"Error ([STEP3]llm_skill_extractor): Local Ollama response format unexpected. Raw: {response.text[:500]}")
-                    return fallback_response
-            except json.JSONDecodeError:
-                # This happens if response.text isn't valid JSON
-                print(f"Error ([STEP3]llm_skill_extractor): Failed to parse Ollama response as JSON. Raw: {response.text[:500]}")
-                return fallback_response
-        elif API_URL == CUSTOM_LLM_API_URL:
-            try:
-                resp_json = response.json()
-                # The custom endpoint may return the result in a "response" field
-                if "response" in resp_json and isinstance(resp_json["response"], str):
-                    json_data = resp_json["response"]
-                else:
-                    print(f"Error ([STEP3]llm_skill_extractor): Custom API response format unexpected. Raw: {response.text[:500]}")
-                    return fallback_response
-            except json.JSONDecodeError:
-                print(f"Error ([STEP3]llm_skill_extractor): Failed to parse Custom API response as JSON. Raw: {response.text[:500]}")
-                return fallback_response
-        else:  
-            # Handle hosted API response
-            try:
-                resp_json = response.json()
-            except json.JSONDecodeError:
-                print(f"Error ([STEP3]llm_skill_extractor): Failed to parse hosted API response as JSON. Raw: {response.text[:500]}")
-                return fallback_response
-                
-            if isinstance(resp_json, dict) and 'output' in resp_json and isinstance(resp_json['output'], str):
-                json_data = resp_json['output']
+        #         # Try to extract the JSON data from various response formats
+        #         if "response" in resp_json and isinstance(resp_json["response"], str):
+        #             # Case 1: Ollama returns a JSON string in "response" field
+        #             json_data = resp_json["response"]
+        #         elif "response" in resp_json and isinstance(resp_json["response"], dict):
+        #             # Case 2: Ollama returns a parsed JSON object in "response" field
+        #             json_data = json.dumps(resp_json["response"])
+        #         elif isinstance(resp_json, dict) and all(key in resp_json for key in fallback_response.keys()):
+        #             # Case 3: The entire response IS the JSON object 
+        #             json_data = json.dumps(resp_json)
+        #         else:
+        #             print(f"Error ([STEP3]llm_skill_extractor): Local Ollama response format unexpected. Raw: {response.text[:500]}")
+        #             return fallback_response
+        #     except json.JSONDecodeError:
+        #         # This happens if response.text isn't valid JSON
+        #         print(f"Error ([STEP3]llm_skill_extractor): Failed to parse Ollama response as JSON. Raw: {response.text[:500]}")
+        #         return fallback_response
+        # elif API_URL == CUSTOM_LLM_API_URL: # This will always be true
+        try:
+            resp_json = response.json()
+            # The custom endpoint may return the result in a "response" field
+            if "response" in resp_json and isinstance(resp_json["response"], str):
+                json_data = resp_json["response"]
+            # It might also return the JSON directly as the root object
+            elif isinstance(resp_json, dict) and all(key in resp_json for key in fallback_response.keys()):
+                 json_data = json.dumps(resp_json)
             else:
-                print(f"Error ([STEP3]llm_skill_extractor): Hosted API response missing 'output' string. Got: {json.dumps(resp_json, indent=2)}")
+                print(f"Error ([STEP3]llm_skill_extractor): Custom API response format unexpected. Raw: {response.text[:500]}")
                 return fallback_response
+        except json.JSONDecodeError:
+            print(f"Error ([STEP3]llm_skill_extractor): Failed to parse Custom API response as JSON. Raw: {response.text[:500]}")
+            return fallback_response
+        # else: # This branch for other hosted APIs is no longer needed
+        #     # Handle hosted API response
+        #     try:
+        #         resp_json = response.json()
+        #     except json.JSONDecodeError:
+        #         print(f"Error ([STEP3]llm_skill_extractor): Failed to parse hosted API response as JSON. Raw: {response.text[:500]}")
+        #         return fallback_response
+                
+        #     if isinstance(resp_json, dict) and 'output' in resp_json and isinstance(resp_json['output'], str):
+        #         json_data = resp_json['output']
+        #     else:
+        #         print(f"Error ([STEP3]llm_skill_extractor): Hosted API response missing 'output' string. Got: {json.dumps(resp_json, indent=2)}")
+        #         return fallback_response
 
         # Make sure we got something back
         if not json_data:

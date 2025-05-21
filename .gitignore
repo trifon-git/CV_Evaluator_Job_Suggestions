@@ -5,6 +5,7 @@
 src/delete_future_jobs.py
 src/delete_null_created_at.py
 src/import_sql_to_mongo.py
+src/reset_chrma_db.py
 
 # Database files
 *.db
