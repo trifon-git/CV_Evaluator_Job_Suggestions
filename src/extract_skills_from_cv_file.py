@@ -50,24 +50,34 @@ try:
 except Exception as e:
     print(f"ERROR during .env loading: {e}")
 
+CUSTOM_LLM_API_URL = os.getenv("CUSTOM_LLM_API_URL")
+CUSTOM_LLM_MODEL_NAME = os.getenv("CUSTOM_LLM_MODEL_NAME")
 OLLAMA_API_URL = os.getenv("OLLAMA_API_URL")
 OLLAMA_MODEL = os.getenv("OLLAMA_MODEL_NAME")
 NGROK_API_URL = os.getenv("NGROK_API_URL")
 
 API_URL = None
-USE_LOCAL_OLLAMA = False
+MODEL_TO_USE = None
+API_TYPE = "unconfigured" # Possible values: 'custom', 'ollama', 'ngrok', 'unconfigured'
 
-if OLLAMA_API_URL and OLLAMA_MODEL:
+if CUSTOM_LLM_API_URL and CUSTOM_LLM_MODEL_NAME:
+    API_URL = CUSTOM_LLM_API_URL
+    MODEL_TO_USE = CUSTOM_LLM_MODEL_NAME
+    API_TYPE = "custom"
+    print(f"INFO: Using Custom LLM API: {API_URL} with model: {MODEL_TO_USE}")
+elif OLLAMA_API_URL and OLLAMA_MODEL:
     API_URL = OLLAMA_API_URL
-    USE_LOCAL_OLLAMA = True
-    print(f"INFO: Using Local Ollama API with model: {OLLAMA_MODEL}")
+    MODEL_TO_USE = OLLAMA_MODEL
+    API_TYPE = "ollama"
+    print(f"INFO: Using Local Ollama API: {API_URL} with model: {MODEL_TO_USE}")
 elif NGROK_API_URL:
     API_URL = NGROK_API_URL
-    USE_LOCAL_OLLAMA = False
-    print(f"INFO: Using NGROK (hosted) API")
+    MODEL_TO_USE = OLLAMA_MODEL # NGROK might use OLLAMA_MODEL if specified, or a default via payload
+    API_TYPE = "ngrok"
+    print(f"INFO: Using NGROK (hosted) API: {API_URL}" + (f" with model: {MODEL_TO_USE}" if MODEL_TO_USE else ""))
 else:
-    print("ERROR: Neither OLLAMA_API_URL/OLLAMA_MODEL_NAME nor NGROK_API_URL are set in .env.")
-    API_URL = None # Ensure API_URL is None if not configured
+    print("ERROR: No suitable API URL (Custom, Ollama, or NGROK) is set in .env. API calls will likely fail.")
+    # API_URL remains None, API_TYPE remains 'unconfigured'
 
 def create_text_chunks(text, max_length, overlap):
     """
@@ -100,7 +110,7 @@ def extract_skills_from_text(text_chunk):
     """
     Extracts skills from the given text CHUNK using an LLM.
     """
-    if not API_URL:
+    if not API_URL or API_TYPE == "unconfigured":
         print("ERROR: API_URL is not configured. Cannot make LLM call.")
         return {"skills": []}
         
@@ -111,22 +121,32 @@ def extract_skills_from_text(text_chunk):
         return fallback_response
 
     headers = {"Content-Type": "application/json"}
-    if not USE_LOCAL_OLLAMA and API_URL and "ngrok" in API_URL: # Added API_URL check
+    if API_TYPE == "ngrok": # Specific header for NGROK
         headers["ngrok-skip-browser-warning"] = "true"
 
     prompt = f"{SYSTEM_PROMPT}\n\nCV Text Segment:\n\"\"\"\n{text_chunk}\n\"\"\"\n\nBased on the instructions and the text segment above, provide the JSON output:"
     
     payload = {}
-    if USE_LOCAL_OLLAMA:
+    if API_TYPE == "custom":
         payload = {
-            "model": OLLAMA_MODEL,
+            "model": MODEL_TO_USE,
+            "prompt": prompt,
+            "stream": False,
+            "options": {"temperature": 0.1, "num_predict": 1024} # Default options, adjust if needed
+        }
+    elif API_TYPE == "ollama":
+        payload = {
+            "model": MODEL_TO_USE,
             "prompt": prompt,
             "stream": False,
             "format": "json", 
             "options": {"temperature": 0.1, "num_predict": 1024} 
         }
-    else:
-        payload = {"prompt": prompt, "model": OLLAMA_MODEL if OLLAMA_MODEL else "default"} # NGROK might need model in payload
+    elif API_TYPE == "ngrok":
+        payload = {
+            "prompt": prompt, 
+            "model": MODEL_TO_USE if MODEL_TO_USE else "default" # NGROK might need model in payload
+        }
 
     try:
         response = requests.post(API_URL, json=payload, headers=headers, timeout=180)
@@ -134,7 +154,27 @@ def extract_skills_from_text(text_chunk):
         
         json_data_str = None
 
-        if USE_LOCAL_OLLAMA:
+        if API_TYPE == "custom":
+            try:
+                resp_json = response.json()
+                if "response" in resp_json and isinstance(resp_json["response"], str):
+                    json_data_str = resp_json["response"]
+                elif isinstance(resp_json, dict) and "skills" in resp_json: # Direct JSON object
+                     return resp_json # Already parsed
+                # If custom API might return JSON string directly in response.text and not as a JSON object field
+                elif not json_data_str and response.text.strip().startswith("{"): 
+                    json_data_str = response.text # Will attempt to parse later
+                else:
+                    print(f"ERROR: Custom LLM API response format unexpected. Raw: {response.text[:500]}")
+                    return fallback_response
+            except json.JSONDecodeError:
+                 # This might happen if response.text is the JSON string itself
+                if response.text.strip().startswith("{") and response.text.strip().endswith("}"):
+                    json_data_str = response.text
+                else:
+                    print(f"ERROR: Failed to parse Custom LLM API response as JSON. Raw: {response.text[:500]}")
+                    return fallback_response
+        elif API_TYPE == "ollama":
             try:
                 resp_json = response.json()
                 if "response" in resp_json and isinstance(resp_json["response"], str):
@@ -147,7 +187,7 @@ def extract_skills_from_text(text_chunk):
             except json.JSONDecodeError:
                 print(f"ERROR: Failed to parse Ollama response as JSON. Raw: {response.text[:500]}")
                 return fallback_response
-        else: # NGROK or other hosted API
+        elif API_TYPE == "ngrok":
             try:
                 resp_json = response.json()
                 if isinstance(resp_json, dict) and 'output' in resp_json and isinstance(resp_json['output'], str):
@@ -155,10 +195,10 @@ def extract_skills_from_text(text_chunk):
                 elif isinstance(resp_json, dict) and "skills" in resp_json: # Direct JSON object
                     return resp_json # Already parsed
                 else:
-                    print(f"ERROR: Hosted API response format unexpected. Got: {json.dumps(resp_json, indent=2)}")
+                    print(f"ERROR: Hosted API (NGROK) response format unexpected. Got: {json.dumps(resp_json, indent=2)}")
                     return fallback_response
             except json.JSONDecodeError:
-                print(f"ERROR: Failed to parse hosted API response as JSON. Raw: {response.text[:500]}")
+                print(f"ERROR: Failed to parse hosted API (NGROK) response as JSON. Raw: {response.text[:500]}")
                 return fallback_response
 
         if not json_data_str:
