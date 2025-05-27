@@ -27,6 +27,7 @@ From the provided job description text, extract the following attributes that ch
 3.  **language_requirements**: A list of *explicitly stated* language proficiencies a candidate needs for this role.
     *   For each language mentioned, create an object: {"language": "LanguageName", "proficiency": "ProficiencyLevel"}
     *   For "ProficiencyLevel", **CHOOSE ONE from these predefined options:** ["Native/Bilingual", "Fluent", "Proficient/Business-level", "Conversational", "Basic", "Not specified"]
+    *   Explicitly use only the defined ones, same capitalization, same spacing, punctuation, and wording.
     *   Example: [{"language": "English", "proficiency": "Fluent"}, {"language": "Danish", "proficiency": "Proficient/Business-level"}]
     *   If proficiency is not mentioned for an explicitly stated language required for the role, use "Not specified" for its proficiency.
     *   If no language requirements are explicitly mentioned as necessary for the candidate, return an empty list: []. (Do not infer the primary language of the document itself here as a candidate requirement unless stated).
@@ -67,13 +68,13 @@ CUSTOM_LLM_MODEL = os.getenv("CUSTOM_LLM_MODEL_NAME")
 # Prioritize: Custom LLM > NGROK > Local Ollama
 if CUSTOM_LLM_API_URL and CUSTOM_LLM_MODEL:
     API_URL = CUSTOM_LLM_API_URL
-    # USE_LOCAL_OLLAMA is already False
+
     print(f"INFO ([STEP3]llm_skill_extractor): Using Custom LLM API: {CUSTOM_LLM_API_URL} with model: {CUSTOM_LLM_MODEL}")
 else:
     raise ValueError("CUSTOM_LLM_API_URL and CUSTOM_LLM_MODEL_NAME must be set in the environment.")
 
 def extract_job_details_with_llm(job_text):
-    # Default response structure if everything goes wrong
+
     fallback_response = {
         "skills": [],
         "experience_level_required": "Not specified",
@@ -89,28 +90,9 @@ def extract_job_details_with_llm(job_text):
 
     # Set up request headers
     headers = {"Content-Type": "application/json"}
-    # The ngrok check is no longer needed here as we are not using ngrok
-    # if not USE_LOCAL_OLLAMA and API_URL and "ngrok" in API_URL:
-    #     headers["ngrok-skip-browser-warning"] = "true"
 
     # Construct the full prompt for the LLM
     prompt = f"{SYSTEM_PROMPT}\n\nJob Description Text:\n\"\"\"\n{job_text}\n\"\"\"\n\nBased on the instructions and the text above, provide the JSON output:"
-    
-    # Build the request payload based on API type
-    payload = {}
-    # USE_LOCAL_OLLAMA is always False, so this branch is never taken
-    # if USE_LOCAL_OLLAMA:
-    #     payload = {
-    #         "model": OLLAMA_MODEL,
-    #         "prompt": prompt,
-    #         "stream": False,
-    #         "format": "json",  # Request JSON format directly from Ollama
-    #         "options": {
-    #             "temperature": 0.1,
-    #             "num_predict": 2048
-    #         }
-    #     }
-    # elif API_URL == CUSTOM_LLM_API_URL: # This will always be true if API_URL is set
     payload = {
         "model": CUSTOM_LLM_MODEL,
         "prompt": prompt,
@@ -122,9 +104,7 @@ def extract_job_details_with_llm(job_text):
         },
         "stream": False
     }
-    # else: # This branch is no longer reachable
-    #     payload = {"prompt": prompt}
-    
+
     try:
         # Make the API call
         response = requests.post(API_URL, json=payload, headers=headers, timeout=180)
@@ -132,30 +112,6 @@ def extract_job_details_with_llm(job_text):
         
         json_data = None
 
-        # Handle the response differently based on API type
-        # The USE_LOCAL_OLLAMA branch is no longer needed
-        # if USE_LOCAL_OLLAMA:
-        #     try:
-        #         resp_json = response.json()
-                
-        #         # Try to extract the JSON data from various response formats
-        #         if "response" in resp_json and isinstance(resp_json["response"], str):
-        #             # Case 1: Ollama returns a JSON string in "response" field
-        #             json_data = resp_json["response"]
-        #         elif "response" in resp_json and isinstance(resp_json["response"], dict):
-        #             # Case 2: Ollama returns a parsed JSON object in "response" field
-        #             json_data = json.dumps(resp_json["response"])
-        #         elif isinstance(resp_json, dict) and all(key in resp_json for key in fallback_response.keys()):
-        #             # Case 3: The entire response IS the JSON object 
-        #             json_data = json.dumps(resp_json)
-        #         else:
-        #             print(f"Error ([STEP3]llm_skill_extractor): Local Ollama response format unexpected. Raw: {response.text[:500]}")
-        #             return fallback_response
-        #     except json.JSONDecodeError:
-        #         # This happens if response.text isn't valid JSON
-        #         print(f"Error ([STEP3]llm_skill_extractor): Failed to parse Ollama response as JSON. Raw: {response.text[:500]}")
-        #         return fallback_response
-        # elif API_URL == CUSTOM_LLM_API_URL: # This will always be true
         try:
             resp_json = response.json()
             # The custom endpoint may return the result in a "response" field
@@ -170,21 +126,7 @@ def extract_job_details_with_llm(job_text):
         except json.JSONDecodeError:
             print(f"Error ([STEP3]llm_skill_extractor): Failed to parse Custom API response as JSON. Raw: {response.text[:500]}")
             return fallback_response
-        # else: # This branch for other hosted APIs is no longer needed
-        #     # Handle hosted API response
-        #     try:
-        #         resp_json = response.json()
-        #     except json.JSONDecodeError:
-        #         print(f"Error ([STEP3]llm_skill_extractor): Failed to parse hosted API response as JSON. Raw: {response.text[:500]}")
-        #         return fallback_response
-                
-        #     if isinstance(resp_json, dict) and 'output' in resp_json and isinstance(resp_json['output'], str):
-        #         json_data = resp_json['output']
-        #     else:
-        #         print(f"Error ([STEP3]llm_skill_extractor): Hosted API response missing 'output' string. Got: {json.dumps(resp_json, indent=2)}")
-        #         return fallback_response
 
-        # Make sure we got something back
         if not json_data:
             print("Error ([STEP3]llm_skill_extractor): No JSON data found in API response.")
             return fallback_response

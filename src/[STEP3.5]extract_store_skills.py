@@ -3,20 +3,20 @@ import sys
 import importlib.util
 import json
 from dotenv import load_dotenv
-import requests # Keep for potential ngrok ping, though less critical now
+import requests 
 from pymongo import MongoClient
 from langdetect import detect, LangDetectException
 from datetime import datetime
 
 print("--- exctract_store_skills.py: Script Started ---", flush=True)
 
-# --- Configuration ---
+
 HTML_CHUNK_SIZE_FOR_TEST = int(os.getenv('HTML_CHUNK_SIZE', 8000))
-MAX_CHUNKS_FOR_TEST = int(os.getenv('MAX_CHUNKS_FOR_TEST', 10)) # Increased default for more thorough chunk testing
+MAX_CHUNKS_FOR_TEST = int(os.getenv('MAX_CHUNKS_FOR_TEST', 10)) 
 PRINT_PROCESSED_TEXT_IN_LOG = os.getenv('PRINT_PROCESSED_TEXT_IN_LOG', 'False').lower() == 'true'
 MAX_SOURCE_TEXT_PRINT_SNIPPET_LENGTH = 1500
 
-# --- Output File Configuration ---
+
 TIMESTAMP_STR = datetime.now().strftime("%Y%m%d_%H%M%S")
 OUTPUT_FILENAME = f"test_llm_chunked_extractions_{TIMESTAMP_STR}.jsonl"
 PROJECT_ROOT_FOR_OUTPUT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -35,7 +35,6 @@ EXPERIENCE_LEVEL_HIERARCHY_TEST = [
     "Manager", "Director", "Executive"
 ]
 
-# --- Path, .env, Import Logic (Mostly same as before) ---
 try:
     current_script_dir = os.path.dirname(os.path.abspath(__file__)); project_root_dir = os.path.dirname(current_script_dir)
     dotenv_path = os.path.join(project_root_dir, '.env')
@@ -51,7 +50,7 @@ if os.path.exists(dotenv_path):
     else: print("exctract_store_skills.py: WARNING: load_dotenv() returned False.", flush=True)
 else: print(f"exctract_store_skills.py: WARNING: .env file NOT found at {dotenv_path}.", flush=True)
 NGROK_API_URL_FROM_ENV = os.getenv('NGROK_API_URL'); OLLAMA_API_URL_FROM_ENV = os.getenv('OLLAMA_API_URL'); OLLAMA_MODEL_NAME_FROM_ENV = os.getenv('OLLAMA_MODEL_NAME')
-MONGO_URI_FROM_ENV = os.getenv('MONGO_URI'); MONGO_DB_NAME_FROM_ENV = os.getenv('MONGO_DB_NAME'); MONGO_COLLECTION_FROM_ENV = "backup_daily_20250521_022726" #MONGO_COLLECTION_FROM_ENV = os.getenv('MONGO_COLLECTION')
+MONGO_URI_FROM_ENV = os.getenv('MONGO_URI'); MONGO_DB_NAME_FROM_ENV = os.getenv('MONGO_DB_NAME'); MONGO_COLLECTION_FROM_ENV = os.getenv('MONGO_COLLECTION')#MONGO_COLLECTION_FROM_ENV = "backup_daily_20250521_022726" 
 if OLLAMA_API_URL_FROM_ENV and OLLAMA_MODEL_NAME_FROM_ENV: print(f"exctract_store_skills.py: [STEP3]llm_skill_extractor.py will use Local Ollama: {OLLAMA_API_URL_FROM_ENV}, Model: {OLLAMA_MODEL_NAME_FROM_ENV}", flush=True)
 elif NGROK_API_URL_FROM_ENV: print(f"exctract_store_skills.py: [STEP3]llm_skill_extractor.py will use NGROK API: ", flush=True)
 else: print("exctract_store_skills.py: WARNING: No LLM API URLs configured in .env for [STEP3]!", flush=True)
@@ -88,8 +87,7 @@ def save_extraction_to_file(data_to_save, source_details):
         "timestamp": datetime.now().isoformat(),
         "source_details": source_details,
         "extracted_data": data_to_save
-        # Original text is not saved to file by default to keep file size manageable
-        # It's printed to log if PRINT_PROCESSED_TEXT_IN_LOG is True
+
     }
     try:
         with open(OUTPUT_FILE_PATH, 'a', encoding='utf-8') as f:
@@ -111,10 +109,10 @@ def test_llm_with_chunking(description_text, source_identifier, job_title_for_fi
         if sample_text_for_lang_detect_test.strip():
             lang_code_test = detect(sample_text_for_lang_detect_test)
             detected_main_language_name_test = LANG_CODE_TO_NAME_MAP_TEST.get(lang_code_test, lang_code_test.capitalize())
-            # print(f"exctract_store_skills.py: Auto-detected main document language: {detected_main_language_name_test} (code: {lang_code_test})", flush=True) # Less verbose
-    except Exception: pass # Silently pass lang detect errors for test script
 
-    # print(f"exctract_store_skills.py: Original text length: {len(description_text)} chars", flush=True); print(f"exctract_store_skills.py: Using chunk_size: {HTML_CHUNK_SIZE_FOR_TEST}", flush=True) # Less verbose
+    except Exception: pass
+
+
     html_chunks_full = chunk_html_content(description_text, HTML_CHUNK_SIZE_FOR_TEST);
     if not html_chunks_full: print(f"exctract_store_skills.py: No chunks generated for {source_identifier}. Skipping.", flush=True); return
     
@@ -123,11 +121,10 @@ def test_llm_with_chunking(description_text, source_identifier, job_title_for_fi
         print(f"exctract_store_skills.py: SKIPPING {source_identifier}: Text split into {len(html_chunks_full)} chunks (>= 10). Not processing.", flush=True)
         return # Skip processing for this job
 
-    html_chunks_to_process = html_chunks_full # Process all chunks if less than 10
-    print(f"exctract_store_skills.py: Processing {len(html_chunks_to_process)} chunk(s) for {source_identifier}.", flush=True) # Added print for total chunks to process
+    html_chunks_to_process = html_chunks_full
+    print(f"exctract_store_skills.py: Processing {len(html_chunks_to_process)} chunk(s) for {source_identifier}.", flush=True)
     processed_text_concatenated_for_log = ""
-    # The old logic for limiting to MAX_CHUNKS_FOR_TEST is now replaced by the check above.
-    # print(f"exctract_store_skills.py: Processing {len(html_chunks_to_process)} chunk(s) for {source_identifier}.", flush=True) # Less verbose
+
     
     aggregated_details_accumulator_test = { "skills": set(), "experience_level_required": "Not specified", "language_requirements": [], "education_level_preferred": "Not specified", "job_type": "Not specified" }
     llm_extracted_languages_map_test = {}; total_api_calls = 0
@@ -208,13 +205,6 @@ def test_llm_with_chunking(description_text, source_identifier, job_title_for_fi
         {"type": source_identifier, "method": "Chunked", "job_title": job_title_for_file, "mongo_id": str(mongo_doc_id_for_file)}
     )
 
-    # --- Add MongoDB Update Logic Here ---
-    # This part will be added in the main execution block below,
-    # where we have access to the MongoDB client and collection.
-    # The function itself just returns the aggregated data if needed,
-    # but for this script's purpose, we'll handle the DB update outside.
-
-    # We will return the aggregated data so the caller can save it to MongoDB
     return final_aggregated_dict_to_print
 
     if PRINT_PROCESSED_TEXT_IN_LOG:
@@ -271,24 +261,24 @@ if MONGO_URI_FROM_ENV and MONGO_DB_NAME_FROM_ENV and MONGO_COLLECTION_FROM_ENV:
                     html_content,
                     source_identifier=f"MongoDB Sample {i+1}",
                     job_title_for_file=job_title,
-                    mongo_doc_id_for_file=doc_id_str # Pass string ID for file saving
+                    mongo_doc_id_for_file=doc_id_str 
                 )
 
-                # --- Add MongoDB Update Logic Here ---
+                
                 if extracted_data and isinstance(extracted_data, dict):
                     try:
-                        # Prepare the update document
+                        
                         update_doc = {"$set": {}}
-                        # Add each key from extracted_data as a separate field at the top level
+                       
                         for key, value in extracted_data.items():
-                            # Only add fields that were successfully extracted and are not None/empty lists
+                            
                             if value is not None and (not isinstance(value, list) or value):
-                                update_doc["$set"][key] = value # Store directly at top level
+                                update_doc["$set"][key] = value 
 
-                        # Perform the update operation only if there are fields to set
+
                         if update_doc["$set"]:
                             update_result = collection.update_one(
-                                {"_id": doc_id}, # Use the original ObjectId
+                                {"_id": doc_id},
                                 update_doc
                             )
 
@@ -310,7 +300,7 @@ if MONGO_URI_FROM_ENV and MONGO_DB_NAME_FROM_ENV and MONGO_COLLECTION_FROM_ENV:
         if mongo_client: mongo_client.close(); print("exctract_store_skills.py: MongoDB connection closed.", flush=True)
 else: print("\n--- exctract_store_skills.py: Skipping MongoDB samples (config not fully set). ---", flush=True)
 
-# --- Direct test of imported_llm_function with empty/None text (still useful) ---
+
 print("\n--- exctract_store_skills.py: Direct test of imported_llm_function with empty/None text ---", flush=True)
 if imported_llm_function:
     try:
