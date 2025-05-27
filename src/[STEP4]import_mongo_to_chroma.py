@@ -147,13 +147,18 @@ def main_import_to_chroma():
         chroma_client_obj = HttpClient(host=CHROMA_HOST, port=CHROMA_PORT, settings=ChromaSettings(anonymized_telemetry=False))
         try:
             chroma_collection = chroma_client_obj.get_collection(name=CHROMA_COLLECTION_NAME_STEP4)
+            if chroma_collection is None:
+                raise ValueError("Chroma collection could not be retrieved.")
             collection_metadata = chroma_collection.metadata or {}
             if collection_metadata.get("hnsw:space") != "cosine":
-                 log_message_step4(f"WARNING: Chroma Collection '{CHROMA_COLLECTION_NAME_STEP4}' exists but metric is '{collection_metadata.get('hnsw:space', 'Unknown')}'. 'cosine' is recommended.")
+                log_message_step4(f"WARNING: Chroma Collection '{CHROMA_COLLECTION_NAME_STEP4}' exists but metric is '{collection_metadata.get('hnsw:space', 'Unknown')}'. 'cosine' is recommended.")
         except Exception as e_get_coll:
             log_message_step4(f"Chroma Collection '{CHROMA_COLLECTION_NAME_STEP4}' not found or error accessing ({e_get_coll}). Creating with 'cosine' metric.")
             chroma_collection = chroma_client_obj.create_collection(name=CHROMA_COLLECTION_NAME_STEP4, metadata={"hnsw:space": "cosine"})
-        log_message_step4(f"Using ChromaDB collection: {CHROMA_COLLECTION_NAME_STEP4} (Metric: {chroma_collection.metadata.get('hnsw:space', 'Unknown')})")
+            if chroma_collection is None:
+                log_message_step4("ERROR: Failed to create Chroma collection.")
+                return
+            log_message_step4(f"Using ChromaDB collection: {CHROMA_COLLECTION_NAME_STEP4} (Metric: {chroma_collection.metadata.get('hnsw:space', 'Unknown')})")
 
 
         try: existing_chroma_ids = set(chroma_collection.get(include=[])['ids'])
@@ -199,6 +204,8 @@ def main_import_to_chroma():
 
                 # --- METADATA PREPARATION START ---
                 metadata = {
+                    "_id": str(job_doc.get("_id")),
+                    "job_id": job_doc.get("job_id", "N/A"),
                     "Title": job_doc.get("Title", "N/A"),
                     "Company": job_doc.get("Company", "N/A"),
                     "URL": job_doc.get("URL", "#"),
