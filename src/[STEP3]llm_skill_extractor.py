@@ -19,6 +19,7 @@ From the provided job description text, extract the following attributes that ch
 
 2.  **experience_level_required**: The level of professional experience required or desired for a candidate to be effective in this role.
     *   **CHOOSE ONE from these predefined options:** ["Entry-level", "Junior (0-2 years)", "Mid-level (3-5 years)", "Senior (5-10 years)", "Lead (7+ years, with leadership)", "Principal/Expert (10+ years, deep expertise)", "Manager", "Director", "Executive"]
+    *   Explicitly use only the defined ones, same capitalization, same spacing, punctuation, and wording.
     *   Select the option that best reflects the seniority and responsibility described. If specific years are mentioned that align with a category, prefer that category (e.g., "4 years experience" maps to "Mid-level (3-5 years)").
     *   If multiple distinct levels are clearly required for different aspects or if it's a very broad role, you may return a list of chosen options, e.g., ["Senior (5-10 years)", "Lead (7+ years, with leadership)"]. Otherwise, prefer a single best fit.
     *   If not explicitly mentioned or clearly inferable for the role, return "Not specified".
@@ -32,11 +33,13 @@ From the provided job description text, extract the following attributes that ch
 
 4.  **education_level_preferred**: The highest level of education *explicitly stated as preferred or required* for a candidate in this role.
     *   **CHOOSE ONE from these predefined options:** ["High School Diploma/GED", "Vocational Training/Apprenticeship", "Associate's Degree", "Bachelor's Degree", "Master's Degree", "Doctorate (PhD)", "Professional Degree (e.g., MD, JD)", "Not specified"]
+    *   Explicitly use only the defined ones, same capitalization, same spacing, punctuation, and wording. 
     *   If a specific field of study is mentioned (e.g., "Bachelor's in Computer Science"), you can optionally append it to the chosen option IN A COMMENT within your thought process, but the JSON value should be one of the predefined options. For the JSON output, just return the chosen education level.
     *   If not explicitly mentioned as a candidate requirement, return "Not specified".
 
 5.  **job_type**: The type of employment *explicitly stated* for this position.
     *   **CHOOSE ONE from these predefined options:** ["Full-time", "Part-time", "Contract/Temporary", "Internship", "Freelance"]
+    *   Explicitly use only the defined ones, same capitalization, same spacing, punctuation, and wording. 
     *   If not mentioned, return "Not specified". (Infer "Full-time" only if the context strongly suggests a standard permanent role *and no other job type indicators are present*).
 
 Output format (MUST be a single JSON object with these exact top-level keys):
@@ -60,9 +63,6 @@ IMPORTANT RULES:
 CUSTOM_LLM_API_URL = os.getenv("CUSTOM_LLM_API_URL")
 CUSTOM_LLM_MODEL = os.getenv("CUSTOM_LLM_MODEL_NAME")
 
-# Figure out which API we're using
-API_URL = None
-USE_LOCAL_OLLAMA = False # This will always be false now
 
 # Prioritize: Custom LLM > NGROK > Local Ollama
 if CUSTOM_LLM_API_URL and CUSTOM_LLM_MODEL:
@@ -114,7 +114,12 @@ def extract_job_details_with_llm(job_text):
     payload = {
         "model": CUSTOM_LLM_MODEL,
         "prompt": prompt,
-        "options": {"num_predict": 2048},
+        "options": {
+            "num_predict": 8192,  # Max tokens for the output
+            "num_ctx": 8192,      # Context window size (input + output)
+            "seed": 101,          # For reproducible outputs
+            "temperature": 0.1    # Controls randomness/creativity
+        },
         "stream": False
     }
     # else: # This branch is no longer reachable

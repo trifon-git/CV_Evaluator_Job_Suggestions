@@ -11,7 +11,7 @@ from datetime import datetime
 print("--- exctract_store_skills.py: Script Started ---", flush=True)
 
 # --- Configuration ---
-HTML_CHUNK_SIZE_FOR_TEST = int(os.getenv('HTML_CHUNK_SIZE', 2000))
+HTML_CHUNK_SIZE_FOR_TEST = int(os.getenv('HTML_CHUNK_SIZE', 8000))
 MAX_CHUNKS_FOR_TEST = int(os.getenv('MAX_CHUNKS_FOR_TEST', 10)) # Increased default for more thorough chunk testing
 PRINT_PROCESSED_TEXT_IN_LOG = os.getenv('PRINT_PROCESSED_TEXT_IN_LOG', 'False').lower() == 'true'
 MAX_SOURCE_TEXT_PRINT_SNIPPET_LENGTH = 1500
@@ -51,7 +51,7 @@ if os.path.exists(dotenv_path):
     else: print("exctract_store_skills.py: WARNING: load_dotenv() returned False.", flush=True)
 else: print(f"exctract_store_skills.py: WARNING: .env file NOT found at {dotenv_path}.", flush=True)
 NGROK_API_URL_FROM_ENV = os.getenv('NGROK_API_URL'); OLLAMA_API_URL_FROM_ENV = os.getenv('OLLAMA_API_URL'); OLLAMA_MODEL_NAME_FROM_ENV = os.getenv('OLLAMA_MODEL_NAME')
-MONGO_URI_FROM_ENV = os.getenv('MONGO_URI'); MONGO_DB_NAME_FROM_ENV = os.getenv('MONGO_DB_NAME'); MONGO_COLLECTION_FROM_ENV = os.getenv('MONGO_COLLECTION')
+MONGO_URI_FROM_ENV = os.getenv('MONGO_URI'); MONGO_DB_NAME_FROM_ENV = os.getenv('MONGO_DB_NAME'); MONGO_COLLECTION_FROM_ENV = "backup_daily_20250521_022726" #MONGO_COLLECTION_FROM_ENV = os.getenv('MONGO_COLLECTION')
 if OLLAMA_API_URL_FROM_ENV and OLLAMA_MODEL_NAME_FROM_ENV: print(f"exctract_store_skills.py: [STEP3]llm_skill_extractor.py will use Local Ollama: {OLLAMA_API_URL_FROM_ENV}, Model: {OLLAMA_MODEL_NAME_FROM_ENV}", flush=True)
 elif NGROK_API_URL_FROM_ENV: print(f"exctract_store_skills.py: [STEP3]llm_skill_extractor.py will use NGROK API: ", flush=True)
 else: print("exctract_store_skills.py: WARNING: No LLM API URLs configured in .env for [STEP3]!", flush=True)
@@ -124,6 +124,7 @@ def test_llm_with_chunking(description_text, source_identifier, job_title_for_fi
         return # Skip processing for this job
 
     html_chunks_to_process = html_chunks_full # Process all chunks if less than 10
+    print(f"exctract_store_skills.py: Processing {len(html_chunks_to_process)} chunk(s) for {source_identifier}.", flush=True) # Added print for total chunks to process
     processed_text_concatenated_for_log = ""
     # The old logic for limiting to MAX_CHUNKS_FOR_TEST is now replaced by the check above.
     # print(f"exctract_store_skills.py: Processing {len(html_chunks_to_process)} chunk(s) for {source_identifier}.", flush=True) # Less verbose
@@ -135,7 +136,7 @@ def test_llm_with_chunking(description_text, source_identifier, job_title_for_fi
         if PRINT_PROCESSED_TEXT_IN_LOG: processed_text_concatenated_for_log += chunk
         elif len(processed_text_concatenated_for_log) < MAX_SOURCE_TEXT_PRINT_SNIPPET_LENGTH : processed_text_concatenated_for_log += chunk
 
-        # print(f"\n  Processing chunk {i+1}/{len(html_chunks_to_process)} (length: {len(chunk)} chars) for {source_identifier}", flush=True) # Less verbose
+        print(f"  Processing chunk {i+1}/{len(html_chunks_to_process)} (length: {len(chunk)} chars) for {source_identifier}", flush=True) # Modified print for chunk number and character count
         try:
             llm_response_dict = imported_llm_function(chunk); total_api_calls += 1
             if not llm_response_dict or not isinstance(llm_response_dict, dict): print(f"  WARNING for {source_identifier} chunk {i+1}: Invalid or no data dict from LLM. Data: {llm_response_dict}", flush=True); continue
