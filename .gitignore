@@ -5,8 +5,9 @@
 src/delete_future_jobs.py
 src/delete_null_created_at.py
 src/import_sql_to_mongo.py
-src/reset_chrma_db.py
+src/reset_chroma_db.py
+src/list_experience_levels.py
+src/remove_mongo_fields.py
 
-# Database files
 *.db
 data/job_listings.db

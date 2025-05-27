@@ -118,10 +118,14 @@ def test_llm_with_chunking(description_text, source_identifier, job_title_for_fi
     html_chunks_full = chunk_html_content(description_text, HTML_CHUNK_SIZE_FOR_TEST);
     if not html_chunks_full: print(f"exctract_store_skills.py: No chunks generated for {source_identifier}. Skipping.", flush=True); return
     
-    html_chunks_to_process = html_chunks_full; processed_text_concatenated_for_log = ""
-    if len(html_chunks_full) > MAX_CHUNKS_FOR_TEST:
-        print(f"exctract_store_skills.py: WARNING for {source_identifier}: Text split into {len(html_chunks_full)} chunks. Limiting to first {MAX_CHUNKS_FOR_TEST} chunks.", flush=True)
-        html_chunks_to_process = html_chunks_full[:MAX_CHUNKS_FOR_TEST]
+    # Check if the number of chunks is 10 or more
+    if len(html_chunks_full) >= 10:  # Use MAX_CHUNKS_FOR_TEST if you prefer it to be configurable
+        print(f"exctract_store_skills.py: SKIPPING {source_identifier}: Text split into {len(html_chunks_full)} chunks (>= 10). Not processing.", flush=True)
+        return # Skip processing for this job
+
+    html_chunks_to_process = html_chunks_full # Process all chunks if less than 10
+    processed_text_concatenated_for_log = ""
+    # The old logic for limiting to MAX_CHUNKS_FOR_TEST is now replaced by the check above.
     # print(f"exctract_store_skills.py: Processing {len(html_chunks_to_process)} chunk(s) for {source_identifier}.", flush=True) # Less verbose
     
     aggregated_details_accumulator_test = { "skills": set(), "experience_level_required": "Not specified", "language_requirements": [], "education_level_preferred": "Not specified", "job_type": "Not specified" }
