@@ -15,14 +15,14 @@ import io
 import tempfile
 import time
 from fpdf import FPDF 
-import json # For parsing language JSON from Chroma metadata
+import json 
 
 # Load environment variables
 load_dotenv()
 
 # --- Import your custom modules ---
 try:
-    from cv_match import find_similar_jobs, generate_embedding_for_skills # explain_job_match, get_embedding_model are internal to cv_match
+    from cv_match import find_similar_jobs, generate_embedding_for_skills
     from extract_skills_from_cv_file import get_extracted_skills_from_file 
     from cover_letter_generator import CoverLetterGenerator
 except ImportError as import_err:
@@ -37,20 +37,21 @@ except Exception as general_import_err:
 # Page config
 st.set_page_config(
     page_title="CV Job Matcher | Denmark",
-    page_icon="👔",
-    layout="wide"
+    page_icon="🎯", # Changed icon
+    layout="wide",
+    initial_sidebar_state="expanded" # Keep sidebar open initially
 )
 
-# --- Constants and Normalization Data (from your STEP3.5 logic) ---
+# --- Constants and Normalization Data ---
 MIN_CV_LENGTH_CHARS = 150
 MAX_CV_LENGTH_CHARS = 20000
 LOCAL_FEEDBACK_FILENAME = "feedback_log.csv" 
 SIMILARITY_THRESHOLD = 40.0 
-MAX_JOBS_TO_DISPLAY = 10 # Increased slightly to allow more results before filtering
-TOP_N_RESULTS_FROM_SEARCH = int(os.getenv('TOP_N_RESULTS_FOR_APP_QUERY', '50')) # Fetch more initially for filtering
+MAX_JOBS_TO_DISPLAY_PER_PAGE = 5 # For pagination later if needed, for now, it's the total max
+TOP_N_RESULTS_FROM_SEARCH = int(os.getenv('TOP_N_RESULTS_FOR_APP_QUERY', '75')) # Fetch more for better filtering
 
 CANONICAL_LANGUAGES_FOR_FILTER = ["English", "Danish", "German", "Spanish", "French", "Norwegian", "Swedish"]
-CANONICAL_AREAS_FOR_FILTER = sorted([ # Sorted for display in multiselect
+CANONICAL_AREAS_FOR_FILTER = sorted([
     "Copenhagen", "Aarhus", "Odense", "Aalborg", "Esbjerg", "Randers", "Kolding", "Horsens", "Vejle", "Roskilde",
     "Herning", "Hørsholm", "Silkeborg", "Næstved", "Fredericia", "Viborg", "Køge", "Holstebro", "Taastrup", "Slagelse",
     "Hillerød", "Sønderborg", "Svendborg", "Hjørning", "Holbæk", "Frederikshavn", "Nørresundby", "Ringsted", "Haderslev",
@@ -65,177 +66,136 @@ def app_normalize_area(raw_area_str):
         return "Other/Unmapped Area"
     
     normalized_area = raw_area_str.strip()
-    # Simplified normalization for display - prefer exact matches from CANONICAL_AREAS_FOR_FILTER first
     for canonical_area_val in CANONICAL_AREAS_FOR_FILTER:
         if normalized_area.lower() == canonical_area_val.lower():
             return canonical_area_val
-        # Check if canonical area is a substring for broader matching
         if canonical_area_val.lower() in normalized_area.lower() and canonical_area_val != "Other/Unmapped Area":
             return canonical_area_val 
             
-    # Very basic replacements (can be expanded from your STEP3.5 logic if needed)
-    city_name_mapping = {'København': 'Copenhagen', 'Århus': 'Aarhus'}
+    city_name_mapping = {'København': 'Copenhagen', 'Århus': 'Aarhus', 'Storkøbenhavn': 'Copenhagen', 'Hovedstadsområdet': 'Copenhagen'}
     for danish_key, canonical_value in city_name_mapping.items():
         if danish_key.lower() in normalized_area.lower():
             return canonical_value
-            
-    # Fallback for areas not perfectly matching the canonical list for filtering purposes
-    # For display, we might show the raw area if no canonical match is found
-    # For filtering, if it doesn't match one of the canonicals, it might be filtered out unless "Other" is selected
     return "Other/Unmapped Area" 
 
-
 def get_job_languages_from_metadata(metadata_dict):
-    """Extracts and normalizes language names from ChromaDB metadata."""
-    languages = set()
-    # 1. Check for 'Language_Requirements_Json_Str' (preferred)
+    extracted_languages_set = set()
     lang_req_json_str = metadata_dict.get("Language_Requirements_Json_Str")
     if lang_req_json_str:
         try:
             lang_list_of_dicts = json.loads(lang_req_json_str)
             if isinstance(lang_list_of_dicts, list):
                 for lang_entry in lang_list_of_dicts:
-                    if isinstance(lang_entry, dict) and isinstance(lang_entry.get("language"), str):
-                        # Simple normalization for display/filter matching
-                        lang_name = lang_entry.get("language").strip()
-                        for canonical in CANONICAL_LANGUAGES_FOR_FILTER:
-                            if canonical.lower() == lang_name.lower():
-                                languages.add(canonical)
-                                break
-                        else: # If no exact canonical match, add original if it seems like a language
-                            if lang_name: languages.add(lang_name.capitalize()) 
-        except json.JSONDecodeError:
-            print(f"Warning: Could not parse Language_Requirements_Json_Str: {lang_req_json_str[:50]}")
+                    if isinstance(lang_entry, dict):
+                        lang_name = lang_entry.get("language")
+                        if isinstance(lang_name, str) and lang_name.strip():
+                            for canonical in CANONICAL_LANGUAGES_FOR_FILTER:
+                                if canonical.lower() == lang_name.strip().lower():
+                                    extracted_languages_set.add(canonical); break
+        except: pass # Silently ignore parsing errors for this field for now
 
-    # 2. Fallback: Check for individual lang_<name>_proficiency fields
-    if not languages: # Only if the JSON string method didn't yield results
-        for key in metadata_dict.keys():
-            if key.startswith("lang_") and key.endswith("_proficiency"):
-                lang_name_from_key = key.replace("lang_", "").replace("_proficiency", "").capitalize()
-                for canonical in CANONICAL_LANGUAGES_FOR_FILTER:
-                    if canonical.lower() == lang_name_from_key.lower():
-                        languages.add(canonical)
-                        break
-    
-    # 3. Add Detected_Ad_Language if it's canonical
-    detected_ad_lang = metadata_dict.get("Detected_Ad_Language") # e.g., "English", "Danish"
-    if detected_ad_lang and detected_ad_lang in CANONICAL_LANGUAGES_FOR_FILTER:
-        languages.add(detected_ad_lang)
-        
-    return sorted(list(languages))
+    for key, value in metadata_dict.items():
+        if key.startswith("lang_") and key.endswith("_proficiency"):
+            lang_name_from_key = key.replace("lang_", "").replace("_proficiency", "")
+            for canonical in CANONICAL_LANGUAGES_FOR_FILTER:
+                if canonical.lower() == lang_name_from_key.lower():
+                    extracted_languages_set.add(canonical); break
+                    
+    detected_ad_lang_raw = metadata_dict.get("Detected_Ad_Language")
+    if isinstance(detected_ad_lang_raw, str) and detected_ad_lang_raw.strip() and detected_ad_lang_raw != "Unknown":
+        for canonical in CANONICAL_LANGUAGES_FOR_FILTER:
+            if canonical.lower() == detected_ad_lang_raw.strip().lower():
+                extracted_languages_set.add(canonical); break
+                
+    return sorted(list(extracted_languages_set))
 
-
-# Initialize Cover Letter Generator (remains the same)
+# Initialize Cover Letter Generator
 @st.cache_resource
 def get_cover_letter_generator():
-    try:
-        return CoverLetterGenerator() 
-    except Exception as e:
-        st.error(f"Failed to initialize Cover Letter Generator: {e}. Check OPENAI_API key in .env.")
-        return None
+    try: return CoverLetterGenerator() 
+    except Exception as e: st.error(f"Cover Letter Generator Error: {e}. Check OPENAI_API key."); return None
 cover_letter_gen = get_cover_letter_generator()
 
-# PDF Generation Function (remains the same)
+# PDF Generation Function
 class PDF(FPDF):
     def header(self): pass 
     def footer(self): pass 
 
 def create_pdf_from_text(text_content):
     try:
-        pdf = PDF()
-        pdf.add_page()
+        pdf = PDF(); pdf.add_page()
         font_path = "DejaVuSans.ttf" 
         font_name = "DejaVu"
         try:
-            if os.path.exists(font_path):
-                 pdf.add_font(font_name, "", font_path, uni=True)
-                 pdf.set_font(font_name, size=11)
+            if os.path.exists(font_path): pdf.add_font(font_name, "", font_path, uni=True)
             else: raise RuntimeError(f"Font file {font_path} not found.")
+            pdf.set_font(font_name, size=11)
         except RuntimeError:
-            print(f"Warning: Custom font not found. Falling back to core PDF fonts.")
+            print(f"Warning: Custom font not found. Falling back to Arial.")
             try: pdf.set_font("Arial", size=11)
-            except RuntimeError: 
-                try: pdf.set_font("Helvetica", size=11)
-                except RuntimeError: pdf.set_font("Times", size=11)
+            except RuntimeError: pdf.set_font("Helvetica", size=11) # Further fallback
+        
         pdf.write(5, text_content) 
         pdf_output_bytes = pdf.output(dest='S')
-        if not pdf_output_bytes:
-            st.error("PDF generation resulted in empty output.")
-            return None
+        if not pdf_output_bytes: st.error("PDF generation resulted in empty output."); return None
         return pdf_output_bytes
-    except Exception as e:
-        st.error(f"Error generating PDF: {e}")
-        print(f"Detailed PDF generation error: {traceback.format_exc()}")
-        return None
+    except Exception as e: st.error(f"Error generating PDF: {e}"); print(f"PDF error: {traceback.format_exc()}"); return None
 
-# File Reading and Feedback functions (remain largely the same)
-def read_cv_file(uploaded_file): # No changes
+# File Reading and Feedback functions (no major changes needed, keeping them concise here for brevity)
+def read_cv_file(uploaded_file): # Condensed
     if not uploaded_file: return None
     try:
-        file_name = uploaded_file.name; file_ext = os.path.splitext(file_name)[1].lower(); cv_text = ""
-        with st.status(f"Reading `{file_name}`...", expanded=False) as status:
-            if file_ext == '.pdf':
-                pdf_reader = PyPDF2.PdfReader(io.BytesIO(uploaded_file.getvalue()))
-                if not pdf_reader.pages: status.update(label="Warning: PDF empty.", state="warning"); return None
-                for page_num in range(len(pdf_reader.pages)): cv_text += (pdf_reader.pages[page_num].extract_text() or "") + "\n"
-                if not cv_text.strip(): status.update(label="Warning: No text in PDF.", state="warning")
-            elif file_ext == '.docx':
-                doc = docx.Document(io.BytesIO(uploaded_file.getvalue()))
-                cv_text = "\n".join([p.text for p in doc.paragraphs if p.text])
-                if not cv_text.strip(): status.update(label="Warning: No text in DOCX.", state="warning")
-            elif file_ext == '.md':
-                md_bytes = uploaded_file.getvalue(); md_text = md_bytes.decode("utf-8", errors="ignore")
-                html = markdown.markdown(md_text); cv_text = re.sub('<[^>]*>', ' ', html).strip()
-                cv_text = re.sub(r'\s+', ' ', cv_text)
-                if not cv_text.strip(): status.update(label="Warning: No text in MD.", state="warning")
-            elif file_ext == '.txt':
-                txt_bytes = uploaded_file.getvalue(); cv_text = txt_bytes.decode("utf-8", errors="ignore")
-                if not cv_text.strip(): status.update(label="Warning: TXT empty.", state="warning")
-            else: st.error(f"Unsupported file type: `{file_ext}`."); status.update(label="Unsupported.", state="error"); return None
-            final_text = cv_text.strip()
-            if final_text: status.update(label=f"Read `{file_name}`.", state="complete"); return final_text
-            else:
-                if status.state not in ["warning", "error"]: status.update(label="No text extracted.", state="warning")
-                return None
+        file_name=uploaded_file.name; file_ext=os.path.splitext(file_name)[1].lower(); cv_text=""
+        with st.spinner(f"Reading `{file_name}`..."):
+            content_bytes = uploaded_file.getvalue()
+            if file_ext=='.pdf':
+                r=PyPDF2.PdfReader(io.BytesIO(content_bytes)); cv_text="".join([(p.extract_text() or "") for p in r.pages])
+            elif file_ext=='.docx':
+                d=docx.Document(io.BytesIO(content_bytes)); cv_text="\n".join([p.text for p in d.paragraphs])
+            elif file_ext=='.md':
+                h=markdown.markdown(content_bytes.decode("utf-8",errors="ignore")); cv_text=re.sub('<[^>]*>',' ',h).strip()
+            elif file_ext=='.txt':
+                cv_text=content_bytes.decode("utf-8",errors="ignore")
+            else: st.error(f"Unsupported: `{file_ext}`."); return None
+        final_text=cv_text.strip()
+        if not final_text: st.warning("No text extracted."); return None
+        return final_text
     except Exception as e: st.error(f"Error reading '{uploaded_file.name}'."); print(f"Read error: {traceback.format_exc()}"); return None
 
-def initialize_local_feedback_csv(): # No changes
+def initialize_local_feedback_csv(): # Condensed
     if not os.path.exists(LOCAL_FEEDBACK_FILENAME):
         try:
-            with open(LOCAL_FEEDBACK_FILENAME, 'w', newline='', encoding='utf-8') as f:
-                csv.writer(f).writerow(["timestamp", "session_id", "cv_upload_time", "job_chroma_id", "rating", "cv_skills_count", "job_title_rated"])
-        except Exception as e: st.error(f"Failed to create feedback file: {e}"); return False
+            with open(LOCAL_FEEDBACK_FILENAME,'w',newline='',encoding='utf-8') as f: csv.writer(f).writerow(["ts","sid","cv_ts","jid","rt","cv_sc","jt"])
+        except Exception as e: st.error(f"Feedback file init error: {e}"); return False
     return True
 
-def record_feedback_local(session_id, cv_upload_time, job_chroma_id, rating, cv_skills_count, job_title): # No changes
+def record_feedback_local(sid, cv_ts, jid, rt, cv_sc, jt): # Condensed
     if not initialize_local_feedback_csv(): return False
     try:
-        new_row = [datetime.now(timezone.utc).isoformat(), session_id, cv_upload_time, job_chroma_id, rating, cv_skills_count, job_title]
-        with open(LOCAL_FEEDBACK_FILENAME, 'a', newline='', encoding='utf-8') as f: csv.writer(f).writerow(new_row)
-        st.toast("Feedback saved!", icon="✅"); return True
-    except Exception as e: st.error(f"Error recording feedback: {e}"); return False
+        with open(LOCAL_FEEDBACK_FILENAME,'a',newline='',encoding='utf-8') as f: csv.writer(f).writerow([datetime.now(timezone.utc).isoformat(),sid,cv_ts,jid,rt,cv_sc,jt])
+        st.toast("Feedback saved!", icon="👍"); return True
+    except Exception as e: st.error(f"Feedback record error: {e}"); return False
 
-def load_and_process_feedback(): # No changes
-    default_res = {"aggregates": {"per_job": {}, "total_up": 0, "total_down": 0}, "dataframe": pd.DataFrame(columns=["timestamp", "session_id", "cv_upload_time", "job_chroma_id", "rating", "cv_skills_count", "job_title_rated"])}
-    if not initialize_local_feedback_csv() or not os.path.isfile(LOCAL_FEEDBACK_FILENAME): return default_res
+def load_and_process_feedback(): # Condensed
+    def_res = {"aggregates":{"per_job":{},"total_up":0,"total_down":0},"dataframe":pd.DataFrame(columns=["ts","sid","cv_ts","jid","rt","cv_sc","jt"])}
+    if not initialize_local_feedback_csv() or not os.path.isfile(LOCAL_FEEDBACK_FILENAME): return def_res
     try:
-        df = pd.read_csv(LOCAL_FEEDBACK_FILENAME, low_memory=False)
-        if df.empty: return default_res
-        required_cols = ['rating', 'job_chroma_id', 'timestamp']
-        if not all(col in df.columns for col in required_cols): return default_res
-        total_up = int(df['rating'].value_counts().get('up', 0)); total_down = int(df['rating'].value_counts().get('down', 0))
-        per_job = {}; 
+        df=pd.read_csv(LOCAL_FEEDBACK_FILENAME,names=["ts","sid","cv_ts","jid","rt","cv_sc","jt"],header=0,low_memory=False) # Added names and header=0
+        if df.empty: return def_res
+        req_c=['rt','jid','ts']; 
+        if not all(c in df.columns for c in req_c):print("FB CSV missing cols"); return def_res
+        tu=int(df['rt'].value_counts().get('up',0)); td=int(df['rt'].value_counts().get('down',0))
+        pj={};
         try:
-            jc = df.groupby('job_chroma_id')['rating'].value_counts().unstack(fill_value=0)
-            if 'up' not in jc.columns: jc['up'] = 0; 
-            if 'down' not in jc.columns: jc['down'] = 0
-            per_job = jc.apply(lambda r: {"up": int(r['up']), "down": int(r['down'])}, axis=1).to_dict()
+            jc=df.groupby('jid')['rt'].value_counts().unstack(fill_value=0)
+            if 'up' not in jc.columns: jc['up']=0
+            if 'down' not in jc.columns: jc['down']=0
+            pj=jc.apply(lambda r:{"up":int(r['up']),"down":int(r['down'])},axis=1).to_dict()
         except: pass
-        aggs = {"per_job": per_job, "total_up": total_up, "total_down": total_down}
-        df['timestamp'] = pd.to_datetime(df['timestamp'], errors='coerce'); df.dropna(subset=['timestamp'], inplace=True)
-        return {"aggregates": aggs, "dataframe": df}
-    except pd.errors.EmptyDataError: return default_res
-    except Exception as e: print(f"Feedback process error: {traceback.format_exc()}"); return default_res
+        aggs={"per_job":pj,"total_up":tu,"total_down":td}
+        df['ts']=pd.to_datetime(df['ts'],errors='coerce');df.dropna(subset=['ts'],inplace=True)
+        return {"aggregates":aggs,"dataframe":df}
+    except: print(f"FB process error: {traceback.format_exc()}"); return def_res
 
 
 # --- Streamlit App State Initialization ---
@@ -244,281 +204,241 @@ if 'cv_upload_time' not in st.session_state: st.session_state.cv_upload_time = N
 if 'feedback_given_jobs' not in st.session_state: st.session_state.feedback_given_jobs = {} 
 if 'cv_skills' not in st.session_state: st.session_state.cv_skills = None
 if 'generated_cover_letters' not in st.session_state: st.session_state.generated_cover_letters = {}
-if 'all_job_matches_cache' not in st.session_state: st.session_state.all_job_matches_cache = None # Cache for all matches
+if 'all_job_matches_cache' not in st.session_state: st.session_state.all_job_matches_cache = None
+if 'cv_text_cache' not in st.session_state: st.session_state.cv_text_cache = None
 
-# --- App Header & Intro (remains the same) ---
-st.title("👨‍💼🇩🇰 CV Job Matcher") 
-# ... (rest of intro markdown) ...
-st.markdown("Unlock your next career move in Denmark. Upload your CV and let our AI find jobs that **truly match your skills.**")
-st.markdown("---")
-st.markdown(f"""
-**How It Works**
-1.  You **upload your CV** (PDF, DOCX, TXT, MD).
-2.  We **extract key skills** from your CV using AI.
-3.  The system **compares your skill profile** to current, active job postings.
-4.  You get the **top results**, ranked by match score (≥ {SIMILARITY_THRESHOLD:.0f}%). Use filters to refine!
-5.  For each match, see **which of your skills contributed** most.
-6.  Optionally, get an **AI-drafted cover letter** tailored to the job.
-7.  Your feedback (👍/👎) is **saved locally** to help track system performance.
 
-Ready to dive in?
-""")
+# --- App Header & Intro ---
+st.title("👨‍💼🇩🇰 CV Job Matcher Pro") 
+st.subheader("Unlock Your Next Career Move in Denmark!")
+st.markdown("Upload your CV, and our AI will find jobs that truly match your skills, help you understand why, and even draft a cover letter.")
 st.markdown("---")
 
-
-# --- Prerequisite Checks (remains the same) ---
+# --- Prerequisite Checks ---
 if not all([os.getenv('EMBEDDING_API_URL'), os.getenv('CHROMA_HOST'), os.getenv('CHROMA_PORT'), os.getenv('CHROMA_COLLECTION')]):
-    st.error("Missing critical backend settings in .env. App cannot function.")
+    st.error("Backend services are not fully configured. Please check `.env` settings. The app cannot function without them.")
     st.stop()
 if not os.getenv("OPENAI_API"):
-    st.warning("OPENAI_API key not found. Cover letter generation disabled.", icon="🔒")
+    st.warning("OpenAI API key not found. Cover letter generation will be disabled.", icon="🔒")
     cover_letter_gen = None 
 
-# --- File Upload ---
-st.subheader("1. Upload Your CV 🚀")
-uploaded_file = st.file_uploader("Choose CV file", type=['pdf', 'docx', 'txt', 'md'], 
-                                label_visibility="collapsed", key="cv_uploader_key",
-                                on_change=lambda: st.session_state.update(all_job_matches_cache=None, generated_cover_letters={})) # Reset cache on new upload
+# --- Main App Layout ---
+# Sidebar for Upload and Filters
+with st.sidebar:
+    st.header("🚀 Get Started")
+    uploaded_file = st.file_uploader("1. Upload Your CV", type=['pdf', 'docx', 'txt', 'md'], 
+                                    key="cv_uploader_key",
+                                    help="Supports PDF, DOCX, Markdown, and TXT files.",
+                                    on_change=lambda: st.session_state.update(all_job_matches_cache=None, generated_cover_letters={}, cv_text_cache=None, cv_skills=None))
+    st.markdown("---")
+    st.header("🔍 Filter Job Matches")
+    selected_locations = st.multiselect("Job Locations (Area)", options=CANONICAL_AREAS_FOR_FILTER, placeholder="Any Location")
+    selected_languages = st.multiselect("Required Languages", options=CANONICAL_LANGUAGES_FOR_FILTER, placeholder="Any Language")
+    
+    st.markdown("---")
+    st.info("Tip: Upload your CV first, then apply filters to the results.")
+    st.caption(f"Matching up to {TOP_N_RESULTS_FROM_SEARCH} jobs, displaying top {MAX_JOBS_TO_DISPLAY_PER_PAGE} after filters.")
 
-# --- Filters ---
-st.sidebar.header("🔍 Filter Job Matches")
-selected_locations = st.sidebar.multiselect(
-    "Job Locations (Area)",
-    options=CANONICAL_AREAS_FOR_FILTER,
-    # default=None, # No default selection
-    placeholder="Select one or more locations"
-)
-selected_languages = st.sidebar.multiselect(
-    "Required Languages",
-    options=CANONICAL_LANGUAGES_FOR_FILTER,
-    # default=None, # No default selection
-    placeholder="Select one or more languages"
-)
 
-# Load feedback data (remains the same)
+# Main content area
+placeholder_processing_status = st.empty() # For global status messages
+
+# Load feedback data
 feedback_result = load_and_process_feedback()
 feedback_aggregates = feedback_result["aggregates"]
 feedback_df = feedback_result["dataframe"]
 
 
-# --- Main Processing Logic ---
 if uploaded_file is not None:
-    # CV Processing (if not already processed or file changed)
-    if st.session_state.all_job_matches_cache is None: # Process only if cache is empty (new upload)
-        file_process_placeholder = st.empty()
-        file_process_placeholder.info(f"Processing `{uploaded_file.name}`...")
-        
-        st.session_state.cv_upload_time = datetime.now(timezone.utc).isoformat()
-        st.session_state.feedback_given_jobs = {} 
-        st.session_state.generated_cover_letters = {}
-        
-        cv_text = read_cv_file(uploaded_file)
-        
-        if cv_text:
-            text_length = len(cv_text) # ... (length checks) ...
-            if text_length >= MIN_CV_LENGTH_CHARS:
-                file_process_placeholder.success(f"CV Read. Extracting skills...")
-                with st.spinner("🤖 Extracting skills..."):
-                    # ... (skill extraction logic - same as before) ...
-                    with tempfile.NamedTemporaryFile(delete=False, suffix=os.path.splitext(uploaded_file.name)[1]) as tmp_file:
-                        tmp_file.write(uploaded_file.getvalue()); temp_cv_path = tmp_file.name
-                    cv_skills = get_extracted_skills_from_file(temp_cv_path); os.unlink(temp_cv_path)
-                    if not cv_skills: file_process_placeholder.error("Could not extract skills."); st.stop()
-                    st.session_state.cv_skills = cv_skills
-                    file_process_placeholder.success(f"Extracted {len(cv_skills)} skills. Generating CV embedding...")
-                    if len(cv_skills) < 50: # Show only if not too many
-                        with st.expander("View Extracted CV Skills"): st.write(cv_skills)
+    if st.session_state.all_job_matches_cache is None: # Process only on new upload or if cache is empty
+        with placeholder_processing_status.container(): # Use container for status
+            with st.spinner(f"Analyzing `{uploaded_file.name}`... This might take a few moments."):
+                st.session_state.cv_upload_time = datetime.now(timezone.utc).isoformat()
+                st.session_state.feedback_given_jobs = {} 
+                st.session_state.generated_cover_letters = {}
                 
-                with st.spinner("🧬 Generating CV embedding..."):
-                    # ... (embedding logic - same as before) ...
-                    cv_skill_embedding = generate_embedding_for_skills(cv_skills)
-                    if cv_skill_embedding is None: file_process_placeholder.error("Could not generate CV embedding."); st.stop()
-                    file_process_placeholder.success("CV embedded. Searching for jobs...")
+                cv_text = read_cv_file(uploaded_file)
+                st.session_state.cv_text_cache = cv_text # Cache raw CV text
+                
+                if cv_text:
+                    # Skill Extraction
+                    with st.spinner("🤖 Extracting skills from your CV..."):
+                        with tempfile.NamedTemporaryFile(delete=False, suffix=os.path.splitext(uploaded_file.name)[1]) as tmp_file:
+                            tmp_file.write(uploaded_file.getvalue()); temp_cv_path = tmp_file.name
+                        cv_skills_list = get_extracted_skills_from_file(temp_cv_path); os.unlink(temp_cv_path)
+                    if not cv_skills_list: placeholder_processing_status.error("Could not extract skills. Try a different CV."); st.stop()
+                    st.session_state.cv_skills = cv_skills_list
+                    if len(cv_skills_list) < 50:
+                        with st.expander("💡 View Extracted CV Skills", expanded=False): st.caption(f"{len(cv_skills_list)} skills: {', '.join(cv_skills_list)}")
+                    
+                    # Embedding
+                    with st.spinner("🧬 Generating CV skills embedding..."):
+                        cv_skill_embedding_vec = generate_embedding_for_skills(cv_skills_list)
+                    if cv_skill_embedding_vec is None: placeholder_processing_status.error("Could not generate CV embedding."); st.stop()
+                    
+                    # Job Matching
+                    with st.spinner('🧠 Searching for matching jobs...'):
+                        all_matches_db, method_used = find_similar_jobs(
+                            cv_skill_embedding=cv_skill_embedding_vec, cv_skills=cv_skills_list, 
+                            top_n=TOP_N_RESULTS_FROM_SEARCH, active_only=True)
+                        st.session_state.all_job_matches_cache = all_matches_db if all_matches_db is not None else []
+                else: # cv_text is None
+                    placeholder_processing_status.error("Could not read CV content."); st.session_state.all_job_matches_cache = []
+            placeholder_processing_status.success(f"CV processing complete! Found {len(st.session_state.all_job_matches_cache)} potential matches.")
+            time.sleep(2) # Keep success message for a bit
+            placeholder_processing_status.empty()
 
-                with st.spinner('🧠 Comparing CV to jobs...'):
-                    # ... (find_similar_jobs logic - same as before, store in session state) ...
-                    all_job_matches_from_db, method_used = find_similar_jobs(
-                        cv_skill_embedding=cv_skill_embedding, cv_skills=cv_skills, 
-                        top_n=TOP_N_RESULTS_FROM_SEARCH, active_only=True)
-                    st.session_state.all_job_matches_cache = all_job_matches_from_db if all_job_matches_from_db is not None else []
-                    st.session_state.cv_text_cache = cv_text # Cache CV text for cover letters
-                file_process_placeholder.empty()
-        else: # cv_text is None
-            if uploaded_file: file_process_placeholder.error("Could not read CV content.")
-            st.session_state.all_job_matches_cache = [] # Ensure it's an empty list on read failure
 
-    # --- Apply Filters and Display Results ---
-    if st.session_state.all_job_matches_cache is not None:
-        current_matches_to_filter = st.session_state.all_job_matches_cache
+# Apply Filters and Display Results
+if st.session_state.all_job_matches_cache is not None:
+    current_matches_to_filter = list(st.session_state.all_job_matches_cache) # Work with a copy
+    
+    # Apply Location Filter
+    if selected_locations:
+        filtered_by_location = []
+        for job in current_matches_to_filter:
+            job_area_for_filter = app_normalize_area(job.get('Area', ''))
+            if job_area_for_filter in selected_locations:
+                filtered_by_location.append(job)
+        current_matches_to_filter = filtered_by_location
+
+    # Apply Language Filter
+    if selected_languages:
+        filtered_by_language = []
+        for job in current_matches_to_filter:
+            job_langs = get_job_languages_from_metadata(job) 
+            if any(lang in selected_languages for lang in job_langs):
+                filtered_by_language.append(job)
+        current_matches_to_filter = filtered_by_language
         
-        # Apply Location Filter
-        if selected_locations:
-            filtered_by_location = []
-            for job in current_matches_to_filter:
-                job_area_raw = job.get('Area', '')
-                # Use Area_Canonical if available, otherwise normalize raw Area
-                job_area_for_filter = job.get('Area_Canonical', app_normalize_area(job_area_raw))
-                if job_area_for_filter in selected_locations:
-                    filtered_by_location.append(job)
-            current_matches_to_filter = filtered_by_location
-            st.caption(f"Filtered by selected locations. Showing {len(current_matches_to_filter)} of {len(st.session_state.all_job_matches_cache)} potential matches.")
+    final_display_matches = [j for j in current_matches_to_filter if isinstance(j.get('score'), (int, float)) and j.get('score', 0) >= SIMILARITY_THRESHOLD]
+    final_display_matches.sort(key=lambda x: x.get('score', 0), reverse=True)
+    final_display_matches = final_display_matches[:MAX_JOBS_TO_DISPLAY_PER_PAGE]
 
-        # Apply Language Filter
-        if selected_languages:
-            filtered_by_language = []
-            for job in current_matches_to_filter:
-                # metadata for job is now directly in the job dictionary from cv_match.py
-                job_langs = get_job_languages_from_metadata(job) # Pass the whole job dict which contains metadata fields
-                if any(lang in selected_languages for lang in job_langs):
-                    filtered_by_language.append(job)
-            current_matches_to_filter = filtered_by_language
-            st.caption(f"Filtered by selected languages. Showing {len(current_matches_to_filter)} of {len(st.session_state.all_job_matches_cache)} potential matches.")
+    # Tabs for results and analytics
+    tab_results, tab_feedback_analytics = st.tabs(["🎯 Matching Jobs", "📊 Feedback Analytics"])
+    
+    with tab_results:
+        if not uploaded_file:
+             st.info("👋 Upload your CV using the sidebar to find matching jobs!")
+        elif not st.session_state.all_job_matches_cache and uploaded_file :
+             st.warning("Initial job search yielded no results or failed. Try a different CV or check service status.", icon="🤷")
+
+        if final_display_matches:
+            st.success(f"Displaying top {len(final_display_matches)} matches based on your CV and filters (Score ≥ {SIMILARITY_THRESHOLD:.0f}%).")
+            for i, job_match in enumerate(final_display_matches):
+                job_unique_id = job_match.get('chroma_id', f"job_fallback_{i}")
+                job_title = job_match.get('Title', 'N/A')
+                job_company = job_match.get('Company', 'N/A')
+                job_area_display = app_normalize_area(job_match.get('Area', ''))
+                job_status = job_match.get('Status', 'unknown').capitalize()
+                job_url = job_match.get('url', '#')
+                job_score = job_match.get('score', 0.0)
+                contributing_skills = job_match.get('contributing_skills', [])
+                job_description_text = job_match.get('document_text', '') 
+                job_languages_display = get_job_languages_from_metadata(job_match)
+
+                job_feedback_stats = feedback_aggregates["per_job"].get(job_unique_id, {"up": 0, "down": 0})
+
+                with st.container(border=True):
+                    main_cols = st.columns([5, 2]) # Job Info | Score & Feedback
+                    with main_cols[0]: # Job Info Column
+                        st.markdown(f"#### {i+1}. {job_title}")
+                        st.caption(f"**🏢 Company:** {job_company} | **📍 Location:** {job_area_display} | **🚦 Status:** `{job_status}`")
+                        if job_languages_display:
+                            st.caption(f"**🗣️ Languages:** {', '.join(job_languages_display)}")
+                        
+                        with st.expander("🔬 See Matching Skills Analysis", expanded=False):
+                            if contributing_skills:
+                                st.markdown("**Key CV skills contributing to this match:**")
+                                for skill_text, skill_sim_score in contributing_skills: 
+                                    st.markdown(f"- `{skill_text}` (Contribution: {skill_sim_score:.2f})")
+                            else: st.caption("Skill contribution analysis not available or no strong contributing skills found.")
+                        
+                        action_cols = st.columns([1,1]) 
+                        with action_cols[0]: 
+                            if job_url and job_url != '#': st.link_button("Apply Now 🚀", url=job_url, type="primary", use_container_width=True)
+                            else: st.button("Apply Now", disabled=True, use_container_width=True, help="Application link unavailable.")
+                        with action_cols[1]: 
+                            cl_button_key = f"cl_btn_{job_unique_id}"
+                            disable_cl = not (cover_letter_gen and job_description_text and st.session_state.get('cv_text_cache'))
+                            cl_help_text = "Job description or CV text missing." if not (job_description_text and st.session_state.get('cv_text_cache')) else "OpenAI API key missing." if not cover_letter_gen else "Draft a cover letter"
+                            if st.button("Draft Cover Letter 📄", key=cl_button_key, use_container_width=True, disabled=disable_cl, help=cl_help_text):
+                                with st.spinner("🖋️ Drafting cover letter..."):
+                                    gen_letter = cover_letter_gen.generate_cover_letter(job_description_text, st.session_state.cv_text_cache)
+                                st.session_state.generated_cover_letters[job_unique_id] = gen_letter if (gen_letter and not gen_letter.lower().startswith("error:")) else "Error: Could not generate cover letter."
+
+                        if job_unique_id in st.session_state.generated_cover_letters:
+                            letter_content = st.session_state.generated_cover_letters[job_unique_id]
+                            if not letter_content.lower().startswith("error:"):
+                                st.markdown("**Generated Cover Letter Draft:**")
+                                st.text_area("", value=letter_content, height=350, key=f"cl_txt_{job_unique_id}", help="AI draft. Review & edit carefully.")
+                                pdf_bytes = create_pdf_from_text(letter_content)
+                                if pdf_bytes: st.download_button("Download PDF 💾", data=pdf_bytes, file_name=f"CoverLetter_{re.sub(r'[^a-zA-Z0-9_]', '', job_title)[:30]}.pdf", mime="application/pdf", key=f"dl_pdf_{job_unique_id}")
+                            else: st.error(letter_content, icon="⚠️")
+                    
+                    with main_cols[1]: # Score & Feedback Column
+                        st.metric("Match Score", f"{job_score:.1f}%", help="How well your CV skills match this job's profile.")
+                        st.markdown("**Rate this match:**")
+                        fb_key_suffix = f"fb_{job_unique_id}_{st.session_state.cv_upload_time or ''}"
+                        current_rating = st.session_state.feedback_given_jobs.get(job_unique_id)
+                        fb_cols = st.columns(2)
+                        cv_skill_count = len(st.session_state.cv_skills or [])
+                        with fb_cols[0]:
+                            if st.button("👍", key=f"up_{fb_key_suffix}", disabled=(current_rating is not None), use_container_width=True, type="primary" if current_rating=="up" else "secondary", help="Good match!"):
+                                if record_feedback_local(st.session_state.session_id, st.session_state.cv_upload_time, job_unique_id, "up", cv_skill_count, job_title):
+                                    st.session_state.feedback_given_jobs[job_unique_id] = "up"; st.rerun()
+                        with fb_cols[1]:
+                            if st.button("👎", key=f"down_{fb_key_suffix}", disabled=(current_rating is not None), use_container_width=True, type="primary" if current_rating=="down" else "secondary", help="Not a good match."):
+                                if record_feedback_local(st.session_state.session_id, st.session_state.cv_upload_time, job_unique_id, "down", cv_skill_count, job_title):
+                                    st.session_state.feedback_given_jobs[job_unique_id] = "down"; st.rerun()
+                        st.caption(f"Community Votes: 👍{job_feedback_stats.get('up', 0)} | 👎{job_feedback_stats.get('down', 0)}")
+                        if current_rating: st.success(f"You rated: {'👍' if current_rating == 'up' else '👎'}")
             
-        # Further filter by similarity score and limit display count
-        final_display_matches = [j for j in current_matches_to_filter if isinstance(j.get('score'), (int, float)) and j.get('score', 0) >= SIMILARITY_THRESHOLD]
-        final_display_matches.sort(key=lambda x: x.get('score', 0), reverse=True)
-        final_display_matches = final_display_matches[:MAX_JOBS_TO_DISPLAY]
-
-        # Create Tabs for results and analytics
-        tab_results, tab_feedback_analytics = st.tabs(["🎯 Matching Jobs", "📊 Overall Feedback"])
-        
-        with tab_results:
-            st.subheader(f"2. Job Matches (Score ≥ {SIMILARITY_THRESHOLD:.0f}%)")
-            if not st.session_state.all_job_matches_cache and uploaded_file : # If initial search failed
-                 st.warning("Job search failed or returned no results. Try a different CV.", icon="🤷")
-
-            if final_display_matches:
-                st.markdown(f"Displaying top {len(final_display_matches)} matches based on your CV and selected filters.")
-                for i, job_match in enumerate(final_display_matches):
-                    # ... (The job display, feedback, and cover letter logic from your previous app.py version) ...
-                    # This part is long, so I'll keep it concise here. It's the same as before.
-                    # Ensure you use `job_match.get('Area_Canonical', app_normalize_area(job_match.get('Area','')))` for display
-                    # and `get_job_languages_from_metadata(job_match)` for displaying job languages.
-
-                    job_unique_id = job_match.get('chroma_id', f"job_fallback_{i}")
-                    job_title = job_match.get('Title', 'N/A')
-                    job_company = job_match.get('Company', 'N/A')
-                    # For display, use canonical if available, else normalize raw
-                    job_area_display = job_match.get('Area_Canonical', app_normalize_area(job_match.get('Area', '')))
-                    job_status = job_match.get('Status', 'unknown').capitalize()
-                    job_url = job_match.get('url', '#')
-                    job_score = job_match.get('score', 0.0)
-                    contributing_skills = job_match.get('contributing_skills', [])
-                    job_description_text = job_match.get('document_text', '') 
-                    job_languages_display = get_job_languages_from_metadata(job_match)
+        elif st.session_state.all_job_matches_cache is not None and not final_display_matches and (selected_locations or selected_languages):
+            st.info("No jobs match your current filter criteria. Try adjusting the filters or uploading a different CV.", icon="🧐")
+        elif st.session_state.all_job_matches_cache is not None and not final_display_matches and uploaded_file:
+            st.info(f"Found {len(st.session_state.all_job_matches_cache)} potential matches, but none scored {SIMILARITY_THRESHOLD:.0f}% or higher. Try refining your CV or broadening your search.", icon="📉")
 
 
-                    job_feedback_stats = feedback_aggregates["per_job"].get(job_unique_id, {"up": 0, "down": 0})
-
-                    with st.container(border=True):
-                        col_info, col_score_feedback = st.columns([3, 1.5])
-                        with col_info:
-                            st.markdown(f"**{i+1}. {job_title}**")
-                            st.markdown(f"**Company:** {job_company} | **Location:** {job_area_display} | **Status:** `{job_status}`")
-                            if job_languages_display:
-                                st.markdown(f"**Languages:** {', '.join(job_languages_display)}")
-                            
-                            with st.expander("See Matching Skills Analysis", expanded=False):
-                                # ... (same as before) ...
-                                if contributing_skills:
-                                    st.markdown("Key CV skills contributing to this match:")
-                                    for skill, skill_sim in contributing_skills: st.caption(f"- \"{skill}\" (Contribution: {skill_sim:.2f})")
-                                else: st.caption("Skill contribution analysis not available.")
-                            
-                            action_cols = st.columns([1,1,2]) 
-                            with action_cols[0]: # Apply button
-                                # ... (same as before) ...
-                                if job_url and job_url != '#': st.link_button("Apply Now 🚀", url=job_url, type="primary", use_container_width=True)
-                                else: st.button("Apply Now", disabled=True, use_container_width=True)
-                            with action_cols[1]: # Cover letter button
-                                # ... (same as before, ensure st.session_state.cv_text_cache is used for cv_text) ...
-                                cl_button_key = f"cl_btn_{job_unique_id}"
-                                if cover_letter_gen and job_description_text and st.session_state.get('cv_text_cache'):
-                                    if st.button("Draft Cover Letter 📄", key=cl_button_key, use_container_width=True):
-                                        with st.spinner("🖋️ Drafting..."):
-                                            gen_letter = cover_letter_gen.generate_cover_letter(job_description_text, st.session_state.cv_text_cache)
-                                        st.session_state.generated_cover_letters[job_unique_id] = gen_letter or "Error generating."
-                                elif not st.session_state.get('cv_text_cache'):
-                                    st.button("Draft Cover Letter 📄", key=cl_button_key, disabled=True, help="CV text missing.", use_container_width=True)
-                                # ... (other disabled conditions for CL button) ...
-
-                            if job_unique_id in st.session_state.generated_cover_letters: # Display CL
-                                # ... (same as before with PDF download) ...
-                                letter_content = st.session_state.generated_cover_letters[job_unique_id]
-                                if not letter_content.lower().startswith("error"):
-                                    st.markdown("**Generated Cover Letter Draft:**"); st.text_area("", value=letter_content, height=400, key=f"cl_txt_{job_unique_id}")
-                                    pdf_bytes = create_pdf_from_text(letter_content)
-                                    if pdf_bytes: st.download_button("Download PDF 💾", data=pdf_bytes, file_name=f"CoverLetter_{re.sub(r'[^a-zA-Z0-9_]', '', job_title)[:30]}.pdf", mime="application/pdf", key=f"dl_pdf_{job_unique_id}")
-                                else: st.caption(letter_content)
-
-
-                        with col_score_feedback: # Feedback buttons
-                            # ... (same as before, ensure st.session_state.cv_skills is used for cv_skills_count) ...
-                            st.metric("Match Score", f"{job_score:.1f}%"); st.write("Rate this match:")
-                            fb_key_suffix = f"fb_{job_unique_id}_{st.session_state.cv_upload_time}"; current_rating = st.session_state.feedback_given_jobs.get(job_unique_id)
-                            fb_cols = st.columns(2)
-                            with fb_cols[0]:
-                                if st.button("👍", key=f"up_{fb_key_suffix}", disabled=(current_rating is not None), use_container_width=True, type="primary" if current_rating == "up" else "secondary"):
-                                    if record_feedback_local(st.session_state.session_id, st.session_state.cv_upload_time, job_unique_id, "up", len(st.session_state.cv_skills or []), job_title):
-                                        st.session_state.feedback_given_jobs[job_unique_id] = "up"; st.rerun()
-                            with fb_cols[1]:
-                                if st.button("👎", key=f"down_{fb_key_suffix}", disabled=(current_rating is not None), use_container_width=True, type="primary" if current_rating == "down" else "secondary"):
-                                    if record_feedback_local(st.session_state.session_id, st.session_state.cv_upload_time, job_unique_id, "down", len(st.session_state.cv_skills or []), job_title):
-                                        st.session_state.feedback_given_jobs[job_unique_id] = "down"; st.rerun()
-                            st.caption(f"Votes: 👍{job_feedback_stats.get('up', 0)} | 👎{job_feedback_stats.get('down', 0)}")
-                            if current_rating: st.caption(f"✔️ Rated: {'👍' if current_rating == 'up' else '👎'}")
-            
-            elif not st.session_state.all_job_matches_cache and uploaded_file: # Already handled if search failed
-                 pass # Message shown above
-            elif st.session_state.all_job_matches_cache is not None and not final_display_matches:
-                 st.info("No jobs match your current filter criteria and similarity threshold.", icon="🧐")
-
-
-        with tab_feedback_analytics: # This tab content remains the same
-            # ... (same feedback analytics display as before) ...
-            st.subheader("Overall Match Performance & Feedback")
-            st.markdown("This section provides insights based on **all historical feedback** (saved locally).")
-            st.markdown("---")
+        with tab_feedback_analytics: 
+            st.header("📈 Community Feedback Analytics")
+            st.markdown("Insights from all user feedback (saved locally). Your ratings help improve this overview!")
+            st.divider()
+            # ... (Feedback analytics display logic - remains largely the same as your previous version) ...
             total_up = feedback_aggregates.get("total_up", 0); total_down = feedback_aggregates.get("total_down", 0)
             total_votes = total_up + total_down
             if total_votes > 0:
                 st.markdown("**Key Metrics**"); satisfaction_score = (total_up / total_votes) * 100 if total_votes > 0 else 0
-                col_t, col_s = st.columns(2); col_t.metric("Total Feedback Votes", total_votes); col_s.metric("Overall Satisfaction", f"{satisfaction_score:.1f}%")
-                st.markdown("---"); st.markdown("**Feedback Distribution**")
-                pie_data = pd.DataFrame({'Rating Type': ['Good 👍', 'Bad 👎'], 'Votes': [total_up, total_down]})
+                m_col1, m_col2 = st.columns(2)
+                m_col1.metric("Total Feedback Votes", total_votes, help="Total 👍 & 👎 ratings."); 
+                m_col2.metric("Overall Satisfaction", f"{satisfaction_score:.1f}%", help="% of 👍 ratings.")
+                st.divider()
+                st.markdown("**Feedback Distribution**")
+                pie_data = pd.DataFrame({'Rating Type': ['Good Matches 👍', 'Bad Matches 👎'], 'Votes': [total_up, total_down]})
                 try:
-                    fig_pie = px.pie(pie_data, values='Votes', names='Rating Type', color='Rating Type', color_discrete_map={'Good 👍':'#2ECC71', 'Bad 👎':'#E74C3C'})
-                    fig_pie.update_layout(legend_title_text='Feedback', margin=dict(t=20,b=20,l=0,r=0)); fig_pie.update_traces(textposition='inside', textinfo='percent+value')
+                    fig_pie = px.pie(pie_data, values='Votes', names='Rating Type', color='Rating Type', color_discrete_map={'Good Matches 👍':'#2ECC71', 'Bad Matches 👎':'#E74C3C'}, hole=0.3)
+                    fig_pie.update_layout(legend_title_text='Feedback', margin=dict(t=20,b=20,l=0,r=0)); fig_pie.update_traces(textposition='inside', textinfo='percent+label')
                     st.plotly_chart(fig_pie, use_container_width=True)
                 except Exception as plot_err: st.error(f"Pie chart error: {plot_err}")
-                st.markdown("---"); st.markdown("**Feedback Trend Over Time (Daily)**")
-                if (feedback_df is not None and not feedback_df.empty and 'timestamp' in feedback_df.columns and pd.api.types.is_datetime64_any_dtype(feedback_df['timestamp'])):
+                st.divider()
+                st.markdown("**Feedback Trend Over Time (Daily)**")
+                if (feedback_df is not None and not feedback_df.empty and 'ts' in feedback_df.columns and pd.api.types.is_datetime64_any_dtype(feedback_df['ts'])):
                     try:
-                        daily_fb = feedback_df.set_index('timestamp').resample('D')['rating'].value_counts().unstack(fill_value=0)
+                        daily_fb = feedback_df.set_index('ts').resample('D')['rt'].value_counts().unstack(fill_value=0)
                         if 'up' not in daily_fb.columns: daily_fb['up'] = 0
                         if 'down' not in daily_fb.columns: daily_fb['down'] = 0
                         daily_fb = daily_fb.rename(columns={'up': 'Good 👍', 'down': 'Bad 👎'})
                         if not daily_fb.empty and (daily_fb['Good 👍'].sum() > 0 or daily_fb['Bad 👎'].sum() > 0):
-                            fig_time = px.line(daily_fb, y=['Good 👍', 'Bad 👎'], markers=True, labels={"timestamp": "Date", "value": "Ratings", "variable": "Rating"}, color_discrete_map={'Good 👍': '#2ECC71', 'Bad 👎': '#E74C3C'})
+                            fig_time = px.area(daily_fb, y=['Good 👍', 'Bad 👎'], labels={"ts": "Date", "value": "Ratings", "variable": "Rating"}, color_discrete_map={'Good 👍': '#2ECC71', 'Bad 👎': '#E74C3C'}, markers=True)
                             fig_time.update_layout(hovermode="x unified", legend_title_text='Rating', yaxis_title="Number of Ratings")
                             st.plotly_chart(fig_time, use_container_width=True)
                         else: st.info("Not enough data for trend.", icon="📈")
                     except Exception as time_plot_err: st.error(f"Trend chart error: {time_plot_err}")
                 else: st.info("Not enough timestamp data for trend.", icon="⏳")
-            else: st.info("📊 No feedback yet. Rate matches to build stats!", icon="✏️")
-
-elif uploaded_file is None and st.session_state.all_job_matches_cache is not None:
-    # This case handles when filters are changed but no new file is uploaded
-    # We re-apply filters to the cached results
-    current_matches_to_filter = st.session_state.all_job_matches_cache
-    # ... (Apply location and language filters as above) ...
-    # ... (Display results in tab_results as above) ...
-    # This part is intentionally left a bit more abstract as the core logic is duplicated.
-    # You would essentially repeat the filtering and display logic here, acting on cached data.
-    # For brevity, I'm not fully duplicating it. Ensure you handle this state if needed.
-    st.info("Filters applied to previous search results. Upload a new CV to refresh job matches from the database.")
+            else: st.info("📊 No feedback yet. Rate matches to see community analytics!", icon="✏️")
 
 
 # Footer
-st.divider()
-st.caption("CV Job Matcher | MLOps Project Demo")
+st.markdown("---")
+st.caption("CV Job Matcher Pro | An MLOps Project | For Educational Purposes")
