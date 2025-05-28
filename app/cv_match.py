@@ -4,239 +4,319 @@ import os
 import traceback
 import chromadb
 from dotenv import load_dotenv
-from chromadb import HttpClient
+from chromadb import HttpClient, Settings as ChromaSettings
 import requests
 import urllib3
+import json # Added for parsing Skills_Json_Str from metadata
 
 # Load config
-load_dotenv()  # get env vars from .env
+load_dotenv()
 
-# Constants 
-TOP_N_RESULTS = int(os.getenv('TOP_N_RESULTS', '10'))
+# Constants
+TOP_N_RESULTS_DEFAULT = int(os.getenv('TOP_N_RESULTS', '20'))
 CHROMA_HOST = os.getenv('CHROMA_HOST')
 CHROMA_PORT_STR = os.getenv('CHROMA_PORT')
 COLLECTION_NAME = os.getenv('CHROMA_COLLECTION')
 EMBEDDING_API_URL = os.getenv('EMBEDDING_API_URL', '')
 VERIFY_SSL_STR = os.getenv('VERIFY_SSL', 'true')
+EXPLAIN_TOP_N_CONTRIBUTING_SKILLS = int(os.getenv('EXPLAIN_TOP_N_CONTRIBUTING_SKILLS', 3))
+MODEL_NAME_FOR_EMBEDDING = os.getenv('MODEL_NAME', 'paraphrase-multilingual-mpnet-base-v2')
 
-# Fix port config if it's messed up
 try:
     CHROMA_PORT = int(CHROMA_PORT_STR) if CHROMA_PORT_STR else 8000
 except ValueError:
-    print(f"Warning: Can't use CHROMA_PORT '{CHROMA_PORT_STR}', defaulting to 8000.")
+    print(f"Warning: Invalid CHROMA_PORT '{CHROMA_PORT_STR}', defaulting to 8000.")
     CHROMA_PORT = 8000
 
-# Handle SSL verification
 VERIFY_SSL = VERIFY_SSL_STR.lower() == 'true'
-if not VERIFY_SSL:
-    # Skip the warnings if we're ignoring SSL
+if not VERIFY_SSL and EMBEDDING_API_URL:
     urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
+_embedding_model_cache = None
+def get_embedding_model():
+    global _embedding_model_cache
+    if _embedding_model_cache is None:
+        try:
+            from sentence_transformers import SentenceTransformer
+            print(f"Loading local sentence transformer model: {MODEL_NAME_FOR_EMBEDDING}")
+            _embedding_model_cache = SentenceTransformer(MODEL_NAME_FOR_EMBEDDING)
+            print("Local embedding model loaded.")
+        except ImportError:
+            print("Warning: sentence_transformers library not found. Local embedding will not work.")
+            _embedding_model_cache = "error"
+        except Exception as e:
+            print(f"Error loading local SentenceTransformer model: {e}")
+            _embedding_model_cache = "error"
+    return _embedding_model_cache if _embedding_model_cache != "error" else None
 
-def get_remote_embedding(texts):
-    """Get embeddings from API"""
+def get_remote_embedding_batch(texts_batch):
     if not EMBEDDING_API_URL:
-        print("Error: EMBEDDING_API_URL missing.")
-        return []
+        print("Error: EMBEDDING_API_URL not configured for remote embedding.")
+        return [None] * len(texts_batch) 
 
+    if not texts_batch: return []
+    
     try:
-        # Hit the embedding API
-        response = requests.post(
-            EMBEDDING_API_URL,
-            json={"texts": texts},
-            verify=VERIFY_SSL
-        )
+        print(f"Calling remote embedding API for {len(texts_batch)} texts...")
+        response = requests.post(EMBEDDING_API_URL, json={"texts": texts_batch}, verify=VERIFY_SSL, timeout=60)
         response.raise_for_status()
-        return response.json().get("embeddings", [])
+        embeddings_data = response.json().get("embeddings", [])
+        if len(embeddings_data) == len(texts_batch):
+            return [np.array(emb) if emb is not None else None for emb in embeddings_data]
+        else:
+            print(f"Warning: Mismatch in remote embeddings count. Expected {len(texts_batch)}, got {len(embeddings_data)}.")
+            return [None] * len(texts_batch)
     except Exception as e:
-        print(f"Error with embedding API: {e}")
+        print(f"Error calling remote embedding API: {e}")
+        traceback.print_exc() # Print full traceback for remote API errors
+        return [None] * len(texts_batch)
+
+def generate_embedding_for_skills(skills_list):
+    if not skills_list or not isinstance(skills_list, list):
+        return None
+    
+    valid_skills = [s for s in skills_list if isinstance(s, str) and s.strip()]
+    if not valid_skills:
+        return None
+
+    skill_embeddings_np = []
+
+    if EMBEDDING_API_URL:
+        print(f"Attempting remote embedding for {len(valid_skills)} skills.")
+        batch_size = 32 
+        for i in range(0, len(valid_skills), batch_size):
+            batch = valid_skills[i:i+batch_size]
+            remote_embs = get_remote_embedding_batch(batch)
+            skill_embeddings_np.extend([emb for emb in remote_embs if emb is not None])
+    else:
+        print("EMBEDDING_API_URL not set. Attempting local embedding.")
+        model = get_embedding_model()
+        if model:
+            try:
+                raw_embeddings = model.encode(valid_skills, show_progress_bar=False)
+                skill_embeddings_np = [np.array(emb) for emb in raw_embeddings]
+            except Exception as e:
+                print(f"Error during local batch skill embedding: {e}")
+        else:
+            print("Local embedding model not available. Cannot generate skill embeddings.")
+            return None
+
+    if not skill_embeddings_np:
+        print("No valid skill embeddings were generated.")
+        return None
+
+    average_embedding = np.mean(skill_embeddings_np, axis=0)
+    norm = np.linalg.norm(average_embedding)
+    
+    return (average_embedding / norm if norm > 0 else average_embedding).tolist()
+
+def cosine_similarity_np(vec1, vec2):
+    if vec1 is None or vec2 is None: return 0.0
+    vec1_np, vec2_np = np.array(vec1), np.array(vec2)
+    # Ensure vectors are not zero vectors and have same dimension
+    if vec1_np.shape != vec2_np.shape or np.all(vec1_np==0) or np.all(vec2_np==0):
+        return 0.0
+    dot_product = np.dot(vec1_np, vec2_np)
+    norm_vec1, norm_vec2 = np.linalg.norm(vec1_np), np.linalg.norm(vec2_np)
+    # Check for zero norm to avoid division by zero
+    if norm_vec1 == 0 or norm_vec2 == 0:
+        return 0.0
+    return dot_product / (norm_vec1 * norm_vec2)
+
+def explain_job_match(cv_skills, job_skills_from_meta, cv_embedding_overall, job_embedding_from_chroma):
+    if not cv_skills or job_embedding_from_chroma is None:
+        return []
+        
+    valid_cv_skills = [s for s in cv_skills if isinstance(s, str) and s.strip()]
+    if not valid_cv_skills:
+        return []
+        
+    cv_individual_skill_vectors_list = []
+    if EMBEDDING_API_URL:
+        cv_individual_skill_vectors_list = get_remote_embedding_batch(valid_cv_skills)
+    else:
+        model = get_embedding_model()
+        if model:
+            try:
+                raw_embeddings = model.encode(valid_cv_skills, show_progress_bar=False)
+                cv_individual_skill_vectors_list = [np.array(e) for e in raw_embeddings]
+            except Exception as e:
+                print(f"Error embedding individual CV skills locally for explanation: {e}")
+        else:
+            print("Local model not available for CV skill embedding in explain_job_match.")
+            return []
+
+    # Filter out skills for which embedding failed
+    successfully_embedded_cv_skills = []
+    successfully_embedded_cv_vectors = []
+    for i, skill_text in enumerate(valid_cv_skills):
+        if i < len(cv_individual_skill_vectors_list) and cv_individual_skill_vectors_list[i] is not None:
+            successfully_embedded_cv_skills.append(skill_text)
+            successfully_embedded_cv_vectors.append(cv_individual_skill_vectors_list[i])
+
+    if not successfully_embedded_cv_vectors:
+        print("No CV skills could be embedded for explanation.")
         return []
 
+    skill_contributions = []
+    job_emb_np = np.array(job_embedding_from_chroma)
 
-def generate_cv_embedding_remote(cv_text):
-    """Chunk CV, get embeddings for each chunk, average them"""
-    if not cv_text or not isinstance(cv_text, str):
-        return None
+    for i, skill_text in enumerate(successfully_embedded_cv_skills):
+        skill_vector = successfully_embedded_cv_vectors[i]
+        # Calculate similarity of this individual CV skill vector to the overall job embedding
+        similarity = cosine_similarity_np(skill_vector, job_emb_np) 
+        skill_contributions.append((skill_text, similarity))
 
-    try:
-        # Settings for chunking
-        chunk_size = 1000
-        overlap = 200
-        chunks = []
+    skill_contributions.sort(key=lambda x: x[1], reverse=True)
+    return skill_contributions[:EXPLAIN_TOP_N_CONTRIBUTING_SKILLS]
 
-        # Create overlapping chunks of text
-        start = 0
-        while start < len(cv_text):
-            end = start + chunk_size
-            chunk = cv_text[start:end]
-            if chunk.strip():  # Skip empty chunks
-                chunks.append(chunk)
-
-            # Next chunk start position
-            next_start = end - overlap
-            if next_start <= start:  # Make sure we move forward
-                next_start = start + 1
-            start = next_start
-
-            if start >= len(cv_text):
-                break
-
-        if not chunks:
-            print("Warning: No chunks to embed.")
-            return None
-
-        # Process chunks in batches to avoid API overload
-        chunk_embeddings = []
-        batch_size = 16
-
-        for i in range(0, len(chunks), batch_size):
-            batch_chunks = chunks[i:i+batch_size]
-            batch_embeddings = get_remote_embedding(batch_chunks)
-
-            if batch_embeddings and len(batch_embeddings) == len(batch_chunks):
-                chunk_embeddings.extend(batch_embeddings)
-            else:
-                # Try one at a time if batch failed
-                for chunk in batch_chunks:
-                    embedding_response = get_remote_embedding([chunk])
-                    if embedding_response:
-                        chunk_embeddings.append(embedding_response[0])
-                    else:
-                        print("⚠️ Skipping chunk - got empty response")
-
-        if not chunk_embeddings:
-            print("Error: No chunks were embedded")
-            return None
-
-        # Average the embeddings
-        avg_embedding = np.mean(chunk_embeddings, axis=0)
-        
-        # Normalize
-        norm = np.linalg.norm(avg_embedding)
-        if norm > 0:
-            avg_embedding = avg_embedding / norm
-
-        return avg_embedding
-
-    except Exception as e:
-        print(f"Embedding generation failed: {e}")
-        traceback.print_exc()
-        return None
-
-
-def find_similar_jobs(cv_text, top_n=None, active_only=True):
-    """Find matching jobs using vector search"""
-    # Fallback to default if not specified
+def find_similar_jobs(cv_skill_embedding, cv_skills, top_n=None, active_only=True):
     if top_n is None:
-        top_n = TOP_N_RESULTS
+        top_n = TOP_N_RESULTS_DEFAULT
 
-    # Get embedding for the CV
-    cv_embedding = generate_cv_embedding_remote(cv_text)
-    if cv_embedding is None:
-        return [], "Couldn't generate CV embedding"
+    if cv_skill_embedding is None:
+        return [], "CV Skill Embedding is missing."
+
+    if not all([CHROMA_HOST, CHROMA_PORT_STR, COLLECTION_NAME]):
+        return [], "ChromaDB connection details (host, port, collection) are not fully configured."
 
     try:
-        # Check we have the basics
-        if not CHROMA_HOST or not CHROMA_PORT or not COLLECTION_NAME:
-             return [], "Missing ChromaDB connection details"
-
-        # Connect to the DB
-        chroma_client = HttpClient(
-            host=CHROMA_HOST,
-            port=CHROMA_PORT,
-            ssl=False,
-            headers={"accept": "application/json"}
-        )
-
-        # Get our collection
+        chroma_client = HttpClient(host=CHROMA_HOST, port=CHROMA_PORT, settings=ChromaSettings(anonymized_telemetry=False))
+        
         try:
             collection = chroma_client.get_collection(COLLECTION_NAME)
+            print(f"Connected to ChromaDB collection: {COLLECTION_NAME}")
         except Exception as conn_err:
-            return [], f"Failed to get collection '{COLLECTION_NAME}': {conn_err}"
+            return [], f"Failed to get ChromaDB collection '{COLLECTION_NAME}': {conn_err}"
 
-        # Only show active jobs unless told otherwise
         where_clause = {"Status": "active"} if active_only else None
+        if active_only: print("Filtering for active jobs only in ChromaDB.")
+        
+        query_embedding_list = cv_skill_embedding if isinstance(cv_skill_embedding, list) else cv_skill_embedding.tolist()
 
-        # Do the search
+        print(f"Querying ChromaDB with top_n={top_n}...")
         results = collection.query(
-            query_embeddings=[cv_embedding.tolist()],
+            query_embeddings=[query_embedding_list],
             n_results=top_n,
-            include=["metadatas", "distances"],
+            include=["metadatas", "distances", "documents", "embeddings"], 
             where=where_clause
         )
-
+        
         matches = []
+        if results and results.get('ids') and results['ids'] and isinstance(results['ids'][0], list):
+            num_results = len(results['ids'][0])
+            print(f"ChromaDB returned {num_results} raw results.")
 
-        # Process what we found
-        if results and results.get('ids') and results['ids'] and results['ids'][0]:
-            result_ids = results['ids'][0]
-            len_ids = len(result_ids)
+            # Pre-check structure of results for robustness
+            distances_list = results.get('distances', [[]])[0] if results.get('distances') and results['distances'] else [None] * num_results
+            metadatas_list = results.get('metadatas', [[]])[0] if results.get('metadatas') and results['metadatas'] else [{}] * num_results
+            documents_list = results.get('documents', [[]])[0] if results.get('documents') and results['documents'] else [""] * num_results
+            embeddings_list = results.get('embeddings', [[]])[0] if results.get('embeddings') and results['embeddings'] else [None] * num_results
 
-            # Get metadata and distances, handle missing data
-            result_metadatas = results.get('metadatas', [[]])[0]
-            if len(result_metadatas) != len_ids:
-                result_metadatas = ([{}] * len_ids)
+            # Ensure sub-lists have the expected length
+            if not (len(distances_list) == num_results and \
+                    len(metadatas_list) == num_results and \
+                    len(documents_list) == num_results and \
+                    len(embeddings_list) == num_results):
+                print("Warning: Mismatch in lengths of returned lists from ChromaDB query. Results might be incomplete.")
+                # Fallback to iterating only up to the shortest list to avoid IndexError
+                min_len = min(len(distances_list), len(metadatas_list), len(documents_list), len(embeddings_list), num_results)
+                if min_len < num_results:
+                    print(f"Adjusting iteration from {num_results} to {min_len} due to list length mismatch.")
+                num_results = min_len
 
-            result_distances = results.get('distances', [[]])[0]
-            if len(result_distances) != len_ids:
-                result_distances = ([0.0] * len_ids)
 
-            # Build result list
-            for chroma_id, metadata, distance in zip(result_ids, result_metadatas, result_distances):
-                # Make sure metadata is valid
-                if not isinstance(metadata, dict):
-                    metadata = {}
-                    print(f"Warning: Bad metadata for ID {chroma_id}")
+            for i in range(num_results):
+                chroma_id = results['ids'][0][i]
+                
+                distance = distances_list[i]
+                metadata = metadatas_list[i] if isinstance(metadatas_list[i], dict) else {}
+                document_text = documents_list[i] if isinstance(documents_list[i], str) else ""
+                job_embedding_item = embeddings_list[i]
+                
+                job_embedding = None
+                if job_embedding_item is not None and (isinstance(job_embedding_item, list) or isinstance(job_embedding_item, np.ndarray)):
+                    job_embedding = np.array(job_embedding_item)
+                else:
+                    print(f"Warning: Embedding for ID {chroma_id} at index {i} is None or not a list/array.")
 
-                # Convert distance to a score people can understand (0-100)
-                similarity_score = np.exp(-distance) * 100 if distance is not None else 0.0
+                if distance is None:
+                    print(f"Warning: Job ID {chroma_id} missing distance. Assigning lowest score.")
+                    similarity_score_percent = 0.0 
+                else:
+                    # ChromaDB with 'cosine' space returns distance = 1 - cosine_similarity
+                    # So, cosine_similarity = 1 - distance.
+                    # Score is cosine_similarity * 100.
+                    # Distance should ideally be between 0 (identical) and 1 (orthogonal) or up to 2 (opposite).
+                    # If distance is truly 1-sim, and sim is [-1, 1], then distance is [0, 2].
+                    # Let's assume distance is already a value where smaller is better.
+                    # A common way to map distance [0, ~1 or ~2] to similarity [100, 0]
+                    # If distance is 1 - cosine_similarity, then similarity = 1 - distance.
+                    # To get percent, (1 - distance) * 100. Clamping distance to [0,1] is safer for this.
+                    clamped_distance = min(max(float(distance), 0.0), 1.0) # Clamp to avoid scores > 100 or < 0 if dist is outside [0,1]
+                    similarity_score_percent = (1.0 - clamped_distance) * 100.0
+                
+                job_skills_str = metadata.get('Skills_Json_Str', '[]')
+                try:
+                    job_skills_list = json.loads(job_skills_str) if isinstance(job_skills_str, str) else []
+                except json.JSONDecodeError:
+                    job_skills_list = []
+                    print(f"Warning: Could not parse Skills_Json_Str for job {chroma_id}: {job_skills_str[:50]}")
 
-                # Add to matches
-                matches.append({
+
+                contributing_cv_skills = []
+                if job_embedding is not None and cv_skills: 
+                     # cv_skill_embedding is the overall embedding for the CV
+                     contributing_cv_skills = explain_job_match(cv_skills, job_skills_list, cv_skill_embedding, job_embedding)
+
+                match_data = {
                     "chroma_id": chroma_id,
-                    "score": similarity_score,
-                    "type": "ChromaDB similarity",
+                    "score": similarity_score_percent,
                     "Title": metadata.get('Title', 'N/A'),
                     "Company": metadata.get('Company', 'N/A'),
                     "Area": metadata.get('Area', 'N/A'),
-                    "url": metadata.get('Application_URL', metadata.get('URL', '#')),
-                    "posting_date": metadata.get('Published_Date', 'N/A'),
-                    "Status": metadata.get('Status', 'unknown')
-                })
+                    "url": metadata.get('Application_URL', metadata.get('URL', '#')), 
+                    "Status": metadata.get('Status', 'unknown'),
+                    "document_text": document_text, 
+                    "job_skills": job_skills_list, 
+                    "contributing_skills": contributing_cv_skills
+                }
+                matches.append(match_data)
+            
+            print(f"Processed {len(matches)} matches from ChromaDB results.")
         else:
-            print("No results from ChromaDB or weird format.")
+            print("No results or unexpected format from ChromaDB query. 'results.ids[0]' might be empty or not a list.")
 
         return matches, "ChromaDB Vector Search"
 
     except Exception as e:
-        print(f"ChromaDB search error: {e}")
+        print(f"Error during ChromaDB search: {e}")
         traceback.print_exc()
-        return [], "ChromaDB search failed"
+        return [], f"ChromaDB Search Failed: {e}"
 
-
-# For testing
 if __name__ == "__main__":
-    print("cv_match_hf loaded.")
-
-    # Quick test
-    print(f"\n--- Test Run ---")
-    if EMBEDDING_API_URL and CHROMA_HOST and CHROMA_PORT and COLLECTION_NAME:
-        try:
-            # Danish CV sample
-            sample_cv = "Jeg er en erfaren software udvikler med kompetencer i Python og cloud infrastruktur."
-
-            # Test it
-            matches, message = find_similar_jobs(sample_cv, top_n=3)
-            print(f"Search result: {message}")
-
-            if matches:
-                print(f"Found {len(matches)} matches.")
-                # Uncomment to see details
-                # print(matches[0])
-            else:
-                print("No matches found.")
-
-        except Exception as e:
-            print(f"Test failed: {e}")
+    print("cv_match.py loaded for direct execution test.")
+    if not all([EMBEDDING_API_URL, CHROMA_HOST, CHROMA_PORT_STR, COLLECTION_NAME]):
+        print("Skipping test: Missing one or more required .env variables for full test.")
     else:
-        print("Skipping test - missing config.")
+        sample_cv_skills_list = ["Python", "machine learning", "data analysis", "communication", "projektledelse", "SQL"]
+        print(f"Test CV Skills: {sample_cv_skills_list}")
+        
+        test_cv_skill_embedding = generate_embedding_for_skills(sample_cv_skills_list)
+        
+        if test_cv_skill_embedding:
+            print(f"Generated test CV embedding (first 5 dims): {test_cv_skill_embedding[:5]}")
+            job_matches_found, message_status = find_similar_jobs(test_cv_skill_embedding, sample_cv_skills_list, top_n=5)
+            print(f"Search Status: {message_status}")
+            if job_matches_found:
+                print(f"Found {len(job_matches_found)} job matches:")
+                for i_match, match_item in enumerate(job_matches_found):
+                    print(f"\n  {i_match+1}. Title: {match_item['Title']}")
+                    print(f"     Score: {match_item['score']:.2f}%")
+                    print(f"     Company: {match_item['Company']}, Area: {match_item['Area']}")
+                    # print(f"     Job Skills: {match_item.get('job_skills', [])[:5]}") # Print first 5 job skills
+                    print(f"     Contributing CV Skills: {[(s_item[0], round(s_item[1], 3)) for s_item in match_item.get('contributing_skills', [])]}")
+            else:
+                print("No job matches found for the test CV skills.")
+        else:
+            print("Failed to generate embedding for test CV skills.")
