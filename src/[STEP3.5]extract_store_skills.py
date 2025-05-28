@@ -14,7 +14,7 @@ print("--- exctract_store_skills.py: Script Started ---", flush=True)
 HTML_CHUNK_SIZE_FOR_TEST = int(os.getenv('HTML_CHUNK_SIZE', 8000))
 MAX_CHUNKS_FOR_TEST = int(os.getenv('MAX_CHUNKS_FOR_TEST', 10)) 
 PRINT_PROCESSED_TEXT_IN_LOG = os.getenv('PRINT_PROCESSED_TEXT_IN_LOG', 'False').lower() == 'true'
-MAX_SOURCE_TEXT_PRINT_SNIPPET_LENGTH = 1500
+MAX_SOURCE_TEXT_PRINT_SNIPPET_LENGTH = 5000
 
 
 TIMESTAMP_STR = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -238,14 +238,10 @@ if MONGO_URI_FROM_ENV and MONGO_DB_NAME_FROM_ENV and MONGO_COLLECTION_FROM_ENV:
             {
                 "html_content": {"$exists": True, "$ne": None, "$ne": ""},
                 "Status": "active",
-                "skills": {"$exists": False}, # Add condition for missing skills
-                "experience_level_required": {"$exists": False}, # Add condition for missing experience
-                "education_level_preferred": {"$exists": False}, # Add condition for missing education
-                "job_type": {"$exists": False}, # Add condition for missing job type
-                "language_requirements": {"$exists": False} # Add condition for missing language requirements
+                "skills": {"$exists": False}  # Only check for missing skills
             },
             {"_id": 1, "Title": 1, "html_content": 1}
-        )) # Fetch 30 samples for testing
+        ))
         if mongo_samples:
             print(f"exctract_store_skills.py: Found {len(mongo_samples)} active samples from MongoDB that are missing extraction data.", flush=True)
             for i, sample_doc in enumerate(mongo_samples):
