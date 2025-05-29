@@ -7,6 +7,7 @@ from tqdm import tqdm
 from datetime import datetime
 from pymongo import MongoClient
 from chromadb import HttpClient, Settings as ChromaSettings
+import chromadb # Import for chromadb.errors
 import time
 import traceback 
 
@@ -114,53 +115,67 @@ def main_import_to_chroma():
         mongo_jobs_collection = mongo_db[COLLECTION_NAME_MONGO_STEP4]; log_message_step4("Connected to MongoDB.")
 
         chroma_client_obj = HttpClient(host=CHROMA_HOST, port=CHROMA_PORT, settings=ChromaSettings(anonymized_telemetry=False))
+        
         chroma_collection = None
-        collection_metric = "cosine" # Default to cosine
+        desired_metric = "cosine" # This is the metric we want the collection to use.
+        effective_metric = "" # To store the actual metric used
 
         try:
-            # Try to get the collection
             log_message_step4(f"Attempting to get Chroma Collection: '{CHROMA_COLLECTION_NAME_STEP4}'")
-            chroma_collection = chroma_client_obj.get_collection(name=CHROMA_COLLECTION_NAME_STEP4)
+            # Try to get the collection first to check its existing metric
+            temp_collection = chroma_client_obj.get_collection(name=CHROMA_COLLECTION_NAME_STEP4)
             
-            # Check metadata if collection was successfully retrieved
-            if chroma_collection:
-                collection_metadata = chroma_collection.metadata # This can be None
-                if collection_metadata is not None:
-                    retrieved_metric = collection_metadata.get("hnsw:space")
-                    if retrieved_metric:
-                        collection_metric = retrieved_metric
-                        if collection_metric != "cosine":
-                            log_message_step4(f"WARNING: Chroma Collection '{CHROMA_COLLECTION_NAME_STEP4}' exists but metric is '{collection_metric}'. 'cosine' is recommended.")
-                    else:
-                        log_message_step4(f"WARNING: Chroma Collection '{CHROMA_COLLECTION_NAME_STEP4}' has metadata but 'hnsw:space' (metric) is not set. Defaulting to assume 'cosine'.")
-                else:
-                    log_message_step4(f"WARNING: Chroma Collection '{CHROMA_COLLECTION_NAME_STEP4}' exists but its metadata is None or not retrievable. Assuming 'cosine' or default behavior.")
-            else: # This case should ideally not be reached if get_collection raises an error on not found
-                log_message_step4(f"Chroma Collection '{CHROMA_COLLECTION_NAME_STEP4}' not found by get_collection. Will attempt to create.")
+            # Collection exists, check its metric
+            collection_metadata = temp_collection.metadata 
+            current_metric = "l2" # Chroma's default if not specified in metadata
+            if collection_metadata and "hnsw:space" in collection_metadata:
+                current_metric = collection_metadata["hnsw:space"]
 
-        except Exception as e_get_coll: # Catches errors from get_collection (e.g., collection does not exist)
-            log_message_step4(f"Chroma Collection '{CHROMA_COLLECTION_NAME_STEP4}' not found or error during get_collection: {e_get_coll}. Attempting to create.")
-            chroma_collection = None # Ensure it's None so we try to create it
+            if current_metric == desired_metric:
+                log_message_step4(f"Chroma Collection '{CHROMA_COLLECTION_NAME_STEP4}' already exists with the desired '{desired_metric}' metric.")
+                chroma_collection = temp_collection
+                effective_metric = desired_metric
+            else:
+                log_message_step4(f"WARNING: Chroma Collection '{CHROMA_COLLECTION_NAME_STEP4}' exists with metric '{current_metric}', but '{desired_metric}' is required.")
+                log_message_step4(f"Deleting existing collection '{CHROMA_COLLECTION_NAME_STEP4}' to recreate with '{desired_metric}' metric.")
+                try:
+                    chroma_client_obj.delete_collection(name=CHROMA_COLLECTION_NAME_STEP4)
+                    log_message_step4(f"Successfully deleted collection '{CHROMA_COLLECTION_NAME_STEP4}'.")
+                    chroma_collection = None # Signal to recreate it
+                except Exception as e_delete:
+                    log_message_step4(f"ERROR: Failed to delete existing collection '{CHROMA_COLLECTION_NAME_STEP4}': {e_delete}. Exiting.")
+                    return
+        
+        except chromadb.errors.CollectionNotDefinedError: # Specific ChromaDB error for not found
+             log_message_step4(f"Chroma Collection '{CHROMA_COLLECTION_NAME_STEP4}' not found. Will be created with '{desired_metric}' metric.")
+             chroma_collection = None # Signal to create it
+        except Exception as e_get_coll: # Catch other potential errors during get_collection
+            log_message_step4(f"An unexpected error occurred while trying to get collection '{CHROMA_COLLECTION_NAME_STEP4}': {e_get_coll}. Assuming it needs to be created.")
+            chroma_collection = None # Signal to create it
 
-        # If collection is still None (either not found or get_collection failed silently), create it
+        # If collection is None (either not found, or was deleted due to metric mismatch), create it
         if chroma_collection is None:
             try:
-                log_message_step4(f"Creating Chroma Collection '{CHROMA_COLLECTION_NAME_STEP4}' with 'cosine' metric.")
-                chroma_collection = chroma_client_obj.create_collection(name=CHROMA_COLLECTION_NAME_STEP4, metadata={"hnsw:space": "cosine"})
-                collection_metric = "cosine" # Explicitly set after creation
-                if chroma_collection is None: # If creation also fails
-                    log_message_step4(f"ERROR: Failed to create Chroma Collection '{CHROMA_COLLECTION_NAME_STEP4}' even after attempting. Exiting.")
-                    return 
-                log_message_step4(f"Successfully created Chroma Collection '{CHROMA_COLLECTION_NAME_STEP4}'.")
+                log_message_step4(f"Creating Chroma Collection '{CHROMA_COLLECTION_NAME_STEP4}' with '{desired_metric}' metric.")
+                chroma_collection = chroma_client_obj.create_collection(
+                    name=CHROMA_COLLECTION_NAME_STEP4, 
+                    metadata={"hnsw:space": desired_metric}
+                )
+                effective_metric = desired_metric 
+                log_message_step4(f"Successfully created Chroma Collection '{CHROMA_COLLECTION_NAME_STEP4}' with '{desired_metric}' metric.")
             except Exception as e_create_coll:
                 log_message_step4(f"ERROR: Critical failure creating Chroma Collection '{CHROMA_COLLECTION_NAME_STEP4}': {e_create_coll}. Exiting.")
                 return
+        
+        if not chroma_collection: # Should not happen if creation was successful or get was successful
+            log_message_step4(f"ERROR: Chroma collection object is unexpectedly None after get/create attempts. Exiting.")
+            return
 
-        log_message_step4(f"Using ChromaDB collection: '{CHROMA_COLLECTION_NAME_STEP4}' (Effective Metric: '{collection_metric}')")
+        log_message_step4(f"Using ChromaDB collection: '{CHROMA_COLLECTION_NAME_STEP4}' (Effective Metric: '{effective_metric}')")
 
 
         try: existing_chroma_ids = set(chroma_collection.get(include=[])['ids'])
-        except Exception: existing_chroma_ids = set()
+        except Exception: existing_chroma_ids = set() # Should be empty if we just created/recreated it
         log_message_step4(f"Found {len(existing_chroma_ids)} existing document IDs in ChromaDB.")
 
         mongo_query = {
