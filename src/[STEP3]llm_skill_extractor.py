@@ -99,8 +99,7 @@ def extract_job_details_with_llm(job_text):
         "options": {
             "num_predict": 8192,  # Max tokens for the output
             "num_ctx": 8192,      # Context window size (input + output)
-            "seed": 101,          # For reproducible outputs
-            "temperature": 0.1    # Controls randomness/creativity
+            "temperature": 0.4    # Controls randomness/creativity
         },
         "stream": False
     }
