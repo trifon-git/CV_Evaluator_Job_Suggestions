@@ -8,6 +8,9 @@ src/import_sql_to_mongo.py
 src/reset_chroma_db.py
 src/list_experience_levels.py
 src/remove_mongo_fields.py
+src/inspect_chroma_data.py
+src/inspect_chroma.py
+
 
 *.db
 data/job_listings.db

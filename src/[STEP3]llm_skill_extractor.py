@@ -69,7 +69,7 @@ CUSTOM_LLM_MODEL = os.getenv("CUSTOM_LLM_MODEL_NAME")
 if CUSTOM_LLM_API_URL and CUSTOM_LLM_MODEL:
     API_URL = CUSTOM_LLM_API_URL
 
-    print(f"INFO ([STEP3]llm_skill_extractor): Using Custom LLM API: {CUSTOM_LLM_API_URL} with model: {CUSTOM_LLM_MODEL}")
+    print(f"INFO ([STEP3]llm_skill_extractor): Using Custom LLM API")
 else:
     raise ValueError("CUSTOM_LLM_API_URL and CUSTOM_LLM_MODEL_NAME must be set in the environment.")
 

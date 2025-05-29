@@ -36,41 +36,78 @@ EXPERIENCE_LEVEL_HIERARCHY_TEST = [
 ]
 
 try:
-    current_script_dir = os.path.dirname(os.path.abspath(__file__)); project_root_dir = os.path.dirname(current_script_dir)
+    current_script_dir = os.path.dirname(os.path.abspath(__file__))
+    project_root_dir = os.path.dirname(current_script_dir)
     dotenv_path = os.path.join(project_root_dir, '.env')
-    skill_extractor_module_name_on_disk = '[STEP3]llm_skill_extractor.py' 
+    skill_extractor_module_name_on_disk = '[STEP3]llm_skill_extractor.py'
     skill_extractor_module_path = os.path.join(current_script_dir, skill_extractor_module_name_on_disk)
-except Exception as e: print(f"exctract_store_skills.py: ERROR during path determination: {e}", flush=True); sys.exit(1)
-print(f"exctract_store_skills.py: Current script directory: {current_script_dir}", flush=True);print(f"exctract_store_skills.py: Determined project root: {project_root_dir}", flush=True)
-print(f"exctract_store_skills.py: Expected .env path: {dotenv_path}", flush=True); print(f"exctract_store_skills.py: Expected skill_extractor module path: {skill_extractor_module_path}", flush=True)
+except Exception as e:
+    print(f"exctract_store_skills.py: ERROR during path determination: {e}", flush=True)
+    sys.exit(1)
+
+print(f"exctract_store_skills.py: Current script directory: {current_script_dir}", flush=True)
+print(f"exctract_store_skills.py: Determined project root: {project_root_dir}", flush=True)
+print(f"exctract_store_skills.py: Expected .env path: {dotenv_path}", flush=True)
+print(f"exctract_store_skills.py: Expected skill_extractor module path: {skill_extractor_module_path}", flush=True)
 print("exctract_store_skills.py: Attempting to load .env file...", flush=True)
+
 if os.path.exists(dotenv_path):
     loaded_dotenv = load_dotenv(dotenv_path=dotenv_path, override=True)
-    if loaded_dotenv: print("exctract_store_skills.py: .env file loaded successfully.", flush=True)
-    else: print("exctract_store_skills.py: WARNING: load_dotenv() returned False.", flush=True)
-else: print(f"exctract_store_skills.py: WARNING: .env file NOT found at {dotenv_path}.", flush=True)
-NGROK_API_URL_FROM_ENV = os.getenv('NGROK_API_URL'); OLLAMA_API_URL_FROM_ENV = os.getenv('OLLAMA_API_URL'); OLLAMA_MODEL_NAME_FROM_ENV = os.getenv('OLLAMA_MODEL_NAME')
-MONGO_URI_FROM_ENV = os.getenv('MONGO_URI'); MONGO_DB_NAME_FROM_ENV = os.getenv('MONGO_DB_NAME'); MONGO_COLLECTION_FROM_ENV = os.getenv('MONGO_COLLECTION')#MONGO_COLLECTION_FROM_ENV = "backup_daily_20250521_022726" 
-if OLLAMA_API_URL_FROM_ENV and OLLAMA_MODEL_NAME_FROM_ENV: print(f"exctract_store_skills.py: [STEP3]llm_skill_extractor.py will use Local Ollama: {OLLAMA_API_URL_FROM_ENV}, Model: {OLLAMA_MODEL_NAME_FROM_ENV}", flush=True)
-elif NGROK_API_URL_FROM_ENV: print(f"exctract_store_skills.py: [STEP3]llm_skill_extractor.py will use NGROK API: ", flush=True)
-else: print("exctract_store_skills.py: WARNING: No LLM API URLs configured in .env for [STEP3]!", flush=True)
-print(f"exctract_store_skills.py: MONGO_URI from env: {'***' if MONGO_URI_FROM_ENV else None}", flush=True); print(f"exctract_store_skills.py: MONGO_DB_NAME from env: {MONGO_DB_NAME_FROM_ENV}", flush=True); print(f"exctract_store_skills.py: MONGO_COLLECTION from env: {MONGO_COLLECTION_FROM_ENV}", flush=True)
-print(f"exctract_store_skills.py: HTML_CHUNK_SIZE_FOR_TEST: {HTML_CHUNK_SIZE_FOR_TEST}", flush=True); print(f"exctract_store_skills.py: MAX_CHUNKS_FOR_TEST: {MAX_CHUNKS_FOR_TEST}", flush=True)
+    if loaded_dotenv:
+        print("exctract_store_skills.py: .env file loaded successfully.", flush=True)
+    else:
+        print("exctract_store_skills.py: WARNING: load_dotenv() returned False.", flush=True)
+else:
+    print(f"exctract_store_skills.py: WARNING: .env file NOT found at {dotenv_path}.", flush=True)
+
+NGROK_API_URL_FROM_ENV = os.getenv('NGROK_API_URL')
+OLLAMA_API_URL_FROM_ENV = os.getenv('OLLAMA_API_URL')
+OLLAMA_MODEL_NAME_FROM_ENV = os.getenv('OLLAMA_MODEL_NAME')
+MONGO_URI_FROM_ENV = os.getenv('MONGO_URI')
+MONGO_DB_NAME_FROM_ENV = os.getenv('MONGO_DB_NAME')
+MONGO_COLLECTION_FROM_ENV = os.getenv('MONGO_COLLECTION') # MONGO_COLLECTION_FROM_ENV = "backup_daily_20250521_022726"
+
+if OLLAMA_API_URL_FROM_ENV and OLLAMA_MODEL_NAME_FROM_ENV:
+    print(f"exctract_store_skills.py: [STEP3]llm_skill_extractor.py will use Local Ollama, Model: {OLLAMA_MODEL_NAME_FROM_ENV}", flush=True)
+elif NGROK_API_URL_FROM_ENV:
+    print(f"exctract_store_skills.py: [STEP3]llm_skill_extractor.py will use NGROK API: ", flush=True) # Consider adding the NGROK URL here if available
+else:
+    print("exctract_store_skills.py: WARNING: No LLM API URLs configured in .env for [STEP3]!", flush=True)
+
+print(f"exctract_store_skills.py: MONGO_URI from env: {'***' if MONGO_URI_FROM_ENV else None}", flush=True)
+print(f"exctract_store_skills.py: MONGO_DB_NAME from env: {MONGO_DB_NAME_FROM_ENV}", flush=True)
+print(f"exctract_store_skills.py: MONGO_COLLECTION from env: {MONGO_COLLECTION_FROM_ENV}", flush=True)
+print(f"exctract_store_skills.py: HTML_CHUNK_SIZE_FOR_TEST: {HTML_CHUNK_SIZE_FOR_TEST}", flush=True)
+print(f"exctract_store_skills.py: MAX_CHUNKS_FOR_TEST: {MAX_CHUNKS_FOR_TEST}", flush=True)
 print(f"exctract_store_skills.py: PRINT_PROCESSED_TEXT_IN_LOG: {PRINT_PROCESSED_TEXT_IN_LOG}", flush=True)
-if not PRINT_PROCESSED_TEXT_IN_LOG: print(f"exctract_store_skills.py: MAX_SOURCE_TEXT_PRINT_SNIPPET_LENGTH (if not printing full to log): {MAX_SOURCE_TEXT_PRINT_SNIPPET_LENGTH}", flush=True)
+
+if not PRINT_PROCESSED_TEXT_IN_LOG:
+    print(f"exctract_store_skills.py: MAX_SOURCE_TEXT_PRINT_SNIPPET_LENGTH (if not printing full to log): {MAX_SOURCE_TEXT_PRINT_SNIPPET_LENGTH}", flush=True)
 
 print(f"exctract_store_skills.py: Attempting to import module: {skill_extractor_module_name_on_disk}", flush=True)
 imported_llm_function = None
-if not os.path.exists(skill_extractor_module_path): print(f"exctract_store_skills.py: ERROR: Module file not found at {skill_extractor_module_path}", flush=True); sys.exit(1)
+
+if not os.path.exists(skill_extractor_module_path):
+    print(f"exctract_store_skills.py: ERROR: Module file not found at {skill_extractor_module_path}", flush=True)
+    sys.exit(1)
+
 try:
-    module_name_for_import = 'skill_extractor_module_step3_for_test'; spec = importlib.util.spec_from_file_location(module_name_for_import, skill_extractor_module_path)
-    if spec is None: print(f"exctract_store_skills.py: ERROR: Could not load spec for module at {skill_extractor_module_path}", flush=True); sys.exit(1)
-    skill_extractor_module_object = importlib.util.module_from_spec(spec); sys.modules[module_name_for_import] = skill_extractor_module_object; spec.loader.exec_module(skill_extractor_module_object)
+    module_name_for_import = 'skill_extractor_module_step3_for_test'
+    spec = importlib.util.spec_from_file_location(module_name_for_import, skill_extractor_module_path)
+    if spec is None:
+        print(f"exctract_store_skills.py: ERROR: Could not load spec for module at {skill_extractor_module_path}", flush=True)
+        sys.exit(1)
+    skill_extractor_module_object = importlib.util.module_from_spec(spec)
+    sys.modules[module_name_for_import] = skill_extractor_module_object
+    spec.loader.exec_module(skill_extractor_module_object)
     imported_llm_function = getattr(skill_extractor_module_object, 'extract_job_details_with_llm', None)
-    if imported_llm_function is None: 
+    if imported_llm_function is None:
         imported_llm_function = getattr(skill_extractor_module_object, 'extract_skills_with_llm', None)
-        if imported_llm_function: print("exctract_store_skills.py: WARNING: Using fallback function name 'extract_skills_with_llm'.")
-        else: print("exctract_store_skills.py: ERROR: 'extract_job_details_with_llm' or 'extract_skills_with_llm' function not found.", flush=True); sys.exit(1)
+        if imported_llm_function:
+            print("exctract_store_skills.py: WARNING: Using fallback function name 'extract_skills_with_llm'.")
+        else:
+            print("exctract_store_skills.py: ERROR: 'extract_job_details_with_llm' or 'extract_skills_with_llm' function not found.", flush=True)
+            sys.exit(1)
     print(f"exctract_store_skills.py: Successfully imported LLM extraction function.", flush=True)
 except Exception as e: print(f"exctract_store_skills.py: ERROR during module import: {e}", flush=True); import traceback; traceback.print_exc(); sys.exit(1)
 
