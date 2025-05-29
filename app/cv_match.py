@@ -68,7 +68,7 @@ def get_remote_embedding_batch(texts_batch):
             return [None] * len(texts_batch)
     except Exception as e:
         print(f"Error calling remote embedding API: {e}")
-        traceback.print_exc() # Print full traceback for remote API errors
+        traceback.print_exc() 
         return [None] * len(texts_batch)
 
 def generate_embedding_for_skills(skills_list):
@@ -113,12 +113,10 @@ def generate_embedding_for_skills(skills_list):
 def cosine_similarity_np(vec1, vec2):
     if vec1 is None or vec2 is None: return 0.0
     vec1_np, vec2_np = np.array(vec1), np.array(vec2)
-    # Ensure vectors are not zero vectors and have same dimension
     if vec1_np.shape != vec2_np.shape or np.all(vec1_np==0) or np.all(vec2_np==0):
         return 0.0
     dot_product = np.dot(vec1_np, vec2_np)
     norm_vec1, norm_vec2 = np.linalg.norm(vec1_np), np.linalg.norm(vec2_np)
-    # Check for zero norm to avoid division by zero
     if norm_vec1 == 0 or norm_vec2 == 0:
         return 0.0
     return dot_product / (norm_vec1 * norm_vec2)
@@ -146,7 +144,6 @@ def explain_job_match(cv_skills, job_skills_from_meta, cv_embedding_overall, job
             print("Local model not available for CV skill embedding in explain_job_match.")
             return []
 
-    # Filter out skills for which embedding failed
     successfully_embedded_cv_skills = []
     successfully_embedded_cv_vectors = []
     for i, skill_text in enumerate(valid_cv_skills):
@@ -163,7 +160,6 @@ def explain_job_match(cv_skills, job_skills_from_meta, cv_embedding_overall, job
 
     for i, skill_text in enumerate(successfully_embedded_cv_skills):
         skill_vector = successfully_embedded_cv_vectors[i]
-        # Calculate similarity of this individual CV skill vector to the overall job embedding
         similarity = cosine_similarity_np(skill_vector, job_emb_np) 
         skill_contributions.append((skill_text, similarity))
 
@@ -207,28 +203,23 @@ def find_similar_jobs(cv_skill_embedding, cv_skills, top_n=None, active_only=Tru
             num_results = len(results['ids'][0])
             print(f"ChromaDB returned {num_results} raw results.")
 
-            # Pre-check structure of results for robustness
             distances_list = results.get('distances', [[]])[0] if results.get('distances') and results['distances'] else [None] * num_results
             metadatas_list = results.get('metadatas', [[]])[0] if results.get('metadatas') and results['metadatas'] else [{}] * num_results
             documents_list = results.get('documents', [[]])[0] if results.get('documents') and results['documents'] else [""] * num_results
             embeddings_list = results.get('embeddings', [[]])[0] if results.get('embeddings') and results['embeddings'] else [None] * num_results
 
-            # Ensure sub-lists have the expected length
             if not (len(distances_list) == num_results and \
                     len(metadatas_list) == num_results and \
                     len(documents_list) == num_results and \
                     len(embeddings_list) == num_results):
                 print("Warning: Mismatch in lengths of returned lists from ChromaDB query. Results might be incomplete.")
-                # Fallback to iterating only up to the shortest list to avoid IndexError
                 min_len = min(len(distances_list), len(metadatas_list), len(documents_list), len(embeddings_list), num_results)
                 if min_len < num_results:
                     print(f"Adjusting iteration from {num_results} to {min_len} due to list length mismatch.")
                 num_results = min_len
 
-
             for i in range(num_results):
                 chroma_id = results['ids'][0][i]
-                
                 distance = distances_list[i]
                 metadata = metadatas_list[i] if isinstance(metadatas_list[i], dict) else {}
                 document_text = documents_list[i] if isinstance(documents_list[i], str) else ""
@@ -237,23 +228,11 @@ def find_similar_jobs(cv_skill_embedding, cv_skills, top_n=None, active_only=Tru
                 job_embedding = None
                 if job_embedding_item is not None and (isinstance(job_embedding_item, list) or isinstance(job_embedding_item, np.ndarray)):
                     job_embedding = np.array(job_embedding_item)
-                else:
-                    print(f"Warning: Embedding for ID {chroma_id} at index {i} is None or not a list/array.")
 
                 if distance is None:
-                    print(f"Warning: Job ID {chroma_id} missing distance. Assigning lowest score.")
                     similarity_score_percent = 0.0 
                 else:
-                    # ChromaDB with 'cosine' space returns distance = 1 - cosine_similarity
-                    # So, cosine_similarity = 1 - distance.
-                    # Score is cosine_similarity * 100.
-                    # Distance should ideally be between 0 (identical) and 1 (orthogonal) or up to 2 (opposite).
-                    # If distance is truly 1-sim, and sim is [-1, 1], then distance is [0, 2].
-                    # Let's assume distance is already a value where smaller is better.
-                    # A common way to map distance [0, ~1 or ~2] to similarity [100, 0]
-                    # If distance is 1 - cosine_similarity, then similarity = 1 - distance.
-                    # To get percent, (1 - distance) * 100. Clamping distance to [0,1] is safer for this.
-                    clamped_distance = min(max(float(distance), 0.0), 1.0) # Clamp to avoid scores > 100 or < 0 if dist is outside [0,1]
+                    clamped_distance = min(max(float(distance), 0.0), 1.0) 
                     similarity_score_percent = (1.0 - clamped_distance) * 100.0
                 
                 job_skills_str = metadata.get('Skills_Json_Str', '[]')
@@ -263,24 +242,21 @@ def find_similar_jobs(cv_skill_embedding, cv_skills, top_n=None, active_only=Tru
                     job_skills_list = []
                     print(f"Warning: Could not parse Skills_Json_Str for job {chroma_id}: {job_skills_str[:50]}")
 
-
                 contributing_cv_skills = []
                 if job_embedding is not None and cv_skills: 
-                     # cv_skill_embedding is the overall embedding for the CV
                      contributing_cv_skills = explain_job_match(cv_skills, job_skills_list, cv_skill_embedding, job_embedding)
 
-                match_data = {
+                # --- THIS IS THE KEY CHANGE ---
+                match_data = {**metadata} # Spread all items from metadata
+                match_data.update({        # Add or override specific calculated/fixed fields
                     "chroma_id": chroma_id,
                     "score": similarity_score_percent,
-                    "Title": metadata.get('Title', 'N/A'),
-                    "Company": metadata.get('Company', 'N/A'),
-                    "Area": metadata.get('Area', 'N/A'),
-                    "url": metadata.get('Application_URL', metadata.get('URL', '#')), 
-                    "Status": metadata.get('Status', 'unknown'),
                     "document_text": document_text, 
                     "job_skills": job_skills_list, 
-                    "contributing_skills": contributing_cv_skills
-                }
+                    "contributing_skills": contributing_cv_skills,
+                    "url": metadata.get('Application_URL', metadata.get('URL', '#')) 
+                })
+                # --- END OF KEY CHANGE ---
                 matches.append(match_data)
             
             print(f"Processed {len(matches)} matches from ChromaDB results.")
@@ -311,10 +287,10 @@ if __name__ == "__main__":
             if job_matches_found:
                 print(f"Found {len(job_matches_found)} job matches:")
                 for i_match, match_item in enumerate(job_matches_found):
-                    print(f"\n  {i_match+1}. Title: {match_item['Title']}")
-                    print(f"     Score: {match_item['score']:.2f}%")
-                    print(f"     Company: {match_item['Company']}, Area: {match_item['Area']}")
-                    # print(f"     Job Skills: {match_item.get('job_skills', [])[:5]}") # Print first 5 job skills
+                    print(f"\n  {i_match+1}. Title: {match_item.get('Title', 'N/A')}") # Use .get() for safety
+                    print(f"     Score: {match_item.get('score', 0.0):.2f}%")
+                    print(f"     Company: {match_item.get('Company', 'N/A')}, Area: {match_item.get('Area', 'N/A')}")
+                    print(f"     Category: {match_item.get('Category', 'N/A')}") # Test: print Category
                     print(f"     Contributing CV Skills: {[(s_item[0], round(s_item[1], 3)) for s_item in match_item.get('contributing_skills', [])]}")
             else:
                 print("No job matches found for the test CV skills.")
