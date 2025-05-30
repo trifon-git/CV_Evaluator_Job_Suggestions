@@ -136,9 +136,9 @@ def save_extraction_to_file(data_to_save, source_details):
 # --- Main Test Execution Function (Chunked Only) ---
 def test_llm_with_chunking(description_text, source_identifier, job_title_for_file="N/A", mongo_doc_id_for_file="N/A"):
     print(f"\n--- exctract_store_skills.py: Testing LLM WITH CHUNKING on text from: {source_identifier} ---", flush=True)
-    if not (OLLAMA_API_URL_FROM_ENV or NGROK_API_URL_FROM_ENV): print("exctract_store_skills.py: ERROR: No API URL configured.", flush=True); return
-    if imported_llm_function is None: print("exctract_store_skills.py: ERROR: extraction function is not available.", flush=True); return
-    if not description_text or not isinstance(description_text, str) or not description_text.strip(): print("exctract_store_skills.py: INFO: Provided text is empty or invalid. Skipping.", flush=True); return
+    if not (OLLAMA_API_URL_FROM_ENV or NGROK_API_URL_FROM_ENV): print("exctract_store_skills.py: ERROR: No API URL configured.", flush=True); return None
+    if imported_llm_function is None: print("exctract_store_skills.py: ERROR: extraction function is not available.", flush=True); return None
+    if not description_text or not isinstance(description_text, str) or not description_text.strip(): print("exctract_store_skills.py: INFO: Provided text is empty or invalid. Skipping.", flush=True); return None
 
     detected_main_language_name_test = "Unknown"
     try:
@@ -151,59 +151,81 @@ def test_llm_with_chunking(description_text, source_identifier, job_title_for_fi
 
 
     html_chunks_full = chunk_html_content(description_text, HTML_CHUNK_SIZE_FOR_TEST);
-    if not html_chunks_full: print(f"exctract_store_skills.py: No chunks generated for {source_identifier}. Skipping.", flush=True); return
+    if not html_chunks_full: print(f"exctract_store_skills.py: No chunks generated for {source_identifier}. Skipping.", flush=True); return None
     
-    # Check if the number of chunks is 10 or more
-    if len(html_chunks_full) >= 10:  # Use MAX_CHUNKS_FOR_TEST if you prefer it to be configurable
-        print(f"exctract_store_skills.py: SKIPPING {source_identifier}: Text split into {len(html_chunks_full)} chunks (>= 10). Not processing.", flush=True)
-        return # Skip processing for this job
+    if len(html_chunks_full) >= MAX_CHUNKS_FOR_TEST:
+        print(f"exctract_store_skills.py: SKIPPING {source_identifier}: Text split into {len(html_chunks_full)} chunks (>= {MAX_CHUNKS_FOR_TEST}). Not processing.", flush=True)
+        return None 
 
     html_chunks_to_process = html_chunks_full
     print(f"exctract_store_skills.py: Processing {len(html_chunks_to_process)} chunk(s) for {source_identifier}.", flush=True)
     processed_text_concatenated_for_log = ""
 
     
-    aggregated_details_accumulator_test = { "skills": set(), "experience_level_required": "Not specified", "language_requirements": [], "education_level_preferred": "Not specified", "job_type": "Not specified" }
-    llm_extracted_languages_map_test = {}; total_api_calls = 0
+    aggregated_details_accumulator_test = {
+        "skills": set(),
+        "experience_level_required": "Not specified",
+        "language_requirements": set(),  # Changed to set for storing unique language names
+        "education_level_preferred": "Not specified",
+        "job_type": "Not specified"
+    }
+    total_api_calls = 0 # Removed llm_extracted_languages_map_test
 
     for i, chunk in enumerate(html_chunks_to_process):
         if PRINT_PROCESSED_TEXT_IN_LOG: processed_text_concatenated_for_log += chunk
         elif len(processed_text_concatenated_for_log) < MAX_SOURCE_TEXT_PRINT_SNIPPET_LENGTH : processed_text_concatenated_for_log += chunk
 
-        print(f"  Processing chunk {i+1}/{len(html_chunks_to_process)} (length: {len(chunk)} chars) for {source_identifier}", flush=True) # Modified print for chunk number and character count
+        print(f"  Processing chunk {i+1}/{len(html_chunks_to_process)} (length: {len(chunk)} chars) for {source_identifier}", flush=True)
         try:
             llm_response_dict = imported_llm_function(chunk); total_api_calls += 1
             if not llm_response_dict or not isinstance(llm_response_dict, dict): print(f"  WARNING for {source_identifier} chunk {i+1}: Invalid or no data dict from LLM. Data: {llm_response_dict}", flush=True); continue
-            # print(f"  LLM response for chunk {i+1} (full dict): {json.dumps(llm_response_dict, indent=2, ensure_ascii=False)}", flush=True) # Very verbose
 
-            skills_from_chunk = llm_response_dict.get('skills', []) # ... (Aggregation logic same as before)
-            if isinstance(skills_from_chunk, list): [aggregated_details_accumulator_test["skills"].add(s.strip()) for s in skills_from_chunk if isinstance(s, str) and s.strip()]
+            skills_from_chunk = llm_response_dict.get('skills', [])
+            if isinstance(skills_from_chunk, list):
+                for s in skills_from_chunk:
+                    if isinstance(s, str) and s.strip():
+                        aggregated_details_accumulator_test["skills"].add(s.strip())
+
             chunk_exp = llm_response_dict.get("experience_level_required"); current_agg_exp = aggregated_details_accumulator_test["experience_level_required"]
             if chunk_exp and chunk_exp != "Not specified":
                 if current_agg_exp == "Not specified": aggregated_details_accumulator_test["experience_level_required"] = chunk_exp
                 elif isinstance(chunk_exp, list): 
-                    if isinstance(current_agg_exp, list): aggregated_details_accumulator_test["experience_level_required"] = sorted(list(set(current_agg_exp + chunk_exp)))
-                    else: aggregated_details_accumulator_test["experience_level_required"] = sorted(list(set([current_agg_exp] + chunk_exp)))
-                elif isinstance(current_agg_exp, list): 
-                    if chunk_exp not in current_agg_exp: current_agg_exp.append(chunk_exp); aggregated_details_accumulator_test["experience_level_required"] = sorted(list(set(current_agg_exp)))
-                elif isinstance(current_agg_exp, str) and current_agg_exp != chunk_exp : aggregated_details_accumulator_test["experience_level_required"] = sorted(list(set([current_agg_exp, chunk_exp])))
+                    valid_chunk_exp = [ce for ce in chunk_exp if isinstance(ce, str) and ce.strip()]
+                    if not valid_chunk_exp: # if chunk_exp is like ["", None]
+                        pass # current_agg_exp remains unchanged
+                    elif isinstance(current_agg_exp, list): 
+                        current_agg_exp.extend(valid_chunk_exp)
+                        aggregated_details_accumulator_test["experience_level_required"] = sorted(list(set(current_agg_exp)))
+                    else: # current_agg_exp is a string
+                        new_exp_list = [current_agg_exp] + valid_chunk_exp
+                        aggregated_details_accumulator_test["experience_level_required"] = sorted(list(set(new_exp_list)))
+                elif isinstance(current_agg_exp, list): # chunk_exp is a string
+                     if chunk_exp not in current_agg_exp: 
+                        current_agg_exp.append(chunk_exp)
+                        aggregated_details_accumulator_test["experience_level_required"] = sorted(list(set(current_agg_exp)))
+                elif isinstance(current_agg_exp, str) and current_agg_exp != chunk_exp : # both are strings
+                    aggregated_details_accumulator_test["experience_level_required"] = sorted(list(set([current_agg_exp, chunk_exp])))
+            
             for key_s in ["education_level_preferred", "job_type"]:
                 chunk_val_s = llm_response_dict.get(key_s)
-                if chunk_val_s and chunk_val_s != "Not specified":
-                    if aggregated_details_accumulator_test[key_s] == "Not specified": aggregated_details_accumulator_test[key_s] = chunk_val_s
-            langs_from_chunk_llm = llm_response_dict.get('language_requirements', [])
+                if isinstance(chunk_val_s, str) and chunk_val_s.strip() and chunk_val_s != "Not specified": # Ensure it's a valid string
+                    if aggregated_details_accumulator_test[key_s] == "Not specified": 
+                        aggregated_details_accumulator_test[key_s] = chunk_val_s
+                    # If already set, typically we prefer the first valid one found or a more specific logic if needed.
+                    # For now, it keeps the first valid one.
+            
+            # Updated language requirements aggregation
+            langs_from_chunk_llm = llm_response_dict.get('language_requirements', []) # Expected: list of strings
             if isinstance(langs_from_chunk_llm, list):
-                for lang_obj in langs_from_chunk_llm:
-                    if isinstance(lang_obj, dict) and "language" in lang_obj and isinstance(lang_obj["language"], str):
-                        lang_name_original = lang_obj["language"].strip(); lang_name_lower = lang_name_original.lower()
-                        proficiency = lang_obj.get("proficiency", "Not specified").strip()
-                        if lang_name_original and (lang_name_lower not in llm_extracted_languages_map_test or \
-                           (llm_extracted_languages_map_test[lang_name_lower]["proficiency"] == "Not specified" and proficiency != "Not specified")):
-                           llm_extracted_languages_map_test[lang_name_lower] = {"language": lang_name_original, "proficiency": proficiency}
-        except Exception as e: print(f"  ERROR processing chunk {i+1} for {source_identifier} with LLM: {e}", flush=True)
+                for lang_name_str in langs_from_chunk_llm:
+                    if isinstance(lang_name_str, str) and lang_name_str.strip():
+                        aggregated_details_accumulator_test["language_requirements"].add(lang_name_str.strip())
 
-    final_aggregated_dict_to_print = {} # ... (Final aggregation logic same as before) ...
+        except Exception as e: print(f"  ERROR processing chunk {i+1} for {source_identifier} with LLM: {e}", flush=True); import traceback; traceback.print_exc()
+
+    final_aggregated_dict_to_print = {}
     final_aggregated_dict_to_print['skills'] = sorted(list(aggregated_details_accumulator_test["skills"]))
+    
     current_exp_values_test_agg = aggregated_details_accumulator_test["experience_level_required"]; chosen_experience_level_test_agg = "Not specified"
     if isinstance(current_exp_values_test_agg, list):
         valid_exp_levels_test_agg = [lvl for lvl in current_exp_values_test_agg if isinstance(lvl, str) and lvl.strip() and lvl != "Not specified"]
@@ -219,19 +241,23 @@ def test_llm_with_chunking(description_text, source_identifier, job_title_for_fi
             chosen_experience_level_test_agg = highest_level_test_agg if highest_level_test_agg != "Not specified" else (temp_fallback_test[0] if temp_fallback_test else "Not specified")
     elif isinstance(current_exp_values_test_agg, str) and current_exp_values_test_agg.strip() and current_exp_values_test_agg != "Not specified": chosen_experience_level_test_agg = current_exp_values_test_agg
     final_aggregated_dict_to_print['experience_level_required'] = chosen_experience_level_test_agg
+    
     final_aggregated_dict_to_print['education_level_preferred'] = aggregated_details_accumulator_test["education_level_preferred"]
     final_aggregated_dict_to_print['job_type'] = aggregated_details_accumulator_test["job_type"]
-    final_test_languages = []; processed_final_lang_names_lower_test = set()
-    for lang_lower, lang_data in llm_extracted_languages_map_test.items(): final_test_languages.append(lang_data); processed_final_lang_names_lower_test.add(lang_lower)
-    if detected_main_language_name_test != "Unknown": # Python rule for main doc language
-        main_lang_lower_test = detected_main_language_name_test.lower()
-        is_main_lang_present = any(entry["language"].lower() == main_lang_lower_test for entry in final_test_languages)
-        if not is_main_lang_present: final_test_languages.append({"language": detected_main_language_name_test, "proficiency": "Fluent"})
-        else:
-            for lang_entry in final_test_languages:
-                if lang_entry["language"].lower() == main_lang_lower_test and lang_entry.get("proficiency", "Not specified") == "Not specified":
-                    lang_entry["proficiency"] = "Fluent"; break
-    final_aggregated_dict_to_print['language_requirements'] = sorted(final_test_languages, key=lambda x: x.get('language', ''))
+
+    # Final processing for language_requirements
+    final_languages_set = aggregated_details_accumulator_test["language_requirements"].copy() # Work with a copy
+    if detected_main_language_name_test != "Unknown":
+        # Add detected main document language if not already present (case-insensitive check)
+        already_present = False
+        for lang_in_set in final_languages_set:
+            if lang_in_set.lower() == detected_main_language_name_test.lower():
+                already_present = True
+                break
+        if not already_present:
+            final_languages_set.add(detected_main_language_name_test) # Add original casing
+
+    final_aggregated_dict_to_print['language_requirements'] = sorted(list(final_languages_set))
 
 
     print(f"\n  exctract_store_skills.py: Final Aggregated Details for '{source_identifier}' (Chunked - {total_api_calls} API calls):", flush=True)
@@ -303,11 +329,20 @@ if MONGO_URI_FROM_ENV and MONGO_DB_NAME_FROM_ENV and MONGO_COLLECTION_FROM_ENV:
                         
                         update_doc = {"$set": {}}
                        
-                        for key, value in extracted_data.items():
-                            
-                            if value is not None and (not isinstance(value, list) or value):
-                                update_doc["$set"][key] = value 
+                        # Ensure all expected fields are considered for update, even if empty lists (like skills or languages)
+                        # or "Not specified" for string fields, if that's the desired behavior for overwriting.
+                        # The current logic only sets fields if they have a "truthy" value or are non-empty lists.
+                        # This should be fine for language_requirements as an empty list is a valid state.
 
+                        for key, value in extracted_data.items():
+                            # This existing logic should correctly handle language_requirements as a list of strings
+                            if value is not None: # Allows empty lists to be set
+                                if isinstance(value, list): # For skills, language_requirements
+                                     update_doc["$set"][key] = value
+                                elif isinstance(value, str) and value.strip(): # For exp, edu, job_type
+                                     update_doc["$set"][key] = value
+                                elif isinstance(value, str) and key in ["experience_level_required", "education_level_preferred", "job_type"] and value == "Not specified":
+                                     update_doc["$set"][key] = value # Explicitly set "Not specified"
 
                         if update_doc["$set"]:
                             update_result = collection.update_one(
