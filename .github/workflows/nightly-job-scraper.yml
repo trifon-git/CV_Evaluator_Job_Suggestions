@@ -2,7 +2,7 @@ name: Job Scraper Every 2 Hours
 
 on:
   schedule:
-    - cron: '0 */7 * * *'
+    - cron: '0 */2 * * *'
   workflow_dispatch:  # Allow manual triggering
 
 jobs:
