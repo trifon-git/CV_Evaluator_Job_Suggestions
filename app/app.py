@@ -68,7 +68,7 @@ print("--- END STARTUP DEBUG ---")
 
 SIMILARITY_THRESHOLD = 40.0
 MAX_JOBS_TO_DISPLAY_PER_PAGE = 5
-TOP_N_RESULTS_FROM_SEARCH = int(os.getenv('TOP_N_RESULTS_FOR_APP_QUERY', '1000'))
+TOP_N_RESULTS_FROM_SEARCH = int(os.getenv('TOP_N_RESULTS_FOR_APP_QUERY', '100000'))
 CANONICAL_LANGUAGES_FOR_FILTER = ["English", "Danish", "German", "Spanish", "French", "Norwegian", "Swedish"]
 
 # --- Helper Functions ---
