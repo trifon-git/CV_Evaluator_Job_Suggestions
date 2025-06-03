@@ -121,154 +121,184 @@ def cosine_similarity_np(vec1, vec2):
         return 0.0
     return dot_product / (norm_vec1 * norm_vec2)
 
-def explain_job_match(cv_skills, job_skills_from_meta, cv_embedding_overall, job_embedding_from_chroma):
-    if not cv_skills or job_embedding_from_chroma is None:
-        return []
-        
-    valid_cv_skills = [s for s in cv_skills if isinstance(s, str) and s.strip()]
-    if not valid_cv_skills:
-        return []
-        
-    cv_individual_skill_vectors_list = []
-    if EMBEDDING_API_URL:
-        cv_individual_skill_vectors_list = get_remote_embedding_batch(valid_cv_skills)
-    else:
-        model = get_embedding_model()
-        if model:
-            try:
-                raw_embeddings = model.encode(valid_cv_skills, show_progress_bar=False)
-                cv_individual_skill_vectors_list = [np.array(e) for e in raw_embeddings]
-            except Exception as e:
-                print(f"Error embedding individual CV skills locally for explanation: {e}")
-        else:
-            print("Local model not available for CV skill embedding in explain_job_match.")
-            return []
-
-    successfully_embedded_cv_skills = []
-    successfully_embedded_cv_vectors = []
-    for i, skill_text in enumerate(valid_cv_skills):
-        if i < len(cv_individual_skill_vectors_list) and cv_individual_skill_vectors_list[i] is not None:
-            successfully_embedded_cv_skills.append(skill_text)
-            successfully_embedded_cv_vectors.append(cv_individual_skill_vectors_list[i])
-
-    if not successfully_embedded_cv_vectors:
-        print("No CV skills could be embedded for explanation.")
+def explain_job(cv_skills, job_skills_from_meta, cv_skill_embeddings_dict, job_embedding_from_chroma):
+    """
+    Optimized version that uses pre-calculated CV skill embeddings.
+    
+    Args:
+        cv_skills: List of CV skill strings
+        job_skills_from_meta: List of job skill strings (not used in current implementation)
+        cv_skill_embeddings_dict: Dict mapping CV skill strings to their embeddings
+        job_embedding_from_chroma: Job embedding vector from ChromaDB
+    """
+    # Fix the boolean check for numpy arrays
+    job_embedding_valid = (
+        job_embedding_from_chroma is not None and 
+        hasattr(job_embedding_from_chroma, '__len__') and 
+        len(job_embedding_from_chroma) > 0
+    )
+    
+    if not cv_skills or not job_embedding_valid or not cv_skill_embeddings_dict:
         return []
 
     skill_contributions = []
     job_emb_np = np.array(job_embedding_from_chroma)
 
-    for i, skill_text in enumerate(successfully_embedded_cv_skills):
-        skill_vector = successfully_embedded_cv_vectors[i]
-        similarity = cosine_similarity_np(skill_vector, job_emb_np) 
-        skill_contributions.append((skill_text, similarity))
+    # Use pre-calculated embeddings
+    for skill_text in cv_skills:
+        if skill_text in cv_skill_embeddings_dict:
+            skill_vector = cv_skill_embeddings_dict[skill_text]
+            similarity = cosine_similarity_np(skill_vector, job_emb_np)
+            skill_contributions.append((skill_text, similarity))
 
+    if not skill_contributions:
+        print("No CV skills had pre-calculated embeddings for explanation.")
+        return []
+
+    # Sort by similarity and return top N
     skill_contributions.sort(key=lambda x: x[1], reverse=True)
     return skill_contributions[:EXPLAIN_TOP_N_CONTRIBUTING_SKILLS]
 
-def find_similar_jobs(cv_skill_embedding, cv_skills, top_n=None, active_only=True):
-    if top_n is None:
-        top_n = TOP_N_RESULTS_DEFAULT
-
-    if cv_skill_embedding is None:
-        return [], "CV Skill Embedding is missing."
-
-    if not all([CHROMA_HOST, CHROMA_PORT_STR, COLLECTION_NAME]):
-        return [], "ChromaDB connection details (host, port, collection) are not fully configured."
+def find_similar_jobs(cv_skills, cv_embedding, top_n=TOP_N_RESULTS_DEFAULT, filter_active_only=True):
+    if not cv_skills or cv_embedding is None:
+        print("Error: CV skills or embedding is missing.")
+        return []
 
     try:
-        chroma_client = HttpClient(host=CHROMA_HOST, port=CHROMA_PORT, settings=ChromaSettings(anonymized_telemetry=False))
+        # Pre-calculate individual CV skill embeddings ONCE
+        print(f"Pre-calculating embeddings for {len(cv_skills)} CV skills...")
+        cv_individual_skill_embeddings = {}  # Dict to store skill -> embedding mapping
         
-        try:
-            collection = chroma_client.get_collection(COLLECTION_NAME)
-            print(f"Connected to ChromaDB collection: {COLLECTION_NAME}")
-        except Exception as conn_err:
-            return [], f"Failed to get ChromaDB collection '{COLLECTION_NAME}': {conn_err}"
+        valid_cv_skills = [s for s in cv_skills if isinstance(s, str) and s.strip()]
+        if valid_cv_skills:
+            if EMBEDDING_API_URL:
+                cv_skill_vectors = get_remote_embedding_batch(valid_cv_skills)
+            else:
+                model = get_embedding_model()
+                if model:
+                    try:
+                        raw_embeddings = model.encode(valid_cv_skills, show_progress_bar=False)
+                        cv_skill_vectors = [np.array(e) for e in raw_embeddings]
+                    except Exception as e:
+                        print(f"Error embedding CV skills: {e}")
+                        cv_skill_vectors = [None] * len(valid_cv_skills)
+                else:
+                    cv_skill_vectors = [None] * len(valid_cv_skills)
+            
+            # Store embeddings in dictionary for quick lookup
+            for i, skill in enumerate(valid_cv_skills):
+                if i < len(cv_skill_vectors) and cv_skill_vectors[i] is not None:
+                    cv_individual_skill_embeddings[skill] = cv_skill_vectors[i]
+        
+        print(f"Successfully pre-calculated embeddings for {len(cv_individual_skill_embeddings)} CV skills.")
 
-        where_clause = {"Status": "active"} if active_only else None
-        if active_only: print("Filtering for active jobs only in ChromaDB.")
-        
-        query_embedding_list = cv_skill_embedding if isinstance(cv_skill_embedding, list) else cv_skill_embedding.tolist()
+        # Connect to ChromaDB
+        chroma_client = HttpClient(host=CHROMA_HOST, port=CHROMA_PORT, settings=ChromaSettings(allow_reset=True))
+        collection = chroma_client.get_collection(name=COLLECTION_NAME)
+        print(f"Connected to ChromaDB collection: {COLLECTION_NAME}")
+
+        # Query ChromaDB
+        query_filter = {"Status": "active"} if filter_active_only else None
+        if query_filter:
+            print("Filtering for active jobs only in ChromaDB.")
 
         print(f"Querying ChromaDB with top_n={top_n}...")
+        
+        # Convert cv_embedding to the right format for ChromaDB
+        if isinstance(cv_embedding, np.ndarray):
+            query_embedding_list = cv_embedding.tolist()
+        elif isinstance(cv_embedding, list):
+            query_embedding_list = cv_embedding
+        else:
+            print(f"Warning: Unexpected cv_embedding type: {type(cv_embedding)}")
+            query_embedding_list = list(cv_embedding)
+
         results = collection.query(
             query_embeddings=[query_embedding_list],
             n_results=top_n,
-            include=["metadatas", "distances", "documents", "embeddings"], 
-            where=where_clause
+            where=query_filter,
+            include=["metadatas", "distances", "documents", "embeddings"]
         )
-        
+
+        if not results or not results['ids'] or not results['ids'][0]:
+            print("No results returned from ChromaDB.")
+            return []
+
+        print(f"ChromaDB returned {len(results['ids'][0])} raw results.")
+
+        # Process results
         matches = []
-        if results and results.get('ids') and results['ids'] and isinstance(results['ids'][0], list):
-            num_results = len(results['ids'][0])
-            print(f"ChromaDB returned {num_results} raw results.")
-
-            distances_list = results.get('distances', [[]])[0] if results.get('distances') and results['distances'] else [None] * num_results
-            metadatas_list = results.get('metadatas', [[]])[0] if results.get('metadatas') and results['metadatas'] else [{}] * num_results
-            documents_list = results.get('documents', [[]])[0] if results.get('documents') and results['documents'] else [""] * num_results
-            embeddings_list = results.get('embeddings', [[]])[0] if results.get('embeddings') and results['embeddings'] else [None] * num_results
-
-            if not (len(distances_list) == num_results and \
-                    len(metadatas_list) == num_results and \
-                    len(documents_list) == num_results and \
-                    len(embeddings_list) == num_results):
-                print("Warning: Mismatch in lengths of returned lists from ChromaDB query. Results might be incomplete.")
-                min_len = min(len(distances_list), len(metadatas_list), len(documents_list), len(embeddings_list), num_results)
-                if min_len < num_results:
-                    print(f"Adjusting iteration from {num_results} to {min_len} due to list length mismatch.")
-                num_results = min_len
-
-            for i in range(num_results):
-                chroma_id = results['ids'][0][i]
-                distance = distances_list[i]
-                metadata = metadatas_list[i] if isinstance(metadatas_list[i], dict) else {}
-                document_text = documents_list[i] if isinstance(documents_list[i], str) else ""
-                job_embedding_item = embeddings_list[i]
+        for i in range(len(results['ids'][0])):
+            try:
+                metadata = results['metadatas'][0][i] if results.get('metadatas') and len(results['metadatas'][0]) > i else {}
+                distance = results['distances'][0][i] if results.get('distances') and len(results['distances'][0]) > i else 1.0
+                document = results['documents'][0][i] if results.get('documents') and len(results['documents'][0]) > i else ""
                 
+                # Fix the numpy array boolean evaluation issue
                 job_embedding = None
-                if job_embedding_item is not None and (isinstance(job_embedding_item, list) or isinstance(job_embedding_item, np.ndarray)):
-                    job_embedding = np.array(job_embedding_item)
+                if results.get('embeddings') and results['embeddings'] and len(results['embeddings']) > 0 and len(results['embeddings'][0]) > i:
+                    job_embedding = results['embeddings'][0][i]
 
-                if distance is None:
-                    similarity_score_percent = 0.0 
-                else:
-                    clamped_distance = min(max(float(distance), 0.0), 1.0) 
-                    similarity_score_percent = (1.0 - clamped_distance) * 100.0
+                score = max(0, min(100, (1 - distance) * 100))
                 
-                job_skills_str = metadata.get('Skills_Json_Str', '[]')
+                job_skills_list = []
+                skills_json_str = metadata.get('Skills_Json_Str', '[]')
                 try:
-                    job_skills_list = json.loads(job_skills_str) if isinstance(job_skills_str, str) else []
-                except json.JSONDecodeError:
+                    job_skills_list = json.loads(skills_json_str) if skills_json_str else []
+                except (json.JSONDecodeError, TypeError):
                     job_skills_list = []
-                    print(f"Warning: Could not parse Skills_Json_Str for job {chroma_id}: {job_skills_str[:50]}")
 
+                # Use pre-calculated embeddings for explanation
                 contributing_cv_skills = []
-                if job_embedding is not None and cv_skills: 
-                     contributing_cv_skills = explain_job_match(cv_skills, job_skills_list, cv_skill_embedding, job_embedding)
+                job_embedding_valid = (
+                    job_embedding is not None and 
+                    hasattr(job_embedding, '__len__') and 
+                    len(job_embedding) > 0
+                )
+                
+                if job_embedding_valid and cv_individual_skill_embeddings:
+                    contributing_cv_skills = explain_job(
+                        cv_skills, 
+                        job_skills_list, 
+                        cv_individual_skill_embeddings,
+                        job_embedding
+                    )
 
-                # --- THIS IS THE KEY CHANGE ---
-                match_data = {**metadata} # Spread all items from metadata
-                match_data.update({        # Add or override specific calculated/fixed fields
-                    "chroma_id": chroma_id,
-                    "score": similarity_score_percent,
-                    "document_text": document_text, 
-                    "job_skills": job_skills_list, 
-                    "contributing_skills": contributing_cv_skills,
-                    "url": metadata.get('Application_URL', metadata.get('URL', '#')) 
-                })
-                # --- END OF KEY CHANGE ---
-                matches.append(match_data)
-            
-            print(f"Processed {len(matches)} matches from ChromaDB results.")
-        else:
-            print("No results or unexpected format from ChromaDB query. 'results.ids[0]' might be empty or not a list.")
+                # Use the correct field names as confirmed by debug output
+                title = metadata.get('Title', 'N/A')
+                company = metadata.get('Company', 'N/A')
+                area = metadata.get('Area', 'N/A')
+                category = metadata.get('Category', 'N/A')
+                url = metadata.get('URL', '')
 
-        return matches, "ChromaDB Vector Search"
+                match = {
+                    'job_id': results['ids'][0][i],
+                    'score': score,
+                    'title': title,
+                    'company': company,
+                    'area': area,
+                    'category': category,
+                    'url': url,
+                    'document': document,
+                    'job_skills': job_skills_list,
+                    'contributing_skills': contributing_cv_skills,
+                    'metadata': metadata
+                }
+                matches.append(match)
+
+            except Exception as e:
+                print(f"Error processing match {i}: {e}")
+                continue
+
+        print(f"Processed {len(matches)} matches from ChromaDB results.")
+        return matches
 
     except Exception as e:
-        print(f"Error during ChromaDB search: {e}")
+        print(f"Error in find_similar_jobs: {e}")
         traceback.print_exc()
-        return [], f"ChromaDB Search Failed: {e}"
+        return []
+    
+
 
 if __name__ == "__main__":
     print("cv_match.py loaded for direct execution test.")

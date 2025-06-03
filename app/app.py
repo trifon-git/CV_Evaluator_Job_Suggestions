@@ -68,7 +68,7 @@ print("--- END STARTUP DEBUG ---")
 
 SIMILARITY_THRESHOLD = 40.0
 MAX_JOBS_TO_DISPLAY_PER_PAGE = 5
-TOP_N_RESULTS_FROM_SEARCH = int(os.getenv('TOP_N_RESULTS_FOR_APP_QUERY', '75'))
+TOP_N_RESULTS_FROM_SEARCH = int(os.getenv('TOP_N_RESULTS_FOR_APP_QUERY', '1000'))
 CANONICAL_LANGUAGES_FOR_FILTER = ["English", "Danish", "German", "Spanish", "French", "Norwegian", "Swedish"]
 
 # --- Helper Functions ---
@@ -299,14 +299,16 @@ with st.sidebar:
     unique_locations_options = []
     unique_categories_options = []
     if st.session_state.all_job_matches_cache:
-        unique_locations_options = sorted(list(set(job.get('Area') for job in st.session_state.all_job_matches_cache if job.get('Area'))))
-        raw_categories_from_cache = [job.get('Category') for job in st.session_state.all_job_matches_cache]
+        # Fix: Use lowercase field names that match cv_match.py output
+        unique_locations_options = sorted(list(set(job.get('area') for job in st.session_state.all_job_matches_cache if job.get('area'))))
+        raw_categories_from_cache = [job.get('category') for job in st.session_state.all_job_matches_cache]
         unique_categories_options = sorted(list(set(cat for cat in raw_categories_from_cache if isinstance(cat, str) and cat.strip())))
+        
         if not unique_categories_options and any(st.session_state.all_job_matches_cache):
             sample_has_category_key = False
             for job_sample in st.session_state.all_job_matches_cache[:min(3, len(st.session_state.all_job_matches_cache))]:
-                if 'Category' in job_sample: sample_has_category_key = True; break
-            if not sample_has_category_key: st.sidebar.caption("⚠️ 'Category' field missing from data.")
+                if 'category' in job_sample: sample_has_category_key = True; break  # Fix: lowercase 'category'
+            if not sample_has_category_key: st.sidebar.caption("⚠️ 'category' field missing from data.")
             else: st.sidebar.caption("⚠️ No filterable categories in data.")
     selected_locations = st.multiselect("Job Locations (Area)", options=unique_locations_options, placeholder="Any Location" if unique_locations_options else "Upload CV to see locations")
     selected_categories = st.multiselect("Job Categories", options=unique_categories_options, placeholder="Any Category" if unique_categories_options else "Upload CV to see categories")
@@ -343,7 +345,7 @@ if uploaded_file is not None:
                         cv_skill_embedding_vec = generate_embedding_for_skills(cv_skills_list)
                     if cv_skill_embedding_vec is None: placeholder_processing_status.error("Could not generate CV embedding."); st.stop()
                     with st.spinner('🧠 Searching for matching jobs...'):
-                        all_matches_db, method_used = find_similar_jobs(cv_skill_embedding=cv_skill_embedding_vec, cv_skills=cv_skills_list, top_n=TOP_N_RESULTS_FROM_SEARCH, active_only=True)
+                        all_matches_db = find_similar_jobs(cv_skills=cv_skills_list, cv_embedding=cv_skill_embedding_vec, top_n=TOP_N_RESULTS_FROM_SEARCH, filter_active_only=True)
                         st.session_state.all_job_matches_cache = all_matches_db if all_matches_db is not None else []
                 else: placeholder_processing_status.error("Could not read CV content."); st.session_state.all_job_matches_cache = []
             if st.session_state.all_job_matches_cache is not None:
@@ -354,9 +356,13 @@ if uploaded_file is not None:
 
 if st.session_state.all_job_matches_cache is not None:
     current_matches_to_filter = list(st.session_state.all_job_matches_cache)
-    if selected_locations: current_matches_to_filter = [job for job in current_matches_to_filter if job.get('Area') in selected_locations]
-    if selected_categories: current_matches_to_filter = [job for job in current_matches_to_filter if job.get('Category') in selected_categories]
-    if selected_languages: current_matches_to_filter = [job for job in current_matches_to_filter if any(lang in selected_languages for lang in get_job_languages_from_metadata(job))]
+    # Fix: Use lowercase field names
+    if selected_locations: 
+        current_matches_to_filter = [job for job in current_matches_to_filter if job.get('area') in selected_locations]
+    if selected_categories: 
+        current_matches_to_filter = [job for job in current_matches_to_filter if job.get('category') in selected_categories]
+    if selected_languages: 
+        current_matches_to_filter = [job for job in current_matches_to_filter if any(lang in selected_languages for lang in get_job_languages_from_metadata(job.get('metadata', {})))]
     final_display_matches = [j for j in current_matches_to_filter if isinstance(j.get('score'), (int, float)) and j.get('score', 0) >= SIMILARITY_THRESHOLD]
     final_display_matches.sort(key=lambda x: x.get('score', 0), reverse=True)
     final_display_matches = final_display_matches[:MAX_JOBS_TO_DISPLAY_PER_PAGE]
@@ -368,12 +374,27 @@ if st.session_state.all_job_matches_cache is not None:
         if final_display_matches:
             st.success(f"Displaying top {len(final_display_matches)} matches (Score ≥ {SIMILARITY_THRESHOLD:.0f}%).")
             for i, job_match in enumerate(final_display_matches):
-                job_unique_id = job_match.get('chroma_id', f"job_fallback_{i}"); job_title = job_match.get('Title', 'N/A')
-                job_company = job_match.get('Company', 'N/A'); job_area_display = job_match.get('Area', 'N/A')
-                job_category_display = job_match.get('Category', 'N/A'); job_status = job_match.get('Status', 'unknown').capitalize()
-                job_url = job_match.get('url', '#'); job_score = job_match.get('score', 0.0)
-                contributing_skills = job_match.get('contributing_skills', []); job_description_text = job_match.get('document_text', '')
-                job_languages_display = get_job_languages_from_metadata(job_match)
+                # Fix: Use 'job_id' instead of 'chroma_id' - this matches what ChromaDB returns
+                job_unique_id = job_match.get('job_id', f"job_fallback_{i}")
+                
+                # Fix: Use correct field names that match ChromaDB metadata structure
+                job_title = job_match.get('title', 'N/A')  # Changed from 'Title' to 'title'
+                job_company = job_match.get('company', 'N/A')  # Changed from 'Company' to 'company'
+                job_area_display = job_match.get('area', 'N/A')  # Changed from 'Area' to 'area'
+                job_category_display = job_match.get('category', 'N/A')  # Changed from 'Category' to 'category'
+                
+                # Fix: Handle status from metadata properly
+                job_status = job_match.get('metadata', {}).get('Status', 'unknown').capitalize()
+                
+                job_url = job_match.get('url', '#')
+                job_score = job_match.get('score', 0.0)
+                contributing_skills = job_match.get('contributing_skills', [])
+                
+                # Fix: Use correct field name for document content
+                job_description_text = job_match.get('document', '')  # Changed from 'document_text' to 'document'
+                
+                # Use metadata for language detection
+                job_languages_display = get_job_languages_from_metadata(job_match.get('metadata', {}))
                 job_feedback_stats = feedback_aggregates["per_job"].get(job_unique_id, {"up": 0, "down": 0})
                 with st.container(border=True):
                     main_cols = st.columns([5, 2])
