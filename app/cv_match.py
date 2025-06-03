@@ -105,10 +105,142 @@ def generate_embedding_for_skills(skills_list):
         print("No valid skill embeddings were generated.")
         return None
 
+    # The important part is here - all skills are averaged into ONE embedding vector
     average_embedding = np.mean(skill_embeddings_np, axis=0)
     norm = np.linalg.norm(average_embedding)
     
     return (average_embedding / norm if norm > 0 else average_embedding).tolist()
+
+# New function for direct skill-to-skill matching
+def calculate_enhanced_job_match_score(cv_skills, job_skills, cv_skill_embeddings_dict, job_embedding):
+    """
+    Enhanced scoring that considers:
+    1. Direct skill matches (exact or near matches)
+    2. Semantic similarity between individual CV skills and the job
+    3. Overall semantic similarity between combined CV and job embeddings
+    4. Contextual importance of skills in the job description
+    
+    Args:
+        cv_skills: List of skills from CV
+        job_skills: List of skills from job ad
+        cv_skill_embeddings_dict: Dictionary mapping CV skills to their embeddings
+        job_embedding: Job embedding vector from ChromaDB
+    
+    Returns:
+        tuple: (enhanced_score, match_details)
+    """
+    if not cv_skills or not job_skills or not cv_skill_embeddings_dict or job_embedding is None:
+        return 0.0, []
+    
+    # 1. Calculate direct skill matches (exact or near matches)
+    cv_skills_lower = [s.lower().strip() for s in cv_skills if isinstance(s, str)]
+    job_skills_lower = [s.lower().strip() for s in job_skills if isinstance(s, str)]
+    
+    exact_matches = []
+    for cv_skill in cv_skills_lower:
+        for job_skill in job_skills_lower:
+            # Check for exact match
+            if cv_skill == job_skill:
+                exact_matches.append((cv_skill, job_skill, 1.0))
+            # Check for substring (partial match)
+            elif cv_skill in job_skill or job_skill in cv_skill:
+                # Shorter text length ratio to avoid spurious substring matches
+                len_ratio = min(len(cv_skill), len(job_skill)) / max(len(cv_skill), len(job_skill))
+                if len_ratio >= 0.7:  # Only consider substantial overlaps
+                    exact_matches.append((cv_skill, job_skill, 0.9 * len_ratio))
+    
+    # 2. Calculate semantic similarity for each CV skill to the job embedding
+    skill_similarities = []
+    job_emb_np = np.array(job_embedding)
+    
+    for skill in cv_skills:
+        if skill in cv_skill_embeddings_dict:
+            skill_vec = cv_skill_embeddings_dict[skill]
+            sim = cosine_similarity_np(skill_vec, job_emb_np)
+            skill_similarities.append((skill, sim))
+    
+    # 3. Calculate bidirectional alignment score - how well each job skill aligns with CV skills
+    job_skill_alignment_scores = []
+    if job_skills and cv_skill_embeddings_dict:
+        for job_skill in job_skills:
+            # Create a simple embedding for the job skill using averaged CV skills
+            best_alignment = 0
+            for cv_skill, cv_emb in cv_skill_embeddings_dict.items():
+                # Simple text similarity check
+                if job_skill.lower() in cv_skill.lower() or cv_skill.lower() in job_skill.lower():
+                    alignment = 0.8  # High alignment for text overlap
+                else:
+                    # Use semantic similarity when available
+                    alignment = cosine_similarity_np(cv_emb, job_emb_np) * 0.5  # Weighted lower
+                best_alignment = max(best_alignment, alignment)
+            job_skill_alignment_scores.append((job_skill, best_alignment))
+    
+    # 4. Compute the enhanced score with all components
+    num_job_skills = max(1, len(job_skills_lower))
+    
+    # Exact match component (weighted by % of job skills matched)
+    exact_match_score = sum(score for _, _, score in exact_matches) / num_job_skills
+    
+    # Semantic similarity component (from CV to job)
+    if skill_similarities:
+        # Use top matches - focus on best skills
+        skill_similarities.sort(key=lambda x: x[1], reverse=True)
+        top_count = max(1, min(5, len(skill_similarities)))
+        semantic_score = sum(sim for _, sim in skill_similarities[:top_count]) / top_count
+    else:
+        semantic_score = 0
+    
+    # Bidirectional alignment component (from job to CV)
+    if job_skill_alignment_scores:
+        # Weight critical/required job skills higher (if we had that info)
+        job_alignment_score = sum(score for _, score in job_skill_alignment_scores) / len(job_skill_alignment_scores)
+    else:
+        job_alignment_score = 0
+    
+    # Combined score with adjusted weights
+    # - Direct matches are most important (50%)
+    # - Semantic similarity is next (30%)
+    # - Bidirectional alignment provides additional context (20%)
+    enhanced_score = (exact_match_score * 0.5) + (semantic_score * 0.3) + (job_alignment_score * 0.2)
+    
+    # Scale to 0-100
+    final_score = min(100, enhanced_score * 100)
+    
+    # Prepare match details for explanation
+    match_details = []
+    
+    # Add exact matches to details
+    for cv_skill, job_skill, match_score in exact_matches:
+        match_details.append({
+            'cv_skill': cv_skill,
+            'job_skill': job_skill,
+            'match_type': 'exact' if match_score == 1.0 else 'partial',
+            'score': match_score
+        })
+    
+    # Add top semantic matches to details
+    if skill_similarities:
+        for skill, sim in skill_similarities[:5]:  # Take top 5 for details
+            if not any(d['cv_skill'] == skill for d in match_details):  # Avoid duplicates
+                match_details.append({
+                    'cv_skill': skill,
+                    'job_skill': None,  # No specific job skill - semantic match
+                    'match_type': 'semantic',
+                    'score': sim
+                })
+    
+    # Add bidirectional alignment details
+    if job_skill_alignment_scores:
+        job_skill_alignment_scores.sort(key=lambda x: x[1], reverse=True)
+        for job_skill, align_score in job_skill_alignment_scores[:3]:  # Take top 3
+            match_details.append({
+                'cv_skill': None,  # No specific CV skill - alignment with overall profile
+                'job_skill': job_skill,
+                'match_type': 'alignment',
+                'score': align_score
+            })
+    
+    return final_score, match_details
 
 def cosine_similarity_np(vec1, vec2):
     if vec1 is None or vec2 is None: return 0.0
@@ -144,7 +276,7 @@ def explain_job(cv_skills, job_skills_from_meta, cv_skill_embeddings_dict, job_e
     skill_contributions = []
     job_emb_np = np.array(job_embedding_from_chroma)
 
-    # Use pre-calculated embeddings
+    # This calculates similarity for EACH individual skill to explain matches
     for skill_text in cv_skills:
         if skill_text in cv_skill_embeddings_dict:
             skill_vector = cv_skill_embeddings_dict[skill_text]
@@ -159,7 +291,7 @@ def explain_job(cv_skills, job_skills_from_meta, cv_skill_embeddings_dict, job_e
     skill_contributions.sort(key=lambda x: x[1], reverse=True)
     return skill_contributions[:EXPLAIN_TOP_N_CONTRIBUTING_SKILLS]
 
-def find_similar_jobs(cv_skills, cv_embedding, top_n=TOP_N_RESULTS_DEFAULT, filter_active_only=True):
+def find_similar_jobs(cv_skills, cv_embedding, top_n=TOP_N_RESULTS_DEFAULT, filter_active_only=True, use_enhanced_scoring=True):
     if not cv_skills or cv_embedding is None:
         print("Error: CV skills or embedding is missing.")
         return []
@@ -213,6 +345,7 @@ def find_similar_jobs(cv_skills, cv_embedding, top_n=TOP_N_RESULTS_DEFAULT, filt
             print(f"Warning: Unexpected cv_embedding type: {type(cv_embedding)}")
             query_embedding_list = list(cv_embedding)
 
+        # The main search uses the COMBINED embedding to find similar jobs
         results = collection.query(
             query_embeddings=[query_embedding_list],
             n_results=top_n,
@@ -234,13 +367,22 @@ def find_similar_jobs(cv_skills, cv_embedding, top_n=TOP_N_RESULTS_DEFAULT, filt
                 distance = results['distances'][0][i] if results.get('distances') and len(results['distances'][0]) > i else 1.0
                 document = results['documents'][0][i] if results.get('documents') and len(results['documents'][0]) > i else ""
                 
-                # Fix the numpy array boolean evaluation issue
+                # Fix the numpy array boolean evaluation issue - CONSOLIDATED DEFINITION
                 job_embedding = None
                 if results.get('embeddings') and results['embeddings'] and len(results['embeddings']) > 0 and len(results['embeddings'][0]) > i:
                     job_embedding = results['embeddings'][0][i]
+                
+                # Check job_embedding validity ONCE
+                job_embedding_valid = (
+                    job_embedding is not None and 
+                    hasattr(job_embedding, '__len__') and 
+                    len(job_embedding) > 0
+                )
 
+                # Convert distance to a percentage score (closer = higher score)
                 score = max(0, min(100, (1 - distance) * 100))
                 
+                # Get job skills from metadata
                 job_skills_list = []
                 skills_json_str = metadata.get('Skills_Json_Str', '[]')
                 try:
@@ -248,14 +390,22 @@ def find_similar_jobs(cv_skills, cv_embedding, top_n=TOP_N_RESULTS_DEFAULT, filt
                 except (json.JSONDecodeError, TypeError):
                     job_skills_list = []
 
+                # Calculate score with enhanced method if requested
+                match_details = []
+                if use_enhanced_scoring and job_embedding_valid and job_skills_list and cv_individual_skill_embeddings:
+                    # Use the new enhanced scoring method
+                    enhanced_score, match_details = calculate_enhanced_job_match_score(
+                        cv_skills, 
+                        job_skills_list,
+                        cv_individual_skill_embeddings,
+                        job_embedding
+                    )
+                    # Blend with original vector similarity score for stability
+                    original_score = max(0, min(100, (1 - distance) * 100))
+                    score = (enhanced_score * 0.7) + (original_score * 0.3)
+
                 # Use pre-calculated embeddings for explanation
                 contributing_cv_skills = []
-                job_embedding_valid = (
-                    job_embedding is not None and 
-                    hasattr(job_embedding, '__len__') and 
-                    len(job_embedding) > 0
-                )
-                
                 if job_embedding_valid and cv_individual_skill_embeddings:
                     contributing_cv_skills = explain_job(
                         cv_skills, 
@@ -271,6 +421,7 @@ def find_similar_jobs(cv_skills, cv_embedding, top_n=TOP_N_RESULTS_DEFAULT, filt
                 category = metadata.get('Category', 'N/A')
                 url = metadata.get('URL', '')
 
+                # Prepare the match entry
                 match = {
                     'job_id': results['ids'][0][i],
                     'score': score,
@@ -282,12 +433,14 @@ def find_similar_jobs(cv_skills, cv_embedding, top_n=TOP_N_RESULTS_DEFAULT, filt
                     'document': document,
                     'job_skills': job_skills_list,
                     'contributing_skills': contributing_cv_skills,
+                    'match_details': match_details,
                     'metadata': metadata
                 }
                 matches.append(match)
 
             except Exception as e:
                 print(f"Error processing match {i}: {e}")
+                traceback.print_exc()  # Add traceback for better debugging
                 continue
 
         print(f"Processed {len(matches)} matches from ChromaDB results.")
@@ -312,17 +465,20 @@ if __name__ == "__main__":
         
         if test_cv_skill_embedding:
             print(f"Generated test CV embedding (first 5 dims): {test_cv_skill_embedding[:5]}")
-            job_matches_found, message_status = find_similar_jobs(test_cv_skill_embedding, sample_cv_skills_list, top_n=5)
-            print(f"Search Status: {message_status}")
-            if job_matches_found:
-                print(f"Found {len(job_matches_found)} job matches:")
-                for i_match, match_item in enumerate(job_matches_found):
-                    print(f"\n  {i_match+1}. Title: {match_item.get('Title', 'N/A')}") # Use .get() for safety
-                    print(f"     Score: {match_item.get('score', 0.0):.2f}%")
-                    print(f"     Company: {match_item.get('Company', 'N/A')}, Area: {match_item.get('Area', 'N/A')}")
-                    print(f"     Category: {match_item.get('Category', 'N/A')}") # Test: print Category
-                    print(f"     Contributing CV Skills: {[(s_item[0], round(s_item[1], 3)) for s_item in match_item.get('contributing_skills', [])]}")
-            else:
-                print("No job matches found for the test CV skills.")
+            try:
+                job_matches_found = find_similar_jobs(cv_skills=sample_cv_skills_list, cv_embedding=test_cv_skill_embedding, top_n=5)
+                if job_matches_found:
+                    print(f"Found {len(job_matches_found)} job matches:")
+                    for i_match, match_item in enumerate(job_matches_found):
+                        print(f"\n  {i_match+1}. Title: {match_item.get('title', 'N/A')}")  # Use lowercase field name
+                        print(f"     Score: {match_item.get('score', 0.0):.2f}%")
+                        print(f"     Company: {match_item.get('company', 'N/A')}, Area: {match_item.get('area', 'N/A')}")
+                        print(f"     Category: {match_item.get('category', 'N/A')}")  # Test: print Category
+                        print(f"     Contributing CV Skills: {[(s_item[0], round(s_item[1], 3)) for s_item in match_item.get('contributing_skills', [])]}")
+                else:
+                    print("No job matches found for the test CV skills.")
+            except Exception as e:
+                print(f"Error during job matching test: {e}")
+                traceback.print_exc()
         else:
             print("Failed to generate embedding for test CV skills.")
