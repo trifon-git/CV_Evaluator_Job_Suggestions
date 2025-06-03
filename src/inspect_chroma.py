@@ -25,7 +25,7 @@ CHROMA_PORT_STR = os.getenv('CHROMA_PORT')
 COLLECTION_NAME = os.getenv('CHROMA_COLLECTION') # The name of your collection, e.g., 'job_embeddings'
 
 # How many items to fetch and display
-LIMIT_RESULTS = 2 # Adjust as needed
+LIMIT_RESULTS = 100 # Adjust as needed
 
 def inspect_collection():
     if not all([CHROMA_HOST, CHROMA_PORT_STR, COLLECTION_NAME]):

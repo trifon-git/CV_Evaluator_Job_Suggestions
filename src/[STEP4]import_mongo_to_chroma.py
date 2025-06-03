@@ -228,13 +228,22 @@ def main_import_to_chroma():
                 metadata["Skills_Json_Str"] = json.dumps(skills_list_cleaned)
                 lang_req_list_raw = job_doc.get("Language_Requirements", job_doc.get("language_requirements", []))
                 processed_languages_for_json = []
+                
+                # Handle the new format: array of strings ["Danish", "English"]
                 if isinstance(lang_req_list_raw, list):
                     for lang_item in lang_req_list_raw:
-                        if isinstance(lang_item, dict) and lang_item.get("language"):
+                        if isinstance(lang_item, str) and lang_item.strip():
+                            # Simple string format - just store the language name
+                            lang_clean = lang_item.strip().lower()
+                            metadata[f"lang_{lang_clean}_proficiency"] = "required"  # Default proficiency when not specified
+                            processed_languages_for_json.append({"language": lang_item.strip(), "proficiency": "Required"})
+                        elif isinstance(lang_item, dict) and lang_item.get("language"):
+                            # Old format compatibility - keep the existing code
                             lang_clean = lang_item["language"].strip().lower()
                             prof_clean = (lang_item.get("proficiency") or "unspecified").strip().lower()
                             metadata[f"lang_{lang_clean}_proficiency"] = prof_clean
                             processed_languages_for_json.append({"language": lang_item["language"].strip(), "proficiency": (lang_item.get("proficiency") or "Unspecified").strip()})
+                
                 metadata["Language_Requirements_Json_Str"] = json.dumps(processed_languages_for_json)
                 batch_metadatas_to_add.append(metadata)
 

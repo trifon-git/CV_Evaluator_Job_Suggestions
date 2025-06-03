@@ -74,30 +74,61 @@ CANONICAL_LANGUAGES_FOR_FILTER = ["English", "Danish", "German", "Spanish", "Fre
 # --- Helper Functions ---
 def get_job_languages_from_metadata(metadata_dict):
     extracted_languages_set = set()
+    
+    # Method 1: Parse JSON language requirements
     lang_req_json_str = metadata_dict.get("Language_Requirements_Json_Str")
     if lang_req_json_str:
         try:
-            lang_list_of_dicts = json.loads(lang_req_json_str)
-            if isinstance(lang_list_of_dicts, list):
-                for lang_entry in lang_list_of_dicts:
-                    if isinstance(lang_entry, dict):
+            lang_data = json.loads(lang_req_json_str)
+            if isinstance(lang_data, list):
+                for lang_entry in lang_data:
+                    # Handle both formats:
+                    # 1. String format: ["Danish", "English"]
+                    if isinstance(lang_entry, str) and lang_entry.strip():
+                        lang_name = lang_entry.strip()
+                        for canonical in CANONICAL_LANGUAGES_FOR_FILTER:
+                            if canonical.lower() == lang_name.lower():
+                                extracted_languages_set.add(canonical)
+                                break
+                    # 2. Object format: [{"language": "Danish", "proficiency": "Fluent"}]
+                    elif isinstance(lang_entry, dict):
                         lang_name = lang_entry.get("language")
                         if isinstance(lang_name, str) and lang_name.strip():
                             for canonical in CANONICAL_LANGUAGES_FOR_FILTER:
                                 if canonical.lower() == lang_name.strip().lower():
-                                    extracted_languages_set.add(canonical); break
-        except: pass
+                                    extracted_languages_set.add(canonical)
+                                    break
+        except Exception as e:
+            print(f"Error parsing Language_Requirements_Json_Str: {e}")
+            pass
+    
+    # Method 2: Check for proficiency fields (no change needed)
     for key, value in metadata_dict.items():
         if key.startswith("lang_") and key.endswith("_proficiency"):
             lang_name_from_key = key.replace("lang_", "").replace("_proficiency", "")
             for canonical in CANONICAL_LANGUAGES_FOR_FILTER:
                 if canonical.lower() == lang_name_from_key.lower():
-                    extracted_languages_set.add(canonical); break
+                    extracted_languages_set.add(canonical)
+                    break
+    
+    # Method 3: Use detected ad language (no change needed)
     detected_ad_lang_raw = metadata_dict.get("Detected_Ad_Language")
     if isinstance(detected_ad_lang_raw, str) and detected_ad_lang_raw.strip() and detected_ad_lang_raw != "Unknown":
         for canonical in CANONICAL_LANGUAGES_FOR_FILTER:
             if canonical.lower() == detected_ad_lang_raw.strip().lower():
-                extracted_languages_set.add(canonical); break
+                extracted_languages_set.add(canonical)
+                break
+    
+    # Method 4: Check for raw language_requirements array directly in metadata
+    raw_lang_reqs = metadata_dict.get("language_requirements")
+    if isinstance(raw_lang_reqs, list):
+        for lang_item in raw_lang_reqs:
+            if isinstance(lang_item, str) and lang_item.strip():
+                for canonical in CANONICAL_LANGUAGES_FOR_FILTER:
+                    if canonical.lower() == lang_item.strip().lower():
+                        extracted_languages_set.add(canonical)
+                        break
+    
     return sorted(list(extracted_languages_set))
 
 @st.cache_resource
