@@ -148,9 +148,7 @@ def get_remote_embedding(texts):
             return []
         return embeddings
     except Exception as e:
-        log_message(f"Error calling embedding API: {str(e)}")
-        import traceback
-        traceback.print_exc()
+        log_message(f"Error calling embedding API: {type(e).__name__}")
         return []
 
 def generate_skills_embedding_remote(skills_list):
@@ -211,7 +209,7 @@ def get_job_data_from_chroma(cv_embedding, top_n=None, active_only=True):
             return []
             
         # Connect to the DB
-        log_message(f"Connecting to ChromaDB at {CHROMA_HOST}:{CHROMA_PORT}")
+        log_message(f"Connecting to ChromaDB")
         chroma_client = HttpClient(
             host=CHROMA_HOST,
             port=CHROMA_PORT,
@@ -359,14 +357,14 @@ if __name__ == "__main__":
         default_cv_path = os.path.join(data_dir, "cv_text_example.md")
         if os.path.exists(default_cv_path):
             cv_file_path = default_cv_path
-            log_message(f"Using default CV file: {cv_file_path}")
+            log_message(f"Using default CV file: {sanitize_path(cv_file_path)}")
         else:
             log_message("No CV file specified and default CV file not found.")
             log_message("Please provide a CV file path as an argument: python test_skill_matching.py path/to/cv_file")
             sys.exit(1)
 
     # Extract skills from CV file
-    log_message(f"Extracting skills from CV file: {cv_file_path}")
+    log_message(f"Extracting skills from CV file: {sanitize_path(cv_file_path)}")
     cv_skills = get_extracted_skills_from_file(cv_file_path)
     
     if not cv_skills:

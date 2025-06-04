@@ -79,7 +79,7 @@ def get_remote_embeddings_step4(batch_skill_lists):
     texts_for_api = [", ".join(skills) for skills in batch_skill_lists if skills] 
     if not texts_for_api: return []
     payload = {"texts": texts_for_api}
-    log_message_step4(f"Calling remote embedding API at {EMBEDDING_API_URL} for {len(texts_for_api)} items.")
+    log_message_step4(f"Calling remote embedding API for {len(texts_for_api)} items.")
     try:
         response = requests.post(EMBEDDING_API_URL, json=payload, verify=VERIFY_SSL, timeout=60)
         response.raise_for_status()
@@ -91,7 +91,7 @@ def get_remote_embeddings_step4(batch_skill_lists):
         log_message_step4(f"Successfully received {len(embeddings)} embeddings from remote API.")
         return embeddings
     except requests.exceptions.RequestException as e: log_message_step4(f"ERROR calling remote embedding API: {e}"); return None
-    except json.JSONDecodeError as e: log_message_step4(f"ERROR decoding JSON from remote API: {e}. Response: {response.text[:200]}"); return None
+    except json.JSONDecodeError as e: log_message_step4(f"ERROR decoding JSON from remote API: {e}."); return None
     except Exception as e: log_message_step4(f"Unexpected ERROR during remote embedding: {e}"); return None
 
 def generate_embeddings_for_batch(batch_skill_lists):
@@ -106,7 +106,7 @@ def generate_embeddings_for_batch(batch_skill_lists):
 
 def main_import_to_chroma():
     log_message_step4("Starting MongoDB to ChromaDB import process...")
-    if USE_REMOTE_EMBEDDING: log_message_step4(f"Remote embedding is ENABLED. API URL: {EMBEDDING_API_URL}")
+    if USE_REMOTE_EMBEDDING: log_message_step4("Remote embedding is ENABLED.")
     else: log_message_step4("Remote embedding is DISABLED. Using local model.")
 
     mongo_client_obj, chroma_client_obj = None, None

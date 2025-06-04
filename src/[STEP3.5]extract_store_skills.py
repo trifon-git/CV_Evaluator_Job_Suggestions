@@ -74,12 +74,7 @@ elif NGROK_API_URL_FROM_ENV:
 else:
     print("exctract_store_skills.py: WARNING: No LLM API URLs configured in .env for [STEP3]!", flush=True)
 
-print(f"exctract_store_skills.py: MONGO_URI from env: {'***' if MONGO_URI_FROM_ENV else None}", flush=True)
-print(f"exctract_store_skills.py: MONGO_DB_NAME from env: {MONGO_DB_NAME_FROM_ENV}", flush=True)
-print(f"exctract_store_skills.py: MONGO_COLLECTION from env: {MONGO_COLLECTION_FROM_ENV}", flush=True)
-print(f"exctract_store_skills.py: HTML_CHUNK_SIZE_FOR_TEST: {HTML_CHUNK_SIZE_FOR_TEST}", flush=True)
-print(f"exctract_store_skills.py: MAX_CHUNKS_FOR_TEST: {MAX_CHUNKS_FOR_TEST}", flush=True)
-print(f"exctract_store_skills.py: PRINT_PROCESSED_TEXT_IN_LOG: {PRINT_PROCESSED_TEXT_IN_LOG}", flush=True)
+
 
 if not PRINT_PROCESSED_TEXT_IN_LOG:
     print(f"exctract_store_skills.py: MAX_SOURCE_TEXT_PRINT_SNIPPET_LENGTH (if not printing full to log): {MAX_SOURCE_TEXT_PRINT_SNIPPET_LENGTH}", flush=True)

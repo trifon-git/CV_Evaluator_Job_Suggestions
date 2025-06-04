@@ -73,17 +73,17 @@ if CUSTOM_LLM_API_URL and CUSTOM_LLM_MODEL:
     API_URL = CUSTOM_LLM_API_URL
     CURRENT_MODEL_NAME = CUSTOM_LLM_MODEL
     API_MODE = "CUSTOM"
-    print(f"INFO ([STEP3]llm_skill_extractor): Using Custom LLM API: {API_URL} with model: {CURRENT_MODEL_NAME}")
+    print(f"INFO ([STEP3]llm_skill_extractor): Using Custom LLM API with model: {CURRENT_MODEL_NAME}")
 elif NGROK_API_URL and OLLAMA_MODEL_NAME: # Assuming NGROK might also use OLLAMA_MODEL_NAME or a specific one
     API_URL = NGROK_API_URL
     CURRENT_MODEL_NAME = OLLAMA_MODEL_NAME # Or a specific model for NGROK if different
     API_MODE = "NGROK"
-    print(f"INFO ([STEP3]llm_skill_extractor): Using NGROK API: {API_URL} with model: {CURRENT_MODEL_NAME}")
+    print(f"INFO ([STEP3]llm_skill_extractor): Using NGROK API with model: {CURRENT_MODEL_NAME}")
 elif OLLAMA_API_URL and OLLAMA_MODEL_NAME:
     API_URL = OLLAMA_API_URL
     CURRENT_MODEL_NAME = OLLAMA_MODEL_NAME
     API_MODE = "OLLAMA"
-    print(f"INFO ([STEP3]llm_skill_extractor): Using Local Ollama API: {API_URL} with model: {CURRENT_MODEL_NAME}")
+    print(f"INFO ([STEP3]llm_skill_extractor): Using Local Ollama API with model: {CURRENT_MODEL_NAME}")
 else:
     # Fallback or error if no API is configured
     print("ERROR ([STEP3]llm_skill_extractor): No LLM API configured. Please check .env variables (CUSTOM_LLM_API_URL, NGROK_API_URL, or OLLAMA_API_URL and associated model names).")

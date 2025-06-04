@@ -6,7 +6,7 @@ import re
 from dotenv import load_dotenv
 
 # Load environment variables
-load_dotenv(dotenv_path=r"F:\MLops\V4\CV_Evaluator_Job_Suggestions\.env")
+load_dotenv()  # This will look for .env in the current directory or parent directories
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -22,7 +22,7 @@ class CoverLetterGenerator:
             self.model_name = model_name
             logger.info(f"OpenAI API key loaded and model {model_name} selected.")
         except Exception as e:
-            logger.error(f"Error setting up OpenAI client: {str(e)}")
+            logger.error(f"Error setting up OpenAI client: {type(e).__name__}")
             raise
 
     def generate_cover_letter(
@@ -78,7 +78,7 @@ Cover Letter:
             return sanitized
 
         except Exception as e:
-            logger.error(f"Error generating cover letter: {str(e)}")
+            logger.error(f"Error generating cover letter: {type(e).__name__}")
             return None
 
 

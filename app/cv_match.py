@@ -1,13 +1,20 @@
 import numpy as np
 import time
 import os
-import traceback
 import chromadb
 from dotenv import load_dotenv
 from chromadb import HttpClient, Settings as ChromaSettings
 import requests
 import urllib3
-import json # Added for parsing Skills_Json_Str from metadata
+import json 
+
+# Add sanitization function at the top
+def sanitize_path(path):
+    """Remove potentially sensitive information from paths"""
+    try:
+        return os.path.basename(path) if path else "unknown"
+    except:
+        return "unknown"
 
 # Load config
 load_dotenv()
@@ -25,7 +32,7 @@ MODEL_NAME_FOR_EMBEDDING = os.getenv('MODEL_NAME', 'paraphrase-multilingual-mpne
 try:
     CHROMA_PORT = int(CHROMA_PORT_STR) if CHROMA_PORT_STR else 8000
 except ValueError:
-    print(f"Warning: Invalid CHROMA_PORT '{CHROMA_PORT_STR}', defaulting to 8000.")
+    print(f"Warning: Invalid CHROMA_PORT, defaulting to 8000.")
     CHROMA_PORT = 8000
 
 VERIFY_SSL = VERIFY_SSL_STR.lower() == 'true'
@@ -38,26 +45,26 @@ def get_embedding_model():
     if _embedding_model_cache is None:
         try:
             from sentence_transformers import SentenceTransformer
-            print(f"Loading local sentence transformer model: {MODEL_NAME_FOR_EMBEDDING}")
+            print("Loading local sentence transformer model...")
             _embedding_model_cache = SentenceTransformer(MODEL_NAME_FOR_EMBEDDING)
             print("Local embedding model loaded.")
         except ImportError:
             print("Warning: sentence_transformers library not found. Local embedding will not work.")
             _embedding_model_cache = "error"
         except Exception as e:
-            print(f"Error loading local SentenceTransformer model: {e}")
+            print(f"Error loading local SentenceTransformer model: {type(e).__name__}")
             _embedding_model_cache = "error"
     return _embedding_model_cache if _embedding_model_cache != "error" else None
 
 def get_remote_embedding_batch(texts_batch):
     if not EMBEDDING_API_URL:
-        print("Error: EMBEDDING_API_URL not configured for remote embedding.")
+        print("Error: Remote embedding API not configured.")
         return [None] * len(texts_batch) 
 
     if not texts_batch: return []
     
     try:
-        print(f"Calling remote embedding API for {len(texts_batch)} texts...")
+        print(f"Calling remote embedding service for {len(texts_batch)} texts...")
         response = requests.post(EMBEDDING_API_URL, json={"texts": texts_batch}, verify=VERIFY_SSL, timeout=60)
         response.raise_for_status()
         embeddings_data = response.json().get("embeddings", [])
@@ -67,8 +74,7 @@ def get_remote_embedding_batch(texts_batch):
             print(f"Warning: Mismatch in remote embeddings count. Expected {len(texts_batch)}, got {len(embeddings_data)}.")
             return [None] * len(texts_batch)
     except Exception as e:
-        print(f"Error calling remote embedding API: {e}")
-        traceback.print_exc() 
+        print(f"Error calling remote embedding service: {type(e).__name__}")
         return [None] * len(texts_batch)
 
 def generate_embedding_for_skills(skills_list):
@@ -89,14 +95,14 @@ def generate_embedding_for_skills(skills_list):
             remote_embs = get_remote_embedding_batch(batch)
             skill_embeddings_np.extend([emb for emb in remote_embs if emb is not None])
     else:
-        print("EMBEDDING_API_URL not set. Attempting local embedding.")
+        print("Remote embedding URL not set. Attempting local embedding.")
         model = get_embedding_model()
         if model:
             try:
                 raw_embeddings = model.encode(valid_skills, show_progress_bar=False)
                 skill_embeddings_np = [np.array(emb) for emb in raw_embeddings]
             except Exception as e:
-                print(f"Error during local batch skill embedding: {e}")
+                print(f"Error during local batch skill embedding: {type(e).__name__}")
         else:
             print("Local embedding model not available. Cannot generate skill embeddings.")
             return None
@@ -312,7 +318,7 @@ def find_similar_jobs(cv_skills, cv_embedding, top_n=TOP_N_RESULTS_DEFAULT, filt
                         raw_embeddings = model.encode(valid_cv_skills, show_progress_bar=False)
                         cv_skill_vectors = [np.array(e) for e in raw_embeddings]
                     except Exception as e:
-                        print(f"Error embedding CV skills: {e}")
+                        print(f"Error embedding CV skills: {type(e).__name__}")
                         cv_skill_vectors = [None] * len(valid_cv_skills)
                 else:
                     cv_skill_vectors = [None] * len(valid_cv_skills)
@@ -327,7 +333,7 @@ def find_similar_jobs(cv_skills, cv_embedding, top_n=TOP_N_RESULTS_DEFAULT, filt
         # Connect to ChromaDB
         chroma_client = HttpClient(host=CHROMA_HOST, port=CHROMA_PORT, settings=ChromaSettings(allow_reset=True))
         collection = chroma_client.get_collection(name=COLLECTION_NAME)
-        print(f"Connected to ChromaDB collection: {COLLECTION_NAME}")
+        print("Connected to ChromaDB")
 
         # Query ChromaDB
         query_filter = {"Status": "active"} if filter_active_only else None
@@ -439,19 +445,16 @@ def find_similar_jobs(cv_skills, cv_embedding, top_n=TOP_N_RESULTS_DEFAULT, filt
                 matches.append(match)
 
             except Exception as e:
-                print(f"Error processing match {i}: {e}")
-                traceback.print_exc()  # Add traceback for better debugging
+                print(f"Error processing match {i}: {type(e).__name__}")
                 continue
 
         print(f"Processed {len(matches)} matches from ChromaDB results.")
         return matches
 
     except Exception as e:
-        print(f"Error in find_similar_jobs: {e}")
-        traceback.print_exc()
+        print(f"Error in find_similar_jobs: {type(e).__name__}")
         return []
     
-
 
 if __name__ == "__main__":
     print("cv_match.py loaded for direct execution test.")
@@ -464,21 +467,20 @@ if __name__ == "__main__":
         test_cv_skill_embedding = generate_embedding_for_skills(sample_cv_skills_list)
         
         if test_cv_skill_embedding:
-            print(f"Generated test CV embedding (first 5 dims): {test_cv_skill_embedding[:5]}")
+            print("Generated test CV embedding successfully")
             try:
                 job_matches_found = find_similar_jobs(cv_skills=sample_cv_skills_list, cv_embedding=test_cv_skill_embedding, top_n=5)
                 if job_matches_found:
                     print(f"Found {len(job_matches_found)} job matches:")
                     for i_match, match_item in enumerate(job_matches_found):
-                        print(f"\n  {i_match+1}. Title: {match_item.get('title', 'N/A')}")  # Use lowercase field name
+                        print(f"\n  {i_match+1}. Title: {match_item.get('title', 'N/A')}")
                         print(f"     Score: {match_item.get('score', 0.0):.2f}%")
                         print(f"     Company: {match_item.get('company', 'N/A')}, Area: {match_item.get('area', 'N/A')}")
-                        print(f"     Category: {match_item.get('category', 'N/A')}")  # Test: print Category
+                        print(f"     Category: {match_item.get('category', 'N/A')}")
                         print(f"     Contributing CV Skills: {[(s_item[0], round(s_item[1], 3)) for s_item in match_item.get('contributing_skills', [])]}")
                 else:
                     print("No job matches found for the test CV skills.")
             except Exception as e:
-                print(f"Error during job matching test: {e}")
-                traceback.print_exc()
+                print(f"Error during job matching test: {type(e).__name__}")
         else:
             print("Failed to generate embedding for test CV skills.")

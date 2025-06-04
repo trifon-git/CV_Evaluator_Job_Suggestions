@@ -44,9 +44,9 @@ try:
     dotenv_path = os.path.join(project_root_dir, '.env')
     if os.path.exists(dotenv_path):
         load_dotenv(dotenv_path=dotenv_path, override=True)
-        print(f"INFO: .env file loaded from {dotenv_path}")
+        print(f"INFO: .env file loaded successfully")
     else:
-        print(f"WARNING: .env file NOT found at {dotenv_path}. API calls might fail.")
+        print(f"WARNING: .env file NOT found. API calls might fail.")
 except Exception as e:
     print(f"ERROR during .env loading: {e}")
 
@@ -64,17 +64,17 @@ if CUSTOM_LLM_API_URL and CUSTOM_LLM_MODEL_NAME:
     API_URL = CUSTOM_LLM_API_URL
     MODEL_TO_USE = CUSTOM_LLM_MODEL_NAME
     API_TYPE = "custom"
-    print(f"INFO: Using Custom LLM API: {API_URL} with model: {MODEL_TO_USE}")
+    print(f"INFO: Using Custom LLM API with model: {MODEL_TO_USE}")
 elif OLLAMA_API_URL and OLLAMA_MODEL:
     API_URL = OLLAMA_API_URL
     MODEL_TO_USE = OLLAMA_MODEL
     API_TYPE = "ollama"
-    print(f"INFO: Using Local Ollama API: {API_URL} with model: {MODEL_TO_USE}")
+    print(f"INFO: Using Local Ollama API with model: {MODEL_TO_USE}")
 elif NGROK_API_URL:
     API_URL = NGROK_API_URL
-    MODEL_TO_USE = OLLAMA_MODEL # NGROK might use OLLAMA_MODEL if specified, or a default via payload
+    MODEL_TO_USE = OLLAMA_MODEL
     API_TYPE = "ngrok"
-    print(f"INFO: Using NGROK (hosted) API: {API_URL}" + (f" with model: {MODEL_TO_USE}" if MODEL_TO_USE else ""))
+    print(f"INFO: Using NGROK (hosted) API with model: {MODEL_TO_USE if MODEL_TO_USE else 'default'}")
 else:
     print("ERROR: No suitable API URL (Custom, Ollama, or NGROK) is set in .env. API calls will likely fail.")
     # API_URL remains None, API_TYPE remains 'unconfigured'
@@ -165,7 +165,7 @@ def extract_skills_from_text(text_chunk):
                 elif not json_data_str and response.text.strip().startswith("{"): 
                     json_data_str = response.text # Will attempt to parse later
                 else:
-                    print(f"ERROR: Custom LLM API response format unexpected. Raw: {response.text[:500]}")
+                    print(f"ERROR: Custom LLM API response format unexpected")
                     return fallback_response
             except json.JSONDecodeError:
                  # This might happen if response.text is the JSON string itself
@@ -195,7 +195,7 @@ def extract_skills_from_text(text_chunk):
                 elif isinstance(resp_json, dict) and "skills" in resp_json: # Direct JSON object
                     return resp_json # Already parsed
                 else:
-                    print(f"ERROR: Hosted API (NGROK) response format unexpected. Got: {json.dumps(resp_json, indent=2)}")
+                    print(f"ERROR: Hosted API (NGROK) response format unexpected")
                     return fallback_response
             except json.JSONDecodeError:
                 print(f"ERROR: Failed to parse hosted API (NGROK) response as JSON. Raw: {response.text[:500]}")
@@ -246,7 +246,7 @@ def extract_skills_from_text(text_chunk):
     except requests.exceptions.RequestException as err:
         print(f"Oops: Something Else: {err}")
     except Exception as e:
-        print(f"An unexpected error occurred: {e}")
+        print(f"An unexpected error occurred during API call: {type(e).__name__}")
         import traceback
         traceback.print_exc()
         
@@ -263,7 +263,7 @@ def get_extracted_skills_from_file(cv_file_to_process=None):
         list: A list of extracted skills, or None if an error occurs.
     """
     target_cv_file = cv_file_to_process if cv_file_to_process else CV_FILE_PATH
-    print(f"--- Processing CV Skill Extraction from File: {target_cv_file} ---")
+    print(f"--- Processing CV Skill Extraction from File: {sanitize_path(target_cv_file)} ---")
 
     if not os.path.exists(target_cv_file):
         print(f"ERROR: CV file not found at {target_cv_file}")

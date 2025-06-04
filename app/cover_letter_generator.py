@@ -11,7 +11,7 @@ project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 dotenv_path = os.path.join(project_root, '.env')
 if not load_dotenv(dotenv_path=dotenv_path) and not os.getenv("OPENAI_API"):
     print("Warning: .env file not found or OPENAI_API key not set directly as environment variable.")
-    print(f"Attempted .env path: {dotenv_path}")
+    print(f"Attempted .env filename: {sanitize_path(dotenv_path)}")
 
 
 # Configure logging
@@ -101,14 +101,24 @@ Cover Letter:
             return sanitized_text
 
         except openai.APIError as e: # Catch OpenAI specific errors
-            logger.error(f"OpenAI API Error generating cover letter: {e}")
-            # You might want to check e.status_code or e.message for more details
-            return f"Error from OpenAI: {e}"
+            logger.error(f"OpenAI API Error type: {type(e).__name__}")
+            # Don't return the full error message to avoid leaking API info
+            return "Error connecting to AI service. Please try again later."
+
         except Exception as e:
-            logger.error(f"Unexpected error generating cover letter: {str(e)}")
-            traceback.print_exc()
+            logger.error(f"Unexpected error type: {type(e).__name__}")
+            # Remove this line completely to prevent stack traces:
+            # traceback.print_exc()
             return None
 
+
+# Add a helper function to sanitize paths
+def sanitize_path(path):
+    """Remove potentially sensitive information from paths"""
+    try:
+        return os.path.basename(path)
+    except:
+        return "unknown_path"
 
 def main_test(): # Renamed to avoid conflict if app.py also has main()
     logger.info("Starting CoverLetterGenerator test...")
@@ -152,8 +162,8 @@ def main_test(): # Renamed to avoid conflict if app.py also has main()
     except ValueError as ve: # Catch init error if API key is missing
         print(f"Test Initialization Error: {ve}")
     except Exception as e:
-        logger.error(f"Error in CoverLetterGenerator main_test: {str(e)}")
-        traceback.print_exc()
+        logger.error(f"Error in CoverLetterGenerator main_test: {type(e).__name__}")
+        #traceback.print_exc()
 
 if __name__ == "__main__":
     main_test()

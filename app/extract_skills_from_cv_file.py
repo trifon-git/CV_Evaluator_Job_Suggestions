@@ -67,19 +67,25 @@ if CUSTOM_LLM_API_URL and CUSTOM_LLM_MODEL_NAME:
     API_URL = CUSTOM_LLM_API_URL
     MODEL_TO_USE = CUSTOM_LLM_MODEL_NAME
     API_TYPE = "custom"
-    print(f"INFO (extract_skills_from_cv_file.py): Using Custom LLM API: {API_URL} with model: {MODEL_TO_USE}")
+    print(f"INFO (extract_skills_from_cv_file.py): Using Custom LLM API with model: {MODEL_TO_USE}")
 elif OLLAMA_API_URL and OLLAMA_MODEL:
     API_URL = OLLAMA_API_URL 
     MODEL_TO_USE = OLLAMA_MODEL
     API_TYPE = "ollama"
-    print(f"INFO (extract_skills_from_cv_file.py): Using Local Ollama API: {API_URL} with model: {MODEL_TO_USE}")
+    print(f"INFO (extract_skills_from_cv_file.py): Using Local Ollama API with model: {MODEL_TO_USE}")
 elif NGROK_API_URL:
     API_URL = NGROK_API_URL
     MODEL_TO_USE = OLLAMA_MODEL 
     API_TYPE = "ngrok_ollama" 
-    print(f"INFO (extract_skills_from_cv_file.py): Using NGROK API: {API_URL}" + (f" with model: {MODEL_TO_USE}" if MODEL_TO_USE else ""))
-else:
-    print("ERROR (extract_skills_from_cv_file.py): No suitable API URL is set in .env. Skill extraction will fail.")
+    print(f"INFO (extract_skills_from_cv_file.py): Using NGROK API with model: {MODEL_TO_USE}")
+
+# Add this helper function at the top of your file after imports
+def sanitize_path(path):
+    """Remove potentially sensitive information from paths"""
+    try:
+        return os.path.basename(path)
+    except:
+        return "unknown_path"
 
 def _read_cv_content_from_file(file_path):
     _, file_extension = os.path.splitext(file_path)
@@ -111,7 +117,6 @@ def _read_cv_content_from_file(file_path):
         return text.strip()
     except Exception as e:
         print(f"Error reading CV file {file_path}: {e}")
-        traceback.print_exc()
         return None
 
 def create_text_chunks_if_needed(text, max_len_single_call, chunk_size_if_needed, overlap_if_needed):
@@ -162,8 +167,7 @@ def extract_skills_from_text_chunk(text_chunk):
         response = requests.post(API_URL, json=payload, headers=headers, timeout=180) # Increased timeout slightly
         
         if response.status_code == 503:
-            print(f"Http Error 503 (Service Unavailable) from LLM API: {API_URL}")
-            print(f"LLM API Response content (first 500 chars): {response.text[:500]}")
+            print(f"Http Error 503 (Service Unavailable) from LLM API")
             return fallback_response # Critical error, LLM service is down
 
         response.raise_for_status() # Raise HTTPError for bad responses (4xx or 5xx) other than 503
@@ -242,12 +246,12 @@ def extract_skills_from_text_chunk(text_chunk):
     except requests.exceptions.RequestException as err:
         print(f"Request Exception with LLM API: {err}")
     except Exception as e:
-        print(f"An unexpected error occurred during LLM call: {e}")
+        print(f"An unexpected error occurred during LLM call: {type(e).__name__}")
         traceback.print_exc()
     return fallback_response
 
 def get_extracted_skills_from_file(cv_file_path):
-    print(f"--- Starting Skill Extraction from File: {cv_file_path} ---")
+    print(f"--- Starting Skill Extraction from File: {sanitize_path(cv_file_path)} ---")
 
     cv_content = _read_cv_content_from_file(cv_file_path)
     if not cv_content:
@@ -302,11 +306,11 @@ if __name__ == "__main__":
     default_test_cv_path = os.path.join(test_cv_dir, "cv_text_example.md") 
 
     if not os.path.exists(default_test_cv_path):
-        print(f"Test CV file not found at: {default_test_cv_path}")
+        print(f"Test CV file not found at: {sanitize_path(default_test_cv_path)}")
         if not os.path.exists(test_cv_dir): os.makedirs(test_cv_dir, exist_ok=True)
         with open(default_test_cv_path, "w", encoding="utf-8") as f:
             f.write("Test CV with skills in Python, Java, and communication.\nAlso experienced with project management.")
-        print(f"Created a dummy test file at: {default_test_cv_path}")
+        print(f"Created a dummy test file: {sanitize_path(default_test_cv_path)}")
 
     extracted_skills = get_extracted_skills_from_file(default_test_cv_path)
 

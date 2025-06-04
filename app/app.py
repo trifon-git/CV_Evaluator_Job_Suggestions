@@ -30,8 +30,8 @@ except ImportError as import_err:
     st.info("Ensure 'cv_match.py', 'extract_skills_from_cv_file.py', and 'cover_letter_generator.py' are in the app folder.")
     st.stop()
 except Exception as general_import_err:
-    st.error(f"**Initialization Error:** Unexpected error importing custom modules: {general_import_err}")
-    traceback.print_exc()
+    st.error(f"**Initialization Error:** Unexpected error importing custom modules: {type(general_import_err).__name__}")
+    print(f"Import error type: {type(general_import_err).__name__}")
     st.stop()
 
 # Page config
@@ -48,23 +48,16 @@ MAX_CV_LENGTH_CHARS = 20000
 APP_DIR = os.path.dirname(os.path.abspath(__file__))
 LOCAL_FEEDBACK_FILENAME = os.path.join(APP_DIR, "feedback_log.csv")
 
-# --- AGGRESSIVE DEBUGGING (Remove or comment out after fixing) ---
-print("--- STARTUP DEBUG ---")
-print(f"app.py __file__ (relative to execution): {__file__}")
-print(f"APP_DIR resolved to: {APP_DIR}")
-print(f"LOCAL_FEEDBACK_FILENAME resolved to: {LOCAL_FEEDBACK_FILENAME}")
-print(f"Does LOCAL_FEEDBACK_FILENAME exist? {os.path.exists(LOCAL_FEEDBACK_FILENAME)}")
-print(f"Is LOCAL_FEEDBACK_FILENAME a file? {os.path.isfile(LOCAL_FEEDBACK_FILENAME)}")
-if os.path.exists(LOCAL_FEEDBACK_FILENAME):
-    try:
-        with open(LOCAL_FEEDBACK_FILENAME, 'r', encoding='utf-8') as f_debug:
-            print(f"First 100 chars of feedback file: {f_debug.read(100)}")
-    except Exception as e_debug_read:
-        print(f"Error trying to read first few chars: {e_debug_read}")
-else:
-    print(f"NOTE: {LOCAL_FEEDBACK_FILENAME} does not exist. Will be created by initialize_local_feedback_csv.")
-print("--- END STARTUP DEBUG ---")
-# --- END AGGRESSIVE DEBUGGING ---
+# --- DEBUG CONFIGURATION ---
+DEBUG_MODE = False  # Set to False in production
+if DEBUG_MODE:
+    print("--- DEBUG MODE ENABLED ---")
+    print(f"app.py filename: {os.path.basename(__file__)}")
+    print(f"APP_DIR basename: {os.path.basename(APP_DIR)}")
+    print(f"Feedback file exists: {os.path.exists(LOCAL_FEEDBACK_FILENAME)}")
+    print(f"Feedback file is a file: {os.path.isfile(LOCAL_FEEDBACK_FILENAME)}")
+    print("--- END DEBUG INFO ---")
+# --- END DEBUG CONFIGURATION ---
 
 SIMILARITY_THRESHOLD = 10
 MAX_JOBS_TO_DISPLAY_PER_PAGE = 5
@@ -157,7 +150,10 @@ def create_pdf_from_text(text_content):
         pdf.write(5, text_content); pdf_output_bytes = pdf.output(dest='S')
         if not pdf_output_bytes: st.error("PDF generation resulted in empty output."); return None
         return pdf_output_bytes
-    except Exception as e: st.error(f"Error generating PDF: {e}"); print(f"PDF error: {traceback.format_exc()}"); return None
+    except Exception as e: 
+        st.error(f"Error generating PDF: {type(e).__name__}") 
+        print(f"PDF error type: {type(e).__name__}")
+        return None
 
 def read_cv_file(uploaded_file):
     if not uploaded_file: return None
@@ -210,7 +206,7 @@ def record_feedback_local(sid, cv_ts, jid, rt, predicted_score_val, rank_display
 
 # --- ADJUSTED load_and_process_feedback ---
 def load_and_process_feedback():
-    print(f"DEBUG: load_and_process_feedback called. Trying to load: {LOCAL_FEEDBACK_FILENAME}")
+    print(f"DEBUG: load_and_process_feedback called. File exists: {os.path.exists(LOCAL_FEEDBACK_FILENAME)}")
     # Internal names can be whatever you prefer, but map from actual CSV
     default_columns = ["ts", "sid", "cv_ts", "jid", "pred_score", "rank_disp", "rt"] 
     def_res = {"aggregates":{"per_job":{},"total_up":0,"total_down":0},"dataframe":pd.DataFrame(columns=default_columns)}
@@ -283,15 +279,14 @@ def load_and_process_feedback():
         return {"aggregates": aggs, "dataframe": df}
 
     except FileNotFoundError:
-        print(f"DEBUG: load_and_process_feedback - Explicit FileNotFoundError for {LOCAL_FEEDBACK_FILENAME}. Returning default.")
+        print(f"DEBUG: load_and_process_feedback - Explicit FileNotFoundError for {LOCAL_FEEDBACK_FILENAME}. Returning def_res.")
         return def_res
     except pd.errors.EmptyDataError:
-        print(f"DEBUG: load_and_process_feedback - Pandas EmptyDataError for {LOCAL_FEEDBACK_FILENAME} (file is empty or has only headers). Returning default.")
+        print(f"DEBUG: load_and_process_feedback - Pandas EmptyDataError for {LOCAL_FEEDBACK_FILENAME} (file is empty or has only headers). Returning def_res.")
         return def_res
     except Exception as e:
-        print(f"DEBUG: load_and_process_feedback - Other exception during pandas read or processing for {LOCAL_FEEDBACK_FILENAME}: {e}")
-        traceback.print_exc()
-        st.warning(f"Could not process feedback file: {e}")
+        print(f"ERROR: Feedback processing issue: {type(e).__name__}")
+        st.warning(f"Could not process feedback file.")
         return def_res
 # --- END ADJUSTED load_and_process_feedback ---
 
