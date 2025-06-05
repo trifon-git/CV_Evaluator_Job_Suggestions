@@ -11,7 +11,8 @@ src/remove_mongo_fields.py
 src/inspect_chroma_data.py
 src/inspect_chroma.py
 src/[UTIL]cleanup_mongo_fields.py
-
-
+Evaluation
+MODELS EVALUATIONS
+data
 *.db
 data/job_listings.db

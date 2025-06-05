@@ -115,7 +115,9 @@ def extract_job_details_with_llm(job_text):
     payload = {
         "model": CURRENT_MODEL_NAME, # Use the determined model name
         "prompt": prompt,
-        "stream": False
+        "stream": False,
+        "temperature": 0.1, # Set temperature to 0 for deterministic output
+
     }
     # For Ollama, the payload structure might be slightly different if it's a direct call not through a custom/NGROK endpoint
     # If API_MODE is "OLLAMA" and it's a direct call, it might just be:
