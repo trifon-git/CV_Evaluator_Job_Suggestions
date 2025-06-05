@@ -1,10 +1,15 @@
 # 🇩🇰 CV Job Matcher for Denmark
 
+🚀 [**Try the App**](https://huggingface.co/spaces/Krepselis/CV_Evalutaor_Job_Suggestions)  
+📊 [**View System Status Dashboard**](https://huggingface.co/spaces/Tryfonas/CV_Evaluator_Health_Check)
+
 An AI-powered application that matches CVs with relevant job postings in Denmark by analyzing skills, experience, and job requirements using advanced natural language processing.
 
 ![CV Job Matcher Pipeline](images/workflow_diagram.jpg)
 
 ## 📋 Project Overview
+...
+
 
 CV Job Matcher is a complete MLOps pipeline that helps job seekers in Denmark find relevant positions based on their qualifications. The system:
 
