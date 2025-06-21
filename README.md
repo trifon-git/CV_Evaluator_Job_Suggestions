@@ -1,7 +1,7 @@
 # 🇩🇰 CV Job Matcher for Denmark
 
 🚀 [**Try the App**](https://huggingface.co/spaces/Krepselis/CV_Evalutaor_Job_Suggestions)  
-📊 [**View System Status Dashboard**](https://huggingface.co/spaces/Tryfonas/CV_Evaluator_Health_Check) The embedding API Url is hosted locally on personal computers, so its gonna be enabled is the last 3 days before the exam
+📊 [**View System Status Dashboard**](https://huggingface.co/spaces/Tryfonas/CV_Evaluator_Health_Check) 
 
 An AI-powered application that matches CVs with relevant job postings in Denmark by analyzing skills, experience, and job requirements using advanced natural language processing.
 
